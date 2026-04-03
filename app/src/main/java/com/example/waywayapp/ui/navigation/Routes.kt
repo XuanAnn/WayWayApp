@@ -1,0 +1,15 @@
+package com.example.waywayapp.ui.navigation
+
+object Routes {
+    const val LOGIN = "login"
+
+    // user
+    const val USER_HOME = "user_home"
+    const val BOOKING = "booking"
+    const val TRACKING = "tracking"
+
+    // driver
+    const val DRIVER_HOME = "driver_home"
+    const val INCOMING = "incoming_ride"
+    const val TRIP = "trip"
+}
