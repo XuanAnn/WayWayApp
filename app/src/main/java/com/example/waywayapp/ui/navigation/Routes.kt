@@ -7,7 +7,11 @@ object Routes {
 
     // user
     const val USER_HOME = "user_home"
-    const val BOOKING = "booking"
+    const val BOOKING = "booking/{type}"
+    fun createBookingRoute(type: String): String {
+        return "booking/$type"
+    }
+
     const val TRACKING = "tracking"
 
     // driver
