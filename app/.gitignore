@@ -1,1 +1,6 @@
 /build
+# Firebase
+google-services.json
+
+# Local config
+local.properties
