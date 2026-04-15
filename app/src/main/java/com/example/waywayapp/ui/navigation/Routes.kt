@@ -2,6 +2,8 @@ package com.example.waywayapp.ui.navigation
 
 object Routes {
     const val LOGIN = "login"
+    const val OTP = "otp"
+    const val REGISTER = "register"
 
     // user
     const val USER_HOME = "user_home"
