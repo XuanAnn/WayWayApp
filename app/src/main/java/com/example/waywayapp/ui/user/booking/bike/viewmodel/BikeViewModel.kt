@@ -8,6 +8,8 @@ import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.waywayapp.data.model.Promo
+import com.example.waywayapp.data.repository.PromoRepository
 import com.example.waywayapp.ui.user.booking.bike.GeocodingResponse
 import com.example.waywayapp.ui.user.booking.bike.GeocodingService
 import com.example.waywayapp.ui.user.booking.bike.OsrmService
@@ -36,7 +38,10 @@ class BikeViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(BikeState())
     val uiState: StateFlow<BikeState> = _uiState.asStateFlow()
+    private val promoRepository = PromoRepository()
 
+    private val _availablePromos = MutableStateFlow<List<Promo>>(emptyList())
+    val availablePromos = _availablePromos.asStateFlow()
     // 1. Khai báo OkHttpClient để thêm Header User-Agent
     private val okHttpClient: okhttp3.OkHttpClient by lazy {
         okhttp3.OkHttpClient.Builder()
@@ -236,7 +241,7 @@ class BikeViewModel : ViewModel() {
     fun calculateRoute() {
         val pickup = _uiState.value.pickupLatLng ?: return
         val dropoff = _uiState.value.dropoffLatLng ?: return
-
+        val promo = _uiState.value.promo ?: null
         Log.d(TAG, "Calculating route from $pickup to $dropoff")
 
         viewModelScope.launch {
@@ -255,7 +260,7 @@ class BikeViewModel : ViewModel() {
                             polylinePoints = points,
                             distance = String.format("%.1f km", route.distance / 1000),
                             duration = String.format("%.0f phút", route.duration / 60),
-                            price = floor(route.distance / 1000) * 5000 + 12000,
+                            price = (floor(route.distance / 1000) * 5000 + 12000),
                             isLoading = false
                         )
                     }
@@ -299,5 +304,28 @@ class BikeViewModel : ViewModel() {
     fun cancelBooking() {
         Log.i(TAG, "Booking canceled")
         _uiState.update { it.copy(status = BookingStatus.IDLE) }
+    }
+    fun applyPromo(promo: Promo) {
+        val currentPrice = uiState.value.price
+        val discountAmount = promoRepository.calculateDiscount(currentPrice, promo)
+
+        _uiState.update { it.copy(
+            promoCode = promo.code,
+            discount = discountAmount,
+            finalPrice = currentPrice - discountAmount
+        )}
+    }
+    // Trong BikeViewModel
+    fun loadPromos() {
+        viewModelScope.launch {
+            try {
+                // Lấy dữ liệu từ Repository
+                val list = promoRepository.getAvailablePromos()
+                _availablePromos.value = list
+                Log.d(TAG, "Promos loaded: ${list.size}")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load promos", e)
+            }
+        }
     }
 }

@@ -15,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeState
 
 @Composable
-fun OnTripUI(state: BikeState, onComplete: () -> Unit) {
+fun OnTripUI(state: BikeState, onBack: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
@@ -36,12 +37,12 @@ fun OnTripUI(state: BikeState, onComplete: () -> Unit) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
                     text = "Tài xế đang đến",
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = Color(0xFF00B1A7),
                     fontWeight = FontWeight.Bold
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -52,7 +53,7 @@ fun OnTripUI(state: BikeState, onComplete: () -> Unit) {
                         // Driver Image Placeholder
                         Box(
                             modifier = Modifier
-                                .size(50.dp)
+                                .size(56.dp)
                                 .clip(CircleShape)
                                 .background(Color.LightGray),
                             contentAlignment = Alignment.Center
@@ -87,7 +88,7 @@ fun OnTripUI(state: BikeState, onComplete: () -> Unit) {
                         onClick = { /* Call */ },
                         modifier = Modifier
                             .weight(1f)
-                            .height(50.dp)
+                            .height(56.dp)
                             .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
                     ) {
                         Icon(Icons.Default.Call, contentDescription = null, tint = Color(0xFF00B1A7))
@@ -97,19 +98,19 @@ fun OnTripUI(state: BikeState, onComplete: () -> Unit) {
                         onClick = { /* Chat */ },
                         modifier = Modifier
                             .weight(1f)
-                            .height(50.dp)
+                            .height(56.dp)
                             .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
                     ) {
                         Icon(Icons.Default.Chat, contentDescription = null, tint = Color(0xFF00B1A7))
                     }
 
                     Button(
-                        onClick = onComplete,
-                        modifier = Modifier.weight(2f).height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B1A7)),
+                        onClick = onBack,
+                        modifier = Modifier.weight(2f).height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Hoàn thành")
+                        Text("Tôi chưa sẵn sàng đi!", textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
             }

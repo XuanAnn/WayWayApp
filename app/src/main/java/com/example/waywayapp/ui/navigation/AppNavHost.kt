@@ -19,7 +19,7 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.USER_HOME,
+        startDestination = Routes.BOOKING,
         modifier = modifier
     ) {
         composable(Routes.LOGIN) {

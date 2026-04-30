@@ -3,12 +3,16 @@ package com.example.waywayapp.ui.user.booking.bike.ui
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CardTravel
+import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -17,10 +21,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.waywayapp.R
+import com.example.waywayapp.ui.theme.GoFoodBg
+import com.example.waywayapp.ui.theme.GoFoodGreen
+import com.example.waywayapp.ui.theme.GoFoodTextDark
+import com.example.waywayapp.ui.theme.GoFoodTextGray
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeViewModel
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BookingStatus
 import com.google.android.gms.maps.model.LatLng
@@ -84,7 +95,8 @@ fun MainMapContent(
 @Composable
 fun BookingInputOverlay(
     viewModel: BikeViewModel,
-    onConfirmBooking: () -> Unit
+    onConfirmBooking: () -> Unit,
+    onSelectPromo: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
@@ -107,7 +119,13 @@ fun BookingInputOverlay(
                     onValueChange = { viewModel.onPickupAddressChange(it) },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Điểm đón") },
-                    leadingIcon = { Icon(Icons.Default.MyLocation, null, tint = Color(0xFF00B1A7)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.MyLocation,
+                            null,
+                            tint = Color(0xFF00B1A7)
+                        )
+                    },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
@@ -147,8 +165,14 @@ fun BookingInputOverlay(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                val latLng = LatLng(result.lat.toDouble(), result.lon.toDouble())
-                                                viewModel.setDropoffLocation(latLng, result.display_name)
+                                                val latLng = LatLng(
+                                                    result.lat.toDouble(),
+                                                    result.lon.toDouble()
+                                                )
+                                                viewModel.setDropoffLocation(
+                                                    latLng,
+                                                    result.display_name
+                                                )
                                                 viewModel.clearSearchResults() // Hàm xóa kết quả gợi ý
                                             }
                                             .padding(12.dp)
@@ -158,7 +182,10 @@ fun BookingInputOverlay(
                                             fontSize = 14.sp,
                                             maxLines = 2
                                         )
-                                        Divider(modifier = Modifier.padding(top = 8.dp), thickness = 0.5.dp)
+                                        Divider(
+                                            modifier = Modifier.padding(top = 8.dp),
+                                            thickness = 0.5.dp
+                                        )
                                     }
                                 }
                             }
@@ -173,7 +200,7 @@ fun BookingInputOverlay(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(10.dp)
                     .align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(16.dp),
@@ -186,23 +213,162 @@ fun BookingInputOverlay(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text("WayWay Bike", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                            Text("${uiState.distance} • ${uiState.duration}", color = Color.Gray)
+                            Text("Bike", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(
+                                0xFF0288D1
+                            )
+                            )
+                            Text("${uiState.distance} • ${uiState.duration}", color = Color(
+                                0xFF303F9F
+                            )
+                            )
                         }
                         val formatter = DecimalFormat("#,###")
-                        Text(
-                            text = "${formatter.format(uiState.price.toInt())} đ",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 24.sp,
-                            color = Color(0xFF0097A7)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = "${formatter.format(uiState.price.toInt())} đ",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 26.sp,
+                                color = Color(0xFF0288D1)
+                            )
+                            Text(
+                                text = "${formatter.format(uiState.price.toInt())} đ",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp,
+                                color = Color.LightGray,
+                                textDecoration = TextDecoration.LineThrough
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "Bạn muốn đến địa điểm : ",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF00B1A7)
+                    )
+                    Spacer(Modifier.padding(5.dp))
+                    Text(
+                        "${uiState.dropoffAddress}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF1976D2),
+                        modifier = Modifier.padding(0.dp),
+                    )
+
+// STATE
+                    var expanded by remember { mutableStateOf(false) }
+                    var selectedPayment by remember { mutableStateOf("Tiền mặt") }
+
+                    // DATA
+                    data class PaymentMethod(val name: String, val icon: Int)
+
+                    val payments = listOf(
+                        PaymentMethod("Tiền mặt", R.drawable.dollar),
+                        PaymentMethod("Momo", R.drawable.momo_icon),
+                        PaymentMethod("Thẻ ngân hàng", R.drawable.ic_credit_card)
+                    )
+
+                    val selectedIcon = payments.find { it.name == selectedPayment }?.icon ?: R.drawable.dollar
+
+// UI
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+
+                        // 🔹 PAYMENT
+                        Column(modifier = Modifier.weight(1f)) {
+
+                            Text("Thanh toán", fontSize = 14.sp, color = Color.Gray)
+
+                            Box {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp)
+                                        .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
+                                        .clickable { expanded = true }
+                                        .padding(horizontal = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(selectedIcon),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(selectedPayment, fontWeight = FontWeight.Medium)
+                                }
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    modifier = Modifier.background(Color(0xFFE0F2F1)),
+                                    shape = RoundedCornerShape(8.dp),
+
+                                ) {
+                                    payments.forEach { payment ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Image(
+                                                        painter = painterResource(payment.icon),
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(28.dp)
+                                                    )
+                                                    Spacer(Modifier.width(8.dp))
+                                                    Text(payment.name)
+                                                }
+                                            },
+                                            onClick = {
+                                                selectedPayment = payment.name
+                                                expanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // 🔹 PROMO
+                        Column(modifier = Modifier.weight(1.2f)) {
+
+                            Text("Ưu đãi", fontSize = 14.sp, color = Color.Gray)
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .background(Color(0xFFFFF3E0), RoundedCornerShape(12.dp))
+                                    .clickable {
+                                        viewModel.loadPromos()
+                                        onSelectPromo()
+                                    }
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.promo),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Spacer(Modifier.width(16.dp))
+                                Text("Chọn mã", fontWeight = FontWeight.Medium)
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = onConfirmBooking,
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B1A7)),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
+                        enabled = uiState.dropoffAddress != "Đang xác định vị trí..." && uiState.dropoffAddress != ""
                     ) {
                         Text("Xác nhận đặt xe", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
@@ -210,5 +376,6 @@ fun BookingInputOverlay(
             }
         }
     }
-}
 
+
+}
