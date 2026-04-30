@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
-import com.example.waywayapp.ui.user.booking.BookingScreen
+import com.example.waywayapp.ui.user.booking.BookingRoute
 import com.example.waywayapp.ui.user.home.HomeScreen
 
 @Composable
@@ -70,7 +70,7 @@ fun AppNavHost(
             )
         ) { backStackEntry ->
             val bookingType = backStackEntry.arguments?.getString("type") ?: "bike"
-            BookingScreen(type = bookingType)
+            BookingRoute(type = bookingType)
         }
 
     }
