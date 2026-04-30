@@ -4,6 +4,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface GeocodingService {
+
     @GET("search")
     suspend fun searchAddress(
         @Query("q") query: String,

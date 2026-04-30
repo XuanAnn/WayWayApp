@@ -3,8 +3,11 @@ package com.example.waywayapp.ui.user.booking.bike.ui
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
@@ -15,10 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeViewModel
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BookingStatus
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import java.text.DecimalFormat
 
@@ -76,23 +81,27 @@ fun MainMapContent(
         }
     }
 }
-
 @Composable
 fun BookingInputOverlay(
     viewModel: BikeViewModel,
     onConfirmBooking: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val searchResults by viewModel.searchResults.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Phần nhập địa chỉ (Phía trên)
         Card(
-            modifier = Modifier.fillMaxWidth().padding(16.dp).align(Alignment.TopCenter),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.TopCenter),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(8.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+                // Ô NHẬP ĐIỂM ĐÓN
                 OutlinedTextField(
                     value = uiState.pickupAddress,
                     onValueChange = { viewModel.onPickupAddressChange(it) },
@@ -102,38 +111,90 @@ fun BookingInputOverlay(
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = uiState.dropoffAddress,
-                    onValueChange = { viewModel.onDropoffAddressChange(it) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Điểm đến") },
-                    placeholder = { Text("Chạm bản đồ để chọn") },
-                    leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Red) },
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true
-                )
+
+                // Ô NHẬP ĐIỂM ĐẾN + AUTOCOMPLETE
+                Column {
+                    OutlinedTextField(
+                        value = uiState.dropoffAddress,
+                        onValueChange = { viewModel.onSearchQueryChange(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Điểm đến") },
+                        placeholder = { Text("Bạn muốn đi đâu?") },
+                        leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Red) },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(
+                            onSearch = { viewModel.searchLocation(uiState.dropoffAddress) }
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true
+                    )
+
+                    // DANH SÁCH GỢI Ý (Hiển thị ngay dưới ô nhập khi có kết quả)
+                    if (searchResults.isNotEmpty()) {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 250.dp), // Giới hạn chiều cao danh sách
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color.White,
+                            tonalElevation = 2.dp
+                        ) {
+                            Column {
+                                searchResults.forEach { result ->
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                val latLng = LatLng(result.lat.toDouble(), result.lon.toDouble())
+                                                viewModel.setDropoffLocation(latLng, result.display_name)
+                                                viewModel.clearSearchResults() // Hàm xóa kết quả gợi ý
+                                            }
+                                            .padding(12.dp)
+                                    ) {
+                                        Text(
+                                            text = result.display_name,
+                                            fontSize = 14.sp,
+                                            maxLines = 2
+                                        )
+                                        Divider(modifier = Modifier.padding(top = 8.dp), thickness = 0.5.dp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
         // Bảng giá và nút đặt xe (Phía dưới)
-        if (uiState.dropoffLatLng != null && !uiState.isLoading) {
+        if (uiState.dropoffLatLng != null && !uiState.isLoading && searchResults.isEmpty()) {
             Card(
-                modifier = Modifier.fillMaxWidth().padding(16.dp).align(Alignment.BottomCenter),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Column {
                             Text("WayWay Bike", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                             Text("${uiState.distance} • ${uiState.duration}", color = Color.Gray)
                         }
                         val formatter = DecimalFormat("#,###")
-                        Text("${formatter.format(uiState.price.toInt())} đ", fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, color = Color(
-                            0xFF0097A7
-                        )
+                        Text(
+                            text = "${formatter.format(uiState.price.toInt())} đ",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 24.sp,
+                            color = Color(0xFF0097A7)
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -150,3 +211,4 @@ fun BookingInputOverlay(
         }
     }
 }
+
