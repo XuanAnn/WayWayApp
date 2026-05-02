@@ -43,6 +43,7 @@ class BikeViewModel : ViewModel() {
     private val _availablePromos = MutableStateFlow<List<Promo>>(emptyList())
     val availablePromos = _availablePromos.asStateFlow()
     // 1. Khai báo OkHttpClient để thêm Header User-Agent
+
     private val okHttpClient: okhttp3.OkHttpClient by lazy {
         okhttp3.OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -241,7 +242,7 @@ class BikeViewModel : ViewModel() {
     fun calculateRoute() {
         val pickup = _uiState.value.pickupLatLng ?: return
         val dropoff = _uiState.value.dropoffLatLng ?: return
-        val promo = _uiState.value.promo ?: null
+        val promo = _uiState.value.promo ?: 1.0
         Log.d(TAG, "Calculating route from $pickup to $dropoff")
 
         viewModelScope.launch {
@@ -256,11 +257,13 @@ class BikeViewModel : ViewModel() {
                     Log.i(TAG, "Route found: ${route.distance}m, ${route.duration}s")
 
                     _uiState.update { state ->
+                        val basePrice = (floor(route.distance / 1000) * 5000 + 12000)
                         state.copy(
                             polylinePoints = points,
                             distance = String.format("%.1f km", route.distance / 1000),
                             duration = String.format("%.0f phút", route.duration / 60),
-                            price = (floor(route.distance / 1000) * 5000 + 12000),
+                            price = basePrice,
+                            finalPrice = basePrice,
                             isLoading = false
                         )
                     }
@@ -307,6 +310,12 @@ class BikeViewModel : ViewModel() {
     }
     fun applyPromo(promo: Promo) {
         val currentPrice = uiState.value.price
+        if (promo.minPrice != null && currentPrice < promo.minPrice) {
+            _uiState.update {
+                it.copy(error = "Đơn tối thiểu ${promo.minPrice}đ mới áp dụng được mã này")
+            }
+            return
+        }
         val discountAmount = promoRepository.calculateDiscount(currentPrice, promo)
 
         _uiState.update { it.copy(

@@ -22,12 +22,12 @@ data class BikeState(
     val status: BookingStatus = BookingStatus.IDLE,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val promo: Double = 0.0,
+    val promo: Double = 1.0,
     // Driver info (Mock)
     val driverName: String = "Nguyễn Văn A",
     val driverPlate: String = "29-A1 123.45",
     val driverRating: Double = 4.9,
-    val promoCode: String = "",
+    val promoCode: String = "Áp mã",
     val discount: Double = 0.0,
     val finalPrice: Double = 0.0
 )

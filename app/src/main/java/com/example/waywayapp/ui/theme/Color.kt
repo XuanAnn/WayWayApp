@@ -11,8 +11,8 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // GOFOOD Theme Colors
-val GoFoodGreen = Color(0xFF00D27B) // Bright green for buttons
-val GoFoodBg = Color(0xFFC8E6C9)    // Light green background
+val GoFoodGreen = Color(0xFF00D27B) 
+val GoFoodBg = Color(0xFFC8E6C9)
 val GoFoodSurface = Color(0xFFFFFFFF)
 val GoFoodTextDark = Color(0xFF333333)
 val GoFoodTextGray = Color(0xFF888888)
@@ -22,6 +22,14 @@ val PrimaryTeal = Color(0xFF00B1A7)
 val DeepTeal = Color(0xFF006266)
 val LightGray = Color(0xFFF5F5F5)
 val DarkGray = Color(0xFF757575)
-val SuccessGreen = Color(0xFF4CAF50)
+val SuccessGreen = Color(0xFF00B14F) // Grab green
 val MintBackground = Color(0xFFF2F9F7)
 val SocialButtonBg = Color(0xFFFFFFFF)
+
+// Driver Specific
+val DriverOfflineBlack = Color(0xFF212121)
+val DriverIconBg = Color(0xFFF0F4F2)
+val DriverIconTint = Color(0xFF004D40)
+val DriverStatusRed = Color(0xFFE53935)
+val DriverSparkleStart = Color(0xFF26C6DA)
+val DriverSparkleEnd = Color(0xFF00897B)

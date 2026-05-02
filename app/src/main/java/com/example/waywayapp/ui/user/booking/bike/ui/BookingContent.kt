@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -28,10 +30,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.R
-import com.example.waywayapp.ui.theme.GoFoodBg
-import com.example.waywayapp.ui.theme.GoFoodGreen
-import com.example.waywayapp.ui.theme.GoFoodTextDark
-import com.example.waywayapp.ui.theme.GoFoodTextGray
+
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeViewModel
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BookingStatus
 import com.google.android.gms.maps.model.LatLng
@@ -227,18 +226,19 @@ fun BookingInputOverlay(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "${formatter.format(uiState.price.toInt())} đ",
+                                text = "${formatter.format(uiState.finalPrice.toInt())} đ",
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 26.sp,
                                 color = Color(0xFF0288D1)
                             )
+                            if(uiState.promoCode != "Áp mã"){
                             Text(
                                 text = "${formatter.format(uiState.price.toInt())} đ",
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 18.sp,
                                 color = Color.LightGray,
-                                textDecoration = TextDecoration.LineThrough
-                            )
+                                textDecoration = TextDecoration.LineThrough,
+                            )}
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -349,15 +349,20 @@ fun BookingInputOverlay(
                                         onSelectPromo()
                                     }
                                     .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.promo),
                                     contentDescription = null,
                                     modifier = Modifier.size(32.dp)
                                 )
-                                Spacer(Modifier.width(16.dp))
-                                Text("Chọn mã", fontWeight = FontWeight.Medium)
+                                Spacer(Modifier.width(0.dp))
+                                Text("${uiState.promoCode}", fontWeight = FontWeight.Medium, color = Color(
+                                    0xFFFF1F1F
+                                ),
+                                    fontSize = 16.sp
+                                )
                             }
                         }
                     }

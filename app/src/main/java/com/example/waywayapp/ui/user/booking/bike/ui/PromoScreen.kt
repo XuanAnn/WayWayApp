@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ fun PromoBottomSheet(
 ) {
     // Sử dụng "by" để code gọn hơn
     val promos by viewModel.availablePromos.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -63,14 +65,19 @@ fun PromoBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(promos) { promo ->
+                val sortedPromos = promos.sortedByDescending { promo ->
+                    promo.minPrice == null || uiState.price >= promo.minPrice
+                }
+                items(sortedPromos) { promo ->
+
+                    val isValid = promo.minPrice == null || uiState.price >= promo.minPrice
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 viewModel.applyPromo(promo)
                                 onPromoSelected()
-                            },
+                            }.alpha(if (isValid) 1f else 0.5f),
                         shape = MaterialTheme.shapes.medium,
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFFF1F8E9) // Màu xanh lá nhạt cho cảm giác tiết kiệm
@@ -119,12 +126,15 @@ fun PromoBottomSheet(
                             }
 
                             // Nút giả để kích thích hành động nhấn
-                            Text(
-                                text = "Áp dụng",
-                                color = Color(0xFF00B1A7),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
+                                if (uiState.error != null){
+                                    Text(
+                                    text = if (isValid) "Áp dụng" else "Không đủ điều kiện",
+                                    color = if (isValid) Color(0xFF00B1A7) else Color.Gray,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+
+                            }
                         }
                     }
                 }

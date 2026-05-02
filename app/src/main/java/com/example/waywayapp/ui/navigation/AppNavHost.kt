@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
+import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
 import com.example.waywayapp.ui.user.home.HomeScreen
 
@@ -19,9 +20,16 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.BOOKING,
+        startDestination = Routes.DRIVER_HOME,
         modifier = modifier
     ) {
+        composable(Routes.DRIVER_HOME) {
+            DriverHomeScreen(
+                onNavigateToTrip = {
+                    navController.navigate(Routes.TRIP)
+                }
+            )
+        }
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
