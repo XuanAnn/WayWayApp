@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,21 +70,23 @@ fun DriverHomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+
+
         ) {
-            // 1. Map Layer
+
+
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(isMyLocationEnabled = uiState.currentLatLng != null),
                 uiSettings = MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false)
             )
-
             // 2. Right Side Floating Controls
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .padding(end = 16.dp, bottom = 150.dp),
+                    .padding(end = 16.dp, bottom = 150.dp)
+                ,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 MapActionFab(Icons.Default.MyLocation)
@@ -96,6 +99,7 @@ fun DriverHomeScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
+                    .padding(bottom = paddingValues.calculateBottomPadding())
             ) {
                 // Connection toggle (Pill or Circle)
                 Box(
@@ -187,9 +191,11 @@ fun DriverHomeScreen(
                         ActionMenuItem(Icons.Default.FlashOn, "Tự động nhận")
                         ActionMenuItem(Icons.Default.MoreHoriz, "Xem thêm")
                     }
-                    
+
                     // Notice and Sparkle FAB overlay
-                    Box(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -198,7 +204,7 @@ fun DriverHomeScreen(
                             Text("Thông tin tạm thời gián đoạn", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                             Text("Bạn vẫn có thể tiếp tục nhận cuốc.", color = Color.Gray, fontSize = 14.sp)
                         }
-                        
+
                         // Sparkle FAB (Bottom Right)
                         Surface(
                             modifier = Modifier
@@ -225,17 +231,19 @@ fun DriverHomeScreen(
                     }
                 }
             }
-            
+
             // Incoming ride card (as a center overlay)
             if (uiState.pickupLatLng != null && isOnline && uiState.status == DriverStatus.ONLINE) {
                 IncomingRideOverlay(
                     uiState = uiState,
-                    onAccept = { 
+                    onAccept = {
                         viewModel.acceptTrip()
                         onNavigateToTrip()
                     },
                     onReject = { viewModel.rejectTrip() },
-                    modifier = Modifier.align(Alignment.Center).padding(16.dp)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
                 )
             }
         }
@@ -324,8 +332,8 @@ fun DriverBottomNavigation(grabGreen: Color) {
 
 @Composable
 fun IncomingRideOverlay(
-    uiState: DriverState, 
-    onAccept: () -> Unit, 
+    uiState: DriverState,
+    onAccept: () -> Unit,
     onReject: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -338,21 +346,25 @@ fun IncomingRideOverlay(
         Column(modifier = Modifier.padding(24.dp)) {
             Text("CHUYẾN XE MỚI", fontWeight = FontWeight.ExtraBold, color = Color(0xFF00B14F), fontSize = 14.sp)
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(10.dp).background(Color(0xFF00B14F), CircleShape))
+                Box(modifier = Modifier
+                    .size(10.dp)
+                    .background(Color(0xFF00B14F), CircleShape))
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(uiState.pickupAddress, fontSize = 14.sp, maxLines = 1)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(10.dp).background(Color.Red, CircleShape))
+                Box(modifier = Modifier
+                    .size(10.dp)
+                    .background(Color.Red, CircleShape))
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(uiState.dropoffAddress, fontSize = 14.sp, maxLines = 1)
             }
-            
+
             Spacer(modifier = Modifier.height(20.dp))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -365,20 +377,24 @@ fun IncomingRideOverlay(
                 )
                 Text(text = uiState.passengerName, color = Color.Gray)
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(
                     onClick = onReject,
-                    modifier = Modifier.weight(1f).height(50.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Từ chối", color = Color.Gray)
                 }
                 Button(
                     onClick = onAccept,
-                    modifier = Modifier.weight(2f).height(50.dp),
+                    modifier = Modifier
+                        .weight(2f)
+                        .height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B14F)),
                     shape = RoundedCornerShape(12.dp)
                 ) {

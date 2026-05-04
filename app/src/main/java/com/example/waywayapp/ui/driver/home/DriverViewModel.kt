@@ -2,11 +2,16 @@ package com.example.waywayapp.ui.driver.home
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.waywayapp.ui.user.booking.bike.OsrmService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import kotlinx.coroutines.delay
@@ -50,14 +55,16 @@ class DriverViewModel : ViewModel() {
                 delay(5000)
             }
         }
+
     }
 
+
     fun toggleOnlineStatus() {
-        _uiState.update { 
+        _uiState.update {
             val newStatus = if (it.status == DriverStatus.OFFLINE) DriverStatus.ONLINE else DriverStatus.OFFLINE
             it.copy(status = newStatus)
         }
-        
+
         if (_uiState.value.status == DriverStatus.ONLINE) {
             viewModelScope.launch {
                 delay(3000)
@@ -67,7 +74,7 @@ class DriverViewModel : ViewModel() {
     }
 
     private fun simulateIncomingTrip() {
-        _uiState.update { 
+        _uiState.update {
             it.copy(
                 pickupAddress = "123 Đường Lê Lợi, Quận 1",
                 dropoffAddress = "Landmark 81, Bình Thạnh",
@@ -131,7 +138,7 @@ class DriverViewModel : ViewModel() {
     }
 
     fun rejectTrip() {
-        _uiState.update { 
+        _uiState.update {
             it.copy(
                 pickupLatLng = null,
                 dropoffLatLng = null,
