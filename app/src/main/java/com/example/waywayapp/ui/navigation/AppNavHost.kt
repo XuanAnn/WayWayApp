@@ -20,16 +20,10 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.DRIVER_HOME,
+        startDestination = Routes.USER_HOME,
         modifier = modifier
     ) {
-        composable(Routes.DRIVER_HOME) {
-            DriverHomeScreen(
-                onNavigateToTrip = {
-                    navController.navigate(Routes.TRIP)
-                }
-            )
-        }
+        //Login
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
