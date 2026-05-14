@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -39,11 +38,10 @@ fun RegisterScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var fullName by remember { mutableStateOf("") }
 
     LaunchedEffect(uiState.isRegisterSuccess) {
-        if (uiState.isRegisterSuccess) {
-            onRegisterSuccess()
-        }
+        if (uiState.isRegisterSuccess) onRegisterSuccess()
     }
 
     LaunchedEffect(uiState.error) {
@@ -55,12 +53,9 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background( brush = Brush.verticalGradient(
-                colors = listOf(GoFoodBg, Color.White)
-            ))
+            .background(AppBg)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header Section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,43 +63,40 @@ fun RegisterScreen(
             ) {
                 Text(
                     text = "Sign Up",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GoFoodTextDark
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextDark
                 )
+
                 Text(
                     text = "Welcome to WayWay",
                     fontSize = 14.sp,
-                    color = GoFoodTextGray
+                    color = TextGray
                 )
             }
 
-            // Top Illustration Placeholder
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(130.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                // PLACEHOLDER FOR TOP ILLUSTRATION (Food/Drink)
-                // Image(painter = painterResource(id = R.drawable.your_signup_img), contentDescription = null)
                 Box(
                     modifier = Modifier
                         .size(120.dp)
                         .padding(end = 16.dp)
-                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                        .background(Color.White.copy(alpha = 0.25f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("🍕🍟", fontSize = 50.sp)
                 }
             }
 
-            // Main Form Container
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    .background(GoFoodSurface)
+                    .background(CardWhite)
             ) {
                 Column(
                     modifier = Modifier
@@ -114,74 +106,93 @@ fun RegisterScreen(
                 ) {
                     Text(
                         text = "Create an account",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = GoFoodTextDark,
+                        fontSize = 21.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = TextDark,
                         modifier = Modifier.align(Alignment.Start)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Email Field
                     TextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter your email", color = GoFoodTextGray) },
-                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = GoFoodTextGray) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            unfocusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+                        placeholder = {
+                            Text("Enter your email", color = TextGray)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Email,
+                                contentDescription = null,
+                                tint = TextGray
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = appTextFieldColors(),
+                        shape = RoundedCornerShape(16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Full Name Field (Using Email state for placeholder as RegisterState was simple)
                     TextField(
-                        value = "", // Placeholder for Full Name
-                        onValueChange = { /* viewModel.onNameChange */ },
+                        value = fullName,
+                        onValueChange = { fullName = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter your full name", color = GoFoodTextGray) },
-                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = GoFoodTextGray) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            unfocusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        placeholder = {
+                            Text("Enter your full name", color = TextGray)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                                tint = TextGray
+                            )
+                        },
+                        colors = appTextFieldColors(),
+                        shape = RoundedCornerShape(16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Password Field
                     TextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter password", color = GoFoodTextGray) },
-                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = GoFoodTextGray) },
+                        placeholder = {
+                            Text("Enter password", color = TextGray)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = TextGray
+                            )
+                        },
                         trailingIcon = {
-                            IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            IconButton(
+                                onClick = {
+                                    isPasswordVisible = !isPasswordVisible
+                                }
+                            ) {
                                 Icon(
-                                    imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    imageVector = if (isPasswordVisible)
+                                        Icons.Default.Visibility
+                                    else
+                                        Icons.Default.VisibilityOff,
                                     contentDescription = null,
-                                    tint = GoFoodTextGray
+                                    tint = TextGray
                                 )
                             }
                         },
-                        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            unfocusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        visualTransformation = if (isPasswordVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
+                        colors = appTextFieldColors(),
+                        shape = RoundedCornerShape(16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -190,73 +201,120 @@ fun RegisterScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(checked = false, onCheckedChange = {})
-                        Text(text = "Reminder me next time", fontSize = 12.sp, color = GoFoodTextGray)
+                        Checkbox(
+                            checked = false,
+                            onCheckedChange = {},
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Lime,
+                                uncheckedColor = TextGray,
+                                checkmarkColor = TextDark
+                            )
+                        )
+
+                        Text(
+                            text = "Remember me next time",
+                            fontSize = 12.sp,
+                            color = TextGray
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Sign Up Button
                     Button(
                         onClick = viewModel::register,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = GoFoodGreen),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = TextDark,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(18.dp)
                     ) {
-                        Text(text = "Sign up", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(
+                            text = "Sign up",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Text(text = "Or sign up with", color = GoFoodTextGray, fontSize = 12.sp)
+                    Text(
+                        text = "Or sign up with",
+                        color = TextGray,
+                        fontSize = 12.sp
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        // PLACEHOLDER FOR SOCIAL ICONS (Facebook, LinkedIn, Google)
-                        SocialIconPlaceholder("f")
-                        SocialIconPlaceholder("in")
-                        SocialIconPlaceholder("G")
-                    }
-                    Row {
-                        Text(text = "Have an account? ", color = GoFoodTextGray, fontSize = 14.sp)
-                        Text(
-                            text = "SIGN IN",
-                            color = GoFoodGreen,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                            modifier = Modifier.clickable { onBackClick() }
-                        )
+                        RegisterSocialIconPlaceholder("f")
+                        RegisterSocialIconPlaceholder("in")
+                        RegisterSocialIconPlaceholder("G")
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    Row {
+                        Text(
+                            text = "Have an account? ",
+                            color = TextGray,
+                            fontSize = 14.sp
+                        )
 
+                        Text(
+                            text = "SIGN IN",
+                            color = TextDark,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.clickable { onBackClick() }
+                        )
+                    }
                 }
             }
         }
 
         if (uiState.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = GoFoodGreen)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Lime)
             }
         }
     }
 }
 
 @Composable
-fun SocialIconPlaceholder(text: String) {
+private fun appTextFieldColors(): TextFieldColors {
+    return TextFieldDefaults.colors(
+        focusedContainerColor = SoftWhite,
+        unfocusedContainerColor = SoftWhite,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+        focusedTextColor = TextDark,
+        unfocusedTextColor = TextDark,
+        cursorColor = TextDark
+    )
+}
+
+@Composable
+fun RegisterSocialIconPlaceholder(text: String) {
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(LightGray.copy(alpha = 0.3f))
+            .background(SoftWhite)
             .clickable { },
         contentAlignment = Alignment.Center
     ) {
-        // You can replace Text with Image(painter = painterResource(id = R.drawable.social_icon), ...)
-        Text(text = text, fontWeight = FontWeight.Bold, color = Color(0xFF3E7BFF))
+        Text(
+            text = text,
+            fontWeight = FontWeight.ExtraBold,
+            color = TextDark
+        )
     }
 }

@@ -12,6 +12,8 @@ import com.example.waywayapp.ui.auth.register.RegisterScreen
 import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
 import com.example.waywayapp.ui.user.home.HomeScreen
+import com.example.waywayapp.ui.user.notification.NotificationScreen
+import com.example.waywayapp.ui.user.payment.AddPaymentScreen
 
 @Composable
 fun AppNavHost(
@@ -60,6 +62,17 @@ fun AppNavHost(
                         "Giao hàng" -> navController.navigate(Routes.createBookingRoute("express"))
                     }
                      },
+                onWalletClick = {
+                    navController.navigate("add_payment")
+
+                },
+                onBottomNavClick = {
+                    route ->
+                    navController.navigate(route){
+                        launchSingleTop = true
+                    }
+                }
+
             )
         }
         composable(Routes.BOOKING,
@@ -70,10 +83,47 @@ fun AppNavHost(
                 }
 
             )
+
         ) { backStackEntry ->
             val bookingType = backStackEntry.arguments?.getString("type") ?: "bike"
             BookingRoute(type = bookingType)
         }
+        composable("home") {
+            HomeScreen(
+                onServiceClick = { serviceId ->
+                    when (serviceId) {
+                        "bike" -> navController.navigate("bike_booking")
+                        "food" -> navController.navigate("food")
+                        "delivery" -> navController.navigate("delivery")
+                    }
+                },
+                onWalletClick = {
+                    navController.navigate("add_payment")
+                },
+                onBottomNavClick = {
+                    route ->
+                    navController.navigate(route){
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable("notification") {
+            NotificationScreen()
+        }
 
+        composable("add_payment") {
+            AddPaymentScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onMomoClick = {
+                    navController.navigate("momo_payment")
+                },
+                onBankClick = {
+                    navController.navigate("bank_payment")
+                }
+            )
+        }
     }
 }

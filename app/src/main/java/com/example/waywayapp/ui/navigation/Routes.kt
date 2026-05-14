@@ -18,4 +18,9 @@ object Routes {
     const val DRIVER_HOME = "driver_home"
     const val INCOMING = "incoming_ride"
     const val TRIP = "trip"
+
+    //Bottom Nav
+    const val NOTIFICATION = "notification"
+    const val RECENTLY_SERVICE = "recent_service"
+    const val PROFILE = "profile"
 }

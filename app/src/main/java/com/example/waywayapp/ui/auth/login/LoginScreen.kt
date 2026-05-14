@@ -18,9 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,15 +37,12 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onSignUpClick: () -> Unit = {}
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var isPasswordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isLoginSuccess) {
-        if (uiState.isLoginSuccess) {
-            onLoginSuccess()
-        }
+        if (uiState.isLoginSuccess) onLoginSuccess()
     }
 
     LaunchedEffect(uiState.error) {
@@ -59,13 +54,9 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background( brush = Brush.verticalGradient(
-                colors = listOf(GoFoodBg, Color.White)
-            ))
+            .background(AppBg)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header Section
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -73,43 +64,43 @@ fun LoginScreen(
             ) {
                 Text(
                     text = "Sign In",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GoFoodTextDark
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextDark
                 )
+
                 Text(
                     text = "Good to see you back.",
                     fontSize = 14.sp,
-                    color = GoFoodTextGray
+                    color = TextGray
                 )
             }
 
-            // Top Illustration (Food/Drink)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(170.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.your_food_img),
+                    contentDescription = null,
+                    modifier = Modifier.size(170.dp)
+                )
 
-                 Image(painter = painterResource(id = R.drawable.your_food_img), contentDescription = null)
                 Box(
                     modifier = Modifier
                         .size(150.dp)
                         .padding(end = 16.dp)
-                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("", fontSize = 60.sp) // Emoji as temporary placeholder
-                }
+                        .background(Color.White.copy(alpha = 0.25f), CircleShape)
+                )
             }
 
-            // Main Form Container
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    .background(GoFoodSurface)
+                    .background(CardWhite)
             ) {
                 Column(
                     modifier = Modifier
@@ -119,65 +110,100 @@ fun LoginScreen(
                 ) {
                     Text(
                         text = "Let's get something",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = GoFoodTextDark,
+                        fontSize = 21.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = TextDark,
                         modifier = Modifier.align(Alignment.Start)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Email Field
                     TextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter your email", color = GoFoodTextGray) },
-                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = GoFoodTextGray) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            unfocusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+                        placeholder = {
+                            Text("Enter your email", color = TextGray)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Email,
+                                contentDescription = null,
+                                tint = TextGray
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = SoftWhite,
+                            unfocusedContainerColor = SoftWhite,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedTextColor = TextDark,
+                            unfocusedTextColor = TextDark,
+                            cursorColor = TextDark
+                        ),
+                        shape = RoundedCornerShape(16.dp)
                     )
 
                     if (uiState.error != null) {
                         Text(
                             text = "You entered it wrong.",
-                            color = GoFoodError,
+                            color = ErrorRed,
                             fontSize = 12.sp,
-                            modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, top = 4.dp)
+                            modifier = Modifier
+                                .align(Alignment.Start)
+                                .padding(start = 8.dp, top = 4.dp)
                         )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Password Field
                     TextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter password", color = GoFoodTextGray) },
-                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = GoFoodTextGray) },
+                        placeholder = {
+                            Text("Enter password", color = TextGray)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = TextGray
+                            )
+                        },
                         trailingIcon = {
-                            IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            IconButton(
+                                onClick = {
+                                    isPasswordVisible = !isPasswordVisible
+                                }
+                            ) {
                                 Icon(
-                                    imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    imageVector = if (isPasswordVisible)
+                                        Icons.Default.Visibility
+                                    else
+                                        Icons.Default.VisibilityOff,
                                     contentDescription = null,
-                                    tint = GoFoodTextGray
+                                    tint = TextGray
                                 )
                             }
                         },
-                        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        visualTransformation = if (isPasswordVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = LightGray.copy(alpha = 0.5f),
-                            unfocusedContainerColor = LightGray.copy(alpha = 0.5f),
+                            focusedContainerColor = SoftWhite,
+                            unfocusedContainerColor = SoftWhite,
                             focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedTextColor = TextDark,
+                            unfocusedTextColor = TextDark,
+                            cursorColor = TextDark
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -188,51 +214,81 @@ fun LoginScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(checked = false, onCheckedChange = {})
-                            Text(text = "Reminder me next time", fontSize = 12.sp, color = GoFoodTextGray)
+                            Checkbox(
+                                checked = false,
+                                onCheckedChange = {},
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = Lime,
+                                    uncheckedColor = TextGray,
+                                    checkmarkColor = TextDark
+                                )
+                            )
+
+                            Text(
+                                text = "Remember me",
+                                fontSize = 12.sp,
+                                color = TextGray
+                            )
                         }
+
                         Text(
                             text = "Forgot password?",
                             fontSize = 12.sp,
-                            color = MofinowBlue,
+                            color = TextDark,
+                            fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable { }
                         )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Sign In Button
                     Button(
                         onClick = viewModel::login,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = GoFoodGreen),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = TextDark,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(18.dp)
                     ) {
-                        Text(text = "Sign in", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(
+                            text = "Sign in",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Text(text = "Or sign in with", color = GoFoodTextGray, fontSize = 12.sp)
+                    Text(
+                        text = "Or sign in with",
+                        color = TextGray,
+                        fontSize = 12.sp
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        SocialIconPlaceholder("f")
-                        SocialIconPlaceholder("in")
-                        SocialIconPlaceholder("G")
+                        LoginSocialIconPlaceholder("f")
+                        LoginSocialIconPlaceholder("in")
+                        LoginSocialIconPlaceholder("G")
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
 
                     Row {
-                        Text(text = "Don't have an account? ", color = GoFoodTextGray, fontSize = 14.sp)
+                        Text(
+                            text = "Don't have an account? ",
+                            color = TextGray,
+                            fontSize = 14.sp
+                        )
+
                         Text(
                             text = "SIGN UP",
-                            color = GoFoodGreen,
-                            fontWeight = FontWeight.Bold,
+                            color = TextDark,
+                            fontWeight = FontWeight.ExtraBold,
                             fontSize = 14.sp,
                             modifier = Modifier.clickable { onSignUpClick() }
                         )
@@ -242,24 +298,32 @@ fun LoginScreen(
         }
 
         if (uiState.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = GoFoodGreen)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Lime)
             }
         }
     }
 }
 
 @Composable
-fun SocialIconPlaceholder(text: String) {
+fun LoginSocialIconPlaceholder(text: String) {
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(LightGray.copy(alpha = 0.3f))
+            .background(SoftWhite)
             .clickable { },
         contentAlignment = Alignment.Center
     ) {
-        // PLACEHOLDER FOR SOCIAL ICONS
-        Text(text = text, fontWeight = FontWeight.Bold, color = MofinowBlue)
+        Text(
+            text = text,
+            fontWeight = FontWeight.ExtraBold,
+            color = TextDark
+        )
     }
 }
