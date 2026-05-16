@@ -1,13 +1,26 @@
-package com.example.waywayapp.ui.user.booking.bike.ui
+package com.example.waywayapp.ui.user.booking.bike.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items // Cần thiết để sử dụng items trong LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ConfirmationNumber // Icon phù hợp hơn cho mã giảm giá
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,14 +31,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeViewModel
+import com.example.waywayapp.ui.user.booking.bike.BikeViewModel
 
 @Composable
 fun PromoBottomSheet(
     viewModel: BikeViewModel,
     onPromoSelected: () -> Unit
 ) {
-    // Sử dụng "by" để code gọn hơn
     val promos by viewModel.availablePromos.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -34,7 +46,6 @@ fun PromoBottomSheet(
             .fillMaxWidth()
             .padding(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 8.dp)
     ) {
-        // Thanh gạch nhỏ phía trên ModalBottomSheet (Handle)
         Box(
             modifier = Modifier
                 .width(40.dp)
@@ -126,8 +137,8 @@ fun PromoBottomSheet(
                             }
 
                             // Nút giả để kích thích hành động nhấn
-                                if (uiState.error != null){
-                                    Text(
+                            if (uiState.error != null){
+                                Text(
                                     text = if (isValid) "Áp dụng" else "Không đủ điều kiện",
                                     color = if (isValid) Color(0xFF00B1A7) else Color.Gray,
                                     fontWeight = FontWeight.Bold,

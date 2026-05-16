@@ -1,32 +1,24 @@
 package com.example.waywayapp.ui.user.booking.food
 
-data class CartItem(
-    val id: String,
-    val foodName: String,
-    val price: Double,
-    val quantity: Int,
-) {
-    val itemTotalPrice: Double
-        get() = price * quantity
-}
+import com.example.waywayapp.ui.user.booking.food.model.CartItemUiModel
+import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
+import com.example.waywayapp.ui.user.booking.food.model.FoodStatus
+
 data class FoodState(
-    val dropoffLocation: String = "",
-
-    val restaurantId: String = "",
-    val restaurantName: String = "",
-    val restaurantAddress: String = "",
-
-    val distanceInKm: Double = 0.0,
-
-    val cartItems: List<CartItem> = emptyList(),
-
-    val isFindingDriver: Boolean = false,
-
-    ) {
-    val deliveryFee: Double
-        get() = 16000 + Math.floor(distanceInKm) * 4000
-    val foodPrice: Double
-        get() = cartItems.sumOf { it.price * it.quantity }
+    val status: FoodStatus = FoodStatus.BROWSING,
+    val searchQuery: String = "",
+    val foods: List<FoodItemUiModel> = emptyList(),
+    val cartItems: List<CartItemUiModel> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
+) {
     val totalPrice: Double
-        get() = foodPrice + deliveryFee
+        get() = cartItems.sumOf { item ->
+            item.food.price * item.quantity.toDouble()
+        }
+
+    val totalQuantity: Int
+        get() = cartItems.sumOf { item ->
+            item.quantity
+        }
 }

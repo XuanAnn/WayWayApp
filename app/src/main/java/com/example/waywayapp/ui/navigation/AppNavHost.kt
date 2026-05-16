@@ -1,11 +1,13 @@
 package com.example.waywayapp.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
@@ -15,6 +17,7 @@ import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
 import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
+import com.example.waywayapp.ui.user.profile.ProfileScreen
 
 @Composable
 fun AppNavHost(
@@ -53,8 +56,11 @@ fun AppNavHost(
 
         // Placeholder for Home
         composable(Routes.USER_HOME) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
             // Your Home Screen
             HomeScreen(
+                currentRoute = currentRoute,
                 onServiceClick = {
                     serviceName ->
                     when (serviceName) {
@@ -72,7 +78,7 @@ fun AppNavHost(
                     navController.navigate(route){
                         launchSingleTop = true
                     }
-                }
+                },
 
             )
         }
@@ -93,11 +99,11 @@ fun AppNavHost(
                 })
         }
 
-        composable("notification") {
+        composable(Routes.NOTIFICATION) {
             NotificationScreen()
         }
-        composable("profile") {
-            NotificationScreen()
+        composable(Routes.PROFILE) {
+            ProfileScreen()
         }
 
 

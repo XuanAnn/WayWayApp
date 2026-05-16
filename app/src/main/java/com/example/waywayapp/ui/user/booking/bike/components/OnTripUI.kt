@@ -1,14 +1,30 @@
-package com.example.waywayapp.ui.user.booking.bike.ui
+package com.example.waywayapp.ui.user.booking.bike.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeState
+import com.example.waywayapp.ui.user.booking.bike.BikeState
 
 @Composable
 fun OnTripUI(state: BikeState, onBack: () -> Unit) {
@@ -41,7 +57,7 @@ fun OnTripUI(state: BikeState, onBack: () -> Unit) {
                     color = Color(0xFF00B1A7),
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
@@ -60,9 +76,9 @@ fun OnTripUI(state: BikeState, onBack: () -> Unit) {
                         ) {
                             Text("👤")
                         }
-                        
+
                         Spacer(modifier = Modifier.width(12.dp))
-                        
+
                         Column {
                             Text(text = state.driverName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -71,7 +87,7 @@ fun OnTripUI(state: BikeState, onBack: () -> Unit) {
                             }
                         }
                     }
-                    
+
                     Column(horizontalAlignment = Alignment.End) {
                         Text(text = state.driverPlate, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                         Text(text = "Honda Vision", fontSize = 12.sp, color = Color.Gray)
@@ -79,7 +95,7 @@ fun OnTripUI(state: BikeState, onBack: () -> Unit) {
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -93,7 +109,7 @@ fun OnTripUI(state: BikeState, onBack: () -> Unit) {
                     ) {
                         Icon(Icons.Default.Call, contentDescription = null, tint = Color(0xFF00B1A7))
                     }
-                    
+
                     IconButton(
                         onClick = { /* Chat */ },
                         modifier = Modifier

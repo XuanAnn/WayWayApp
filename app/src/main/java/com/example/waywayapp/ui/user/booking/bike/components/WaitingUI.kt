@@ -1,16 +1,30 @@
-package com.example.waywayapp.ui.user.booking.bike.ui
+package com.example.waywayapp.ui.user.booking.bike.components
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -69,14 +83,14 @@ fun WaitingUI(onCancel: () -> Unit) {
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text(
                     text = "Đang tìm tài xế cho bạn",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-                
+
                 Text(
                     text = "Vui lòng đợi trong giây lát...",
                     fontSize = 14.sp,
@@ -90,7 +104,7 @@ fun WaitingUI(onCancel: () -> Unit) {
                     onClick = onCancel,
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red)
+                    border = BorderStroke(1.dp, Color.Red)
                 ) {
                     Text(text = "Hủy tìm xe", color = Color.Red, fontWeight = FontWeight.Medium)
                 }

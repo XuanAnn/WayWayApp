@@ -1,4 +1,4 @@
-package com.example.waywayapp.ui.user.booking.bike.viewmodel
+package com.example.waywayapp.ui.user.booking.bike
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,9 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.waywayapp.data.model.Promo
 import com.example.waywayapp.data.repository.PromoRepository
-import com.example.waywayapp.ui.user.booking.bike.GeocodingResponse
-import com.example.waywayapp.ui.user.booking.bike.GeocodingService
-import com.example.waywayapp.ui.user.booking.bike.OsrmService
+import com.example.waywayapp.ui.user.booking.bike.model.BookingStatus
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -27,6 +25,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
@@ -44,8 +43,8 @@ class BikeViewModel : ViewModel() {
     val availablePromos = _availablePromos.asStateFlow()
     // 1. Khai báo OkHttpClient để thêm Header User-Agent
 
-    private val okHttpClient: okhttp3.OkHttpClient by lazy {
-        okhttp3.OkHttpClient.Builder()
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .header("User-Agent", "WayWayApp/1.0 (contact: xuanan25032006@gmail.com)") // Thay bằng email của bạn

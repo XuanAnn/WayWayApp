@@ -1,13 +1,8 @@
-package com.example.waywayapp.ui.user.booking.bike.viewmodel
+package com.example.waywayapp.ui.user.booking.bike
 
+import com.example.waywayapp.ui.user.booking.bike.model.BookingStatus
 import com.google.android.gms.maps.model.LatLng
 
-enum class BookingStatus {
-    IDLE,        // Màn hình chọn điểm đến
-    FINDING,     // Đang tìm tài xế
-    ON_TRIP,     // Đang trong chuyến đi
-    COMPLETED    // Chuyến đi hoàn thành
-}
 
 data class BikeState(
     val currentLatLng: LatLng? = null,
