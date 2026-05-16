@@ -30,7 +30,18 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.R
-
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.TwoWheeler
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.waywayapp.ui.theme.BgLight
+import com.example.waywayapp.ui.theme.CardWhite
+import com.example.waywayapp.ui.theme.DarkCard
+import com.example.waywayapp.ui.theme.Lime
+import com.example.waywayapp.ui.theme.TextDark
+import com.example.waywayapp.ui.theme.TextGray
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BikeViewModel
 import com.example.waywayapp.ui.user.booking.bike.viewmodel.BookingStatus
 import com.google.android.gms.maps.model.LatLng
@@ -100,287 +111,430 @@ fun BookingInputOverlay(
     val uiState by viewModel.uiState.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
 
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // Phần nhập địa chỉ (Phía trên)
+
+        // TOP SEARCH CARD
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 14.dp)
                 .align(Alignment.TopCenter),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(containerColor = CardWhite.copy(alpha = 0.96f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                // Ô NHẬP ĐIỂM ĐÓN
-                OutlinedTextField(
-                    value = uiState.pickupAddress,
-                    onValueChange = { viewModel.onPickupAddressChange(it) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Điểm đón") },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.MyLocation,
-                            null,
-                            tint = Color(0xFF00B1A7)
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(BgLight),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(painterResource(R.drawable.bike_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(50.dp)
                         )
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true
-                )
+                    }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
-                // Ô NHẬP ĐIỂM ĐẾN + AUTOCOMPLETE
-                Column {
-                    OutlinedTextField(
-                        value = uiState.dropoffAddress,
-                        onValueChange = { viewModel.onSearchQueryChange(it) },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Điểm đến") },
-                        placeholder = { Text("Bạn muốn đi đâu?") },
-                        leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Red) },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(
-                            onSearch = { viewModel.searchLocation(uiState.dropoffAddress) }
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
-                    )
+                    Column {
+                        Text(
+                            text = "Đặt xe máy",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TextDark
+                        )
 
-                    // DANH SÁCH GỢI Ý (Hiển thị ngay dưới ô nhập khi có kết quả)
-                    if (searchResults.isNotEmpty()) {
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = 250.dp), // Giới hạn chiều cao danh sách
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.White,
-                            tonalElevation = 2.dp
-                        ) {
-                            Column {
-                                searchResults.forEach { result ->
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable {
-                                                val latLng = LatLng(
-                                                    result.lat.toDouble(),
-                                                    result.lon.toDouble()
-                                                )
-                                                viewModel.setDropoffLocation(
-                                                    latLng,
-                                                    result.display_name
-                                                )
-                                                viewModel.clearSearchResults() // Hàm xóa kết quả gợi ý
-                                            }
-                                            .padding(12.dp)
-                                    ) {
-                                        Text(
-                                            text = result.display_name,
-                                            fontSize = 14.sp,
-                                            maxLines = 2
-                                        )
-                                        Divider(
-                                            modifier = Modifier.padding(top = 8.dp),
-                                            thickness = 0.5.dp
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                        Text(
+                            text = "Chọn điểm đón và điểm đến",
+                            fontSize = 12.sp,
+                            color = TextGray
+                        )
                     }
                 }
-            }
-        }
 
-        // Bảng giá và nút đặt xe (Phía dưới)
-        if (uiState.dropoffLatLng != null && !uiState.isLoading && searchResults.isEmpty()) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .align(Alignment.BottomCenter),
-                shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LocationInputField(
+                    value = uiState.pickupAddress,
+                    onValueChange = { viewModel.onPickupAddressChange(it) },
+                    label = "Điểm đón",
+                    placeholder = "Vị trí hiện tại",
+                    iconColor = Lime,
+                    icon = Icons.Default.MyLocation
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                LocationInputField(
+                    value = uiState.dropoffAddress,
+                    onValueChange = { viewModel.onSearchQueryChange(it) },
+                    label = "Điểm đến",
+                    placeholder = "Bạn muốn đi đâu?",
+                    iconColor = Color(0xFFFF5252),
+                    icon = Icons.Default.Place
+                )
+
+                if (searchResults.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Card(
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = BgLight),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
-                        Column {
-                            Text("Bike", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(
-                                0xFF0288D1
-                            )
-                            )
-                            Text("${uiState.distance} • ${uiState.duration}", color = Color(
-                                0xFF303F9F
-                            )
-                            )
-                        }
-                        val formatter = DecimalFormat("#,###")
                         Column(
-                            horizontalAlignment = Alignment.End
+                            modifier = Modifier.heightIn(max = 230.dp)
                         ) {
-                            Text(
-                                text = "${formatter.format(uiState.finalPrice.toInt())} đ",
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 26.sp,
-                                color = Color(0xFF0288D1)
-                            )
-                            if(uiState.promoCode != "Áp mã"){
-                            Text(
-                                text = "${formatter.format(uiState.price.toInt())} đ",
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 18.sp,
-                                color = Color.LightGray,
-                                textDecoration = TextDecoration.LineThrough,
-                            )}
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Bạn muốn đến địa điểm : ",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF00B1A7)
-                    )
-                    Spacer(Modifier.padding(5.dp))
-                    Text(
-                        "${uiState.dropoffAddress}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF1976D2),
-                        modifier = Modifier.padding(0.dp),
-                    )
-
-// STATE
-                    var expanded by remember { mutableStateOf(false) }
-                    var selectedPayment by remember { mutableStateOf("Tiền mặt") }
-
-                    // DATA
-                    data class PaymentMethod(val name: String, val icon: Int)
-
-                    val payments = listOf(
-                        PaymentMethod("Tiền mặt", R.drawable.dollar),
-                        PaymentMethod("Momo", R.drawable.momo_icon),
-                        PaymentMethod("Thẻ ngân hàng", R.drawable.ic_credit_card)
-                    )
-
-                    val selectedIcon = payments.find { it.name == selectedPayment }?.icon ?: R.drawable.dollar
-
-// UI
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-
-                        // 🔹 PAYMENT
-                        Column(modifier = Modifier.weight(1f)) {
-
-                            Text("Thanh toán", fontSize = 14.sp, color = Color.Gray)
-
-                            Box {
+                            searchResults.forEach { result ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(56.dp)
-                                        .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
-                                        .clickable { expanded = true }
-                                        .padding(horizontal = 12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .clickable {
+                                            val latLng = LatLng(
+                                                result.lat.toDouble(),
+                                                result.lon.toDouble()
+                                            )
+
+                                            viewModel.setDropoffLocation(
+                                                latLng,
+                                                result.display_name
+                                            )
+
+                                            viewModel.clearSearchResults()
+                                        }
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.Top
                                 ) {
-                                    Image(
-                                        painter = painterResource(selectedIcon),
+                                    Icon(
+                                        imageVector = Icons.Default.Place,
                                         contentDescription = null,
-                                        modifier = Modifier.size(32.dp)
+                                        tint = Lime,
+                                        modifier = Modifier.size(20.dp)
                                     )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(selectedPayment, fontWeight = FontWeight.Medium)
-                                }
 
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    modifier = Modifier.background(Color(0xFFE0F2F1)),
-                                    shape = RoundedCornerShape(8.dp),
+                                    Spacer(modifier = Modifier.width(8.dp))
 
-                                ) {
-                                    payments.forEach { payment ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                                    Image(
-                                                        painter = painterResource(payment.icon),
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(28.dp)
-                                                    )
-                                                    Spacer(Modifier.width(8.dp))
-                                                    Text(payment.name)
-                                                }
-                                            },
-                                            onClick = {
-                                                selectedPayment = payment.name
-                                                expanded = false
-                                            }
-                                        )
-                                    }
+                                    Text(
+                                        text = result.display_name,
+                                        fontSize = 13.sp,
+                                        color = TextDark,
+                                        maxLines = 2,
+                                        lineHeight = 17.sp
+                                    )
                                 }
                             }
                         }
-
-                        // 🔹 PROMO
-                        Column(modifier = Modifier.weight(1.2f)) {
-
-                            Text("Ưu đãi", fontSize = 14.sp, color = Color.Gray)
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp)
-                                    .background(Color(0xFFFFF3E0), RoundedCornerShape(12.dp))
-                                    .clickable {
-                                        viewModel.loadPromos()
-                                        onSelectPromo()
-                                    }
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.promo),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Spacer(Modifier.width(0.dp))
-                                Text("${uiState.promoCode}", fontWeight = FontWeight.Medium, color = Color(
-                                    0xFFFF1F1F
-                                ),
-                                    fontSize = 16.sp
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = onConfirmBooking,
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B1A7)),
-                        shape = RoundedCornerShape(16.dp),
-                        enabled = uiState.dropoffAddress != "Đang xác định vị trí..." && uiState.dropoffAddress != ""
-                    ) {
-                        Text("Xác nhận đặt xe", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
+
+        // BOTTOM BOOKING CARD
+        if (uiState.dropoffLatLng != null && !uiState.isLoading && searchResults.isEmpty()) {
+            BookingConfirmCard(
+                viewModel = viewModel,
+                onConfirmBooking = onConfirmBooking,
+                onSelectPromo = onSelectPromo,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
     }
+}
+@Composable
+fun LocationInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    iconColor: Color,
+    icon: ImageVector
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = {
+            Text(
+                text = label,
+                fontSize = 12.sp
+            )
+        },
+        placeholder = {
+            Text(
+                text = placeholder,
+                fontSize = 13.sp
+            )
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor
+            )
+        },
+        shape = RoundedCornerShape(18.dp),
+        singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF4CD08D),
+            unfocusedBorderColor = Color(0xFFE1E3DC),
+            focusedLabelColor = Color(0xFF4CD08D),
+            cursorColor = Color(0xFF4CD08D)
+        ), keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { /* Handle done action if needed */ }
+        )
 
+    )
+}
 
+@Composable
+fun BookingConfirmCard(
+    viewModel: BikeViewModel,
+    onConfirmBooking: () -> Unit,
+    onSelectPromo: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val formatter = DecimalFormat("#,###")
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedPayment by remember { mutableStateOf("Tiền mặt") }
+
+    data class PaymentMethod(val name: String, val icon: Int)
+
+    val payments = listOf(
+        PaymentMethod("Tiền mặt", R.drawable.dollar),
+        PaymentMethod("Momo", R.drawable.momo_icon),
+        PaymentMethod("Thẻ ngân hàng", R.drawable.ic_credit_card)
+    )
+
+    val selectedIcon =
+        payments.find { it.name == selectedPayment }?.icon ?: R.drawable.dollar
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 26.dp, bottomEnd = 26.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 18.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(52.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Color(0xFFF5F7F2)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.bike_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "Bike",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF20242A)
+                    )
+
+                    Text(
+                        text = "${uiState.distance} • ${uiState.duration}",
+                        fontSize = 12.sp,
+                        color = Color(0xFF8B918A)
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = "${formatter.format(uiState.finalPrice.toInt())}đ",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF20242A)
+                    )
+
+                    if (uiState.promoCode != "Áp mã") {
+                        Text(
+                            text = "${formatter.format(uiState.price.toInt())}đ",
+                            fontSize = 13.sp,
+                            color = Color.Gray,
+                            textDecoration = TextDecoration.LineThrough
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Điểm đến",
+                fontSize = 12.sp,
+                color = Color(0xFF8B918A),
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = uiState.dropoffAddress,
+                fontSize = 14.sp,
+                color = Color(0xFF20242A),
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 18.sp,
+                maxLines = 2
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Thanh toán", fontSize = 12.sp, color = Color(0xFF8B918A))
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Box {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp)
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(Color(0xFFF5F7F2))
+                                .clickable { expanded = true }
+                                .padding(horizontal = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(selectedIcon),
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+
+                            Spacer(Modifier.width(8.dp))
+
+                            Text(
+                                text = selectedPayment,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF20242A),
+                                maxLines = 1
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            payments.forEach { payment ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Image(
+                                                painter = painterResource(payment.icon),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(26.dp)
+                                            )
+
+                                            Spacer(Modifier.width(8.dp))
+
+                                            Text(payment.name)
+                                        }
+                                    },
+                                    onClick = {
+                                        selectedPayment = payment.name
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Ưu đãi", fontSize = 12.sp, color = Color(0xFF8B918A))
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(Color(0xFFFFF4D8))
+                            .clickable {
+                                viewModel.loadPromos()
+                                onSelectPromo()
+                            }
+                            .padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.promo),
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp)
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        Text(
+                            text = uiState.promoCode,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFFF7A00),
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Button(
+                onClick = onConfirmBooking,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF20242A),
+                    disabledContainerColor = Color(0xFFB6BBB3)
+                ),
+                shape = RoundedCornerShape(20.dp),
+                enabled = uiState.dropoffAddress != "Đang xác định vị trí..." &&
+                        uiState.dropoffAddress.isNotBlank()
+            ) {
+                Text(
+                    text = "Xác nhận đặt xe",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White
+                )
+            }
+        }
+    }
 }

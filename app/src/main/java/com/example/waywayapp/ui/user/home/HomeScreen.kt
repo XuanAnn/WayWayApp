@@ -17,10 +17,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +37,7 @@ import com.example.waywayapp.ui.theme.CardWhite
 import com.example.waywayapp.ui.theme.DarkCard
 import com.example.waywayapp.ui.theme.DarkGradient
 import com.example.waywayapp.ui.theme.Lime
+import com.example.waywayapp.ui.theme.LimeDark
 import com.example.waywayapp.ui.theme.LimeGradient
 import com.example.waywayapp.ui.theme.StarYellow
 import com.example.waywayapp.ui.theme.TextDark
@@ -45,7 +48,8 @@ fun HomeScreen(
     currentRoute: String? = Routes.USER_HOME,
     onServiceClick: (String) -> Unit = {},
     onWalletClick: () -> Unit = {},
-    onBottomNavClick: (String) -> Unit = {}
+    onBottomNavClick: (String) -> Unit = {},
+    onSearchClick: () -> Unit = {}
 ) {
     Scaffold(
         containerColor = BgLight,
@@ -69,44 +73,23 @@ fun HomeScreen(
         }
     }
 }
-
 @Composable
 fun HeaderSection() {
-    Card(modifier = Modifier.clip(RoundedCornerShape(bottomEnd = 50.dp, bottomStart = 50.dp))) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LimeGradient)
-            .padding(horizontal = 18.dp)
-            .padding(top = 22.dp, bottom = 62.dp)
+            .background(BgLight)
     ) {
-        Box(
-            modifier = Modifier
-                .size(150.dp)
-                .align(Alignment.TopEnd)
-                .offset(x = 48.dp, y = (-50).dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.28f))
-        )
+        Column {
 
-        Box(
-            modifier = Modifier
-                .size(110.dp)
-                .align(Alignment.BottomStart)
-                .offset(x = (-40).dp, y = 42.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.22f))
-        )
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
+            // TOP BAR
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(42.dp)
                         .clip(CircleShape)
                         .background(CardWhite)
                         .clickable { },
@@ -120,17 +103,17 @@ fun HeaderSection() {
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 SearchBox(
                     modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(42.dp)
                         .clip(CircleShape)
                         .background(DarkCard)
                         .clickable { },
@@ -145,57 +128,56 @@ fun HeaderSection() {
 
                     Box(
                         modifier = Modifier
-                            .size(9.dp)
+                            .size(10.dp)
                             .align(Alignment.TopEnd)
-                            .offset(x = (-6).dp, y = 7.dp)
+                            .offset(x = (-5).dp, y = 5.dp)
                             .clip(CircleShape)
                             .background(BadgeRed)
                     )
                 }
             }
 
-            Column {
-                Text(
-                    text = "Welcome back,",
-                    color = TextDark.copy(alpha = 0.65f),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
-                )
+            Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = "WayWay user",
-                    color = TextDark,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    lineHeight = 31.sp
-                )
+            // BANNER
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .offset(y= (-10).dp),
+                shape = RoundedCornerShape(28.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                onClick = {  }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Đặt xe, đồ ăn và giao hàng nhanh trong một ứng dụng.",
-                    color = TextDark.copy(alpha = 0.72f),
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.banner),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
     }
-}}
+}
 
 @Composable
 fun SearchBox(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSearchClick:() -> Unit = {}
 ) {
     var searchText by remember { mutableStateOf("") }
 
     Row(
         modifier = modifier
-            .height(42.dp)
+            .height(50.dp)
             .clip(RoundedCornerShape(22.dp))
             .background(CardWhite.copy(alpha = 0.96f))
-            .padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 14.dp)
+            .clickable { onSearchClick() },
+
+        verticalAlignment = Alignment.CenterVertically,
+
     ) {
         Icon(
             imageVector = Icons.Default.Search,
@@ -238,79 +220,82 @@ fun FloatingWalletCard(
     onWalletClick:() -> Unit = {}
 ) {
     Card(
+    modifier = Modifier
+        .padding(horizontal = 18.dp)
+        .offset(y = (-3).dp)
+        .fillMaxWidth(),
+    shape = RoundedCornerShape(22.dp),
+    colors = CardDefaults.cardColors(
+        containerColor = CardWhite.copy(alpha = 0.85f)
+    ),
+    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+    onClick = { onWalletClick() }
+) {
+    Row(
         modifier = Modifier
-            .padding(horizontal = 18.dp)
-            .offset(y = (-45).dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = CardWhite
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        ),
-        onClick = { onWalletClick() }
+            .fillMaxWidth()
+            .height(64.dp)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-        ) {
+        Image(
+            painter = painterResource(id = R.drawable.momo_icon),
+            contentDescription = null,
+            modifier = Modifier.size(38.dp)
+        )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.momo_icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
+        Spacer(modifier = Modifier.width(10.dp))
 
-                Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "Liên kết MoMo",
+            fontSize = 13.sp,
+            color = TextDark,
+            fontWeight = FontWeight.SemiBold
+        )
 
-                Text(
-                    text = "Liên kết MoMo",
-                    fontSize = 13.sp,
-                    color = TextDark,
-                    fontWeight = FontWeight.SemiBold
-                )
+        Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "Chi tiết",
+            fontSize = 12.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.SemiBold
+        )
 
-                Text(
-                    text = "Chi tiết",
-                    fontSize = 12.sp,
-                    color = TextGray,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = TextGray,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = TextGray,
+            modifier = Modifier.size(18.dp)
+        )
     }
+
+    }
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 data class ServiceItemData(
     val name: String,
-    val icon: String,
-    val background: Color
+    val icon: Int,
 )
-
 private val serviceList = listOf(
-    ServiceItemData("Đồ ăn", "🍔", Color(0xFFFFDCEB)),
-    ServiceItemData("Xe máy", "🛵", Color(0xFFE7E8FF)),
-    ServiceItemData("Ô tô", "🚗", Color(0xFFFFF1BA)),
-    ServiceItemData("Giao hàng", "📦", Color(0xFFE9FF9A)),
+
+    ServiceItemData(
+        "Xe máy",
+        R.drawable.bike_icon,
+    ),
+    ServiceItemData(
+        "Đồ ăn",
+        R.drawable.food_icon,
+    ),
+    ServiceItemData(
+        "Ô tô",
+        R.drawable.car_icon,
+    ),
+    ServiceItemData(
+        "Giao hàng",
+        R.drawable.express_icon,
+    ),
 )
 
 @Composable
@@ -381,13 +366,13 @@ fun ServiceItem(
         Box(
             modifier = Modifier
                 .size(58.dp)
-                .clip(RoundedCornerShape(22.dp))
-                .background(service.background),
+                .clip(RoundedCornerShape(22.dp)) ,
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = service.icon,
-                fontSize = 27.sp
+            Image(
+                painter = painterResource(id = service.icon),
+                contentDescription = service.name,
+                modifier = Modifier.size(80.dp)
             )
         }
 
@@ -395,9 +380,9 @@ fun ServiceItem(
 
         Text(
             text = service.name,
-            fontSize = 11.sp,
+            fontSize = 13.sp,
             color = TextDark,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Medium  ,
             textAlign = TextAlign.Center,
             lineHeight = 13.sp
         )
@@ -407,25 +392,20 @@ fun ServiceItem(
 private data class BannerData(
     val tag: String,
     val title: String,
-    val subtitle: String,
-    val emoji: String,
-    val background: Brush
+    val imageUrl: Int,
 )
 
 private val banners = listOf(
     BannerData(
         tag = "Khuyến mãi",
         title = "Giảm 30% đơn đầu tiên",
-        subtitle = "Áp dụng cho xe máy và đồ ăn",
-        emoji = "⚡",
-        background = LimeGradient
+        imageUrl = R.drawable.banner
     ),
     BannerData(
         tag = "Hot deal",
         title = "Freeship cuối tuần",
-        subtitle = "Miễn phí giao hàng 2km đầu",
-        emoji = "📦",
-        background = DarkGradient
+        imageUrl = R.drawable.banner
+
     )
 )
 
@@ -444,7 +424,7 @@ fun PromoBanners() {
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 18.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(banners) { banner ->
                 BannerItem(data = banner)
@@ -452,84 +432,59 @@ fun PromoBanners() {
         }
     }
 }
-
 @Composable
 private fun BannerItem(
     data: BannerData
 ) {
     Card(
-        modifier = Modifier.width(270.dp),
-        shape = RoundedCornerShape(26.dp),
+        modifier = Modifier
+            .width(250.dp)
+            .height(120.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = CardWhite
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
+            defaultElevation = 5.dp
         )
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(145.dp)
-                .background(data.background)
-                .padding(16.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color.White.copy(alpha = 0.35f))
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                    .align(Alignment.TopStart)
-            ) {
-                Text(
-                    text = data.tag,
-                    color = TextDark,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        Image(
+            painter = painterResource(data.imageUrl),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
-            Text(
-                text = data.emoji,
-                fontSize = 44.sp,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-
-            Column(
-                modifier = Modifier.align(Alignment.BottomStart)
-            ) {
-                Text(
-                    text = data.title,
-                    color = if (data.title.contains("Freeship")) Color.White else TextDark,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-
-                Text(
-                    text = data.subtitle,
-                    color = if (data.title.contains("Freeship")) Color.White.copy(alpha = 0.75f) else TextDark.copy(alpha = 0.7f),
-                    fontSize = 12.sp
-                )
-            }
-        }
     }
 }
-
 data class FoodItemData(
     val name: String,
     val price: String,
     val badge: String,
-    val stars: Int,
-    val emoji: String,
-    val background: Color
+    val imageUrl: Int
 )
 
 private val foodItems = listOf(
-    FoodItemData("Trà sữa Sài Gòn", "từ 35.000đ", "Mới", 4, "🧋", Color(0xFFFFDCEB)),
-    FoodItemData("Phở bò tươi", "từ 45.000đ", "Hot", 5, "🍜", Color(0xFFFFF1BA)),
-    FoodItemData("Cơm thố Nhật", "từ 55.000đ", "Sale", 4, "🍱", Color(0xFFE7E8FF)),
-    FoodItemData("Salad fresh", "từ 40.000đ", "Healthy", 5, "🥗", Color(0xFFBFE9FF)),
-    FoodItemData("Bánh mì đặc biệt", "từ 25.000đ", "Best", 4, "🥖", Color(0xFFE9FF9A))
+    FoodItemData("Trà sữa Sài Gòn",
+        "từ 35.000đ",
+        "Mới",
+        R.drawable.banner_promo1,
+         ),
+    FoodItemData("Cơm thố Nhật",
+        "từ 55.000đ",
+        "Mới",
+        R.drawable.banner_promo1,
+    ),
+    FoodItemData("Trà sữa Sài Gòn",
+        "từ 35.000đ",
+        "Mới",
+        R.drawable.banner_promo1,
+    ),
+    FoodItemData("Trà sữa Sài Gòn",
+        "từ 35.000đ",
+        "Mới",
+        R.drawable.banner_promo1,
+    ),
 )
 
 @Composable
@@ -574,13 +529,14 @@ fun FoodCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(108.dp)
-                    .background(data.background),
+                    .height(108.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = data.emoji,
-                    fontSize = 43.sp
+                Image(
+                    painterResource(data.imageUrl),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
@@ -622,11 +578,6 @@ fun FoodCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = "★".repeat(data.stars) + "☆".repeat(5 - data.stars),
-                    color = StarYellow,
-                    fontSize = 10.sp
-                )
             }
         }
     }

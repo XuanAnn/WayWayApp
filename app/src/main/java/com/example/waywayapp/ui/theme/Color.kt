@@ -5,13 +5,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 
-val BgLight = Color(0xFFE3E5DF)
+val BgLight = Color(0xFFF2FAFF)
 
 
 val AppBg = Color(0xFFE7E8E2)
 val SoftWhite = Color(0xFFF7F8F3)
 
-val CardWhite = Color(0xFFFFFFFF)
+val CardWhite = Color(0xFFFBFFFC)
 val DarkCard = Color(0xFF20242A)
 
 val BorderGray = Color(0xFFE1E3DC)
@@ -28,8 +28,8 @@ val TextLight = Color(0xFFB6BBB3)
 // PRIMARY
 // ─────────────────────────────────────────────
 
-val Lime = Color(0xFFD8FF4F)
-val LimeDark = Color(0xFFB8F236)
+val Lime = Color(0xFF4DC591)
+val LimeDark = Color(0xFF43CE91)
 val LimeSoft = Color(0xFFE9FF9A)
 
 // ─────────────────────────────────────────────

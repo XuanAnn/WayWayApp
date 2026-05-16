@@ -11,6 +11,7 @@ import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
 import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
+import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
 import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
@@ -80,37 +81,25 @@ fun AppNavHost(
                 navArgument("type"){
                     defaultValue = "bike"
                     type = NavType.StringType
-                }
+                },
 
             )
 
         ) { backStackEntry ->
             val bookingType = backStackEntry.arguments?.getString("type") ?: "bike"
-            BookingRoute(type = bookingType)
+            BookingRoute(type = bookingType,
+                onBackClick = {
+                    navController.popBackStack()
+                })
         }
-        composable("home") {
-            HomeScreen(
-                onServiceClick = { serviceId ->
-                    when (serviceId) {
-                        "bike" -> navController.navigate("bike_booking")
-                        "food" -> navController.navigate("food")
-                        "delivery" -> navController.navigate("delivery")
-                    }
-                },
-                onWalletClick = {
-                    navController.navigate("add_payment")
-                },
-                onBottomNavClick = {
-                    route ->
-                    navController.navigate(route){
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
+
         composable("notification") {
             NotificationScreen()
         }
+        composable("profile") {
+            NotificationScreen()
+        }
+
 
         composable("add_payment") {
             AddPaymentScreen(

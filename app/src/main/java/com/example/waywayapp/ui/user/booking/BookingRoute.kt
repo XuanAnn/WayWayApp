@@ -4,6 +4,7 @@ package com.example.waywayapp.ui.user.booking
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.example.waywayapp.ui.user.booking.bike.ui.BikeBookingScreen
+import com.example.waywayapp.ui.user.booking.car.CarScreen
 import com.example.waywayapp.ui.user.booking.express.ExpressBookingScreen
 import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
 
@@ -20,9 +21,13 @@ fun BookingRoute(
         }
 
         "food" -> {
-            FoodBookingScreen()
+            FoodBookingScreen(
+                onBackClick = onBackClick
+            )
         }
-
+        "car" -> {
+            CarScreen()
+        }
         "express" -> {
             ExpressBookingScreen()
         }
