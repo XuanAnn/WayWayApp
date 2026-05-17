@@ -7,6 +7,14 @@ object Routes {
 
     // user
     const val USER_HOME = "user_home"
+    const val FOOD = "food/{foodId}"
+
+    fun createFoodRoute(
+        foodId: Int
+    ): String {
+
+        return "food/$foodId"
+    }
     const val BOOKING = "booking/{type}"
     fun createBookingRoute(type: String): String {
         return "booking/$type"

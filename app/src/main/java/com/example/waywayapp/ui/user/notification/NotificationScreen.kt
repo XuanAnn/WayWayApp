@@ -30,8 +30,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.waywayapp.ui.components.WayWayBottomBar
 import com.example.waywayapp.ui.theme.*
-import com.example.waywayapp.ui.user.home.BottomNavigation
 
 data class NotificationItem(
     val title: String,
@@ -118,7 +118,7 @@ fun NotificationScreen() {
             }
 
             item {
-                BottomNavigation(
+                WayWayBottomBar(
                     currentRoute = null,
                     onItemClick = {}
                 )

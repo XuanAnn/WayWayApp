@@ -62,24 +62,22 @@ fun AppNavHost(
             HomeScreen(
                 currentRoute = currentRoute,
                 onServiceClick = {
-                    serviceName ->
-                    when (serviceName) {
-                        "Xe máy" -> navController.navigate(Routes.createBookingRoute("bike"))
-                        "Đồ ăn" -> navController.navigate(Routes.createBookingRoute("food"))
-                        "Giao hàng" -> navController.navigate(Routes.createBookingRoute("express"))
-                    }
-                     },
+                    type -> navController.navigate(Routes.createBookingRoute(type))
+                },
                 onWalletClick = {
                     navController.navigate("add_payment")
-
                 },
-                onBottomNavClick = {
-                    route ->
-                    navController.navigate(route){
+                onBottomNavClick = { route ->
+                    navController.navigate(route) {
                         launchSingleTop = true
                     }
                 },
+                onFoodClick = { foodId ->
 
+                    navController.navigate(
+                        Routes.createFoodRoute(foodId)
+                    )
+                }
             )
         }
         composable(Routes.BOOKING,
@@ -106,7 +104,25 @@ fun AppNavHost(
             ProfileScreen()
         }
 
+        composable(
+            route = Routes.FOOD,
+            arguments = listOf(
+                navArgument("foodId") {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
 
+            val foodId =
+                backStackEntry.arguments?.getInt("foodId") ?: 0
+
+            FoodBookingScreen(
+                selectedFoodId = foodId,
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
         composable("add_payment") {
             AddPaymentScreen(
                 onBackClick = {

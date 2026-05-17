@@ -7,7 +7,7 @@ import android.graphics.Canvas
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.waywayapp.ui.user.booking.bike.OsrmService
+import com.example.waywayapp.data.remote.api.OsrmApi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -29,12 +29,12 @@ class DriverViewModel : ViewModel() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private val osrmService: OsrmService by lazy {
+    private val osrmApi: OsrmApi by lazy {
         Retrofit.Builder()
             .baseUrl("https://router.project-osrm.org/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(OsrmService::class.java)
+            .create(OsrmApi::class.java)
     }
 
     fun initLocationClient(context: Context) {
@@ -113,7 +113,7 @@ class DriverViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val coordinates = "${start.longitude},${start.latitude};${end.longitude},${end.latitude}"
-                val response = osrmService.getRoute(coordinates)
+                val response = osrmApi.getRoute(coordinates)
                 if (response.routes.isNotEmpty()) {
                     val points = PolyUtil.decode(response.routes[0].geometry)
                     _uiState.update { it.copy(polylinePoints = points) }

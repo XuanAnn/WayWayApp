@@ -30,8 +30,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 import kotlin.math.floor
+import com.example.waywayapp.data.remote.api.GeocodingApi
+import com.example.waywayapp.data.remote.api.OsrmApi
+import com.example.waywayapp.data.remote.dto.geocoding.GeocodingResponseDto
+import com.example.waywayapp.core.network.RetrofitProvider
+class BikeViewModel(
 
-class BikeViewModel : ViewModel() {
+) : ViewModel(
+
+) {
     // Tag dùng để filter trong Logcat
     private val TAG = "WayWay_BikeVM"
 
@@ -42,42 +49,19 @@ class BikeViewModel : ViewModel() {
     private val _availablePromos = MutableStateFlow<List<Promo>>(emptyList())
     val availablePromos = _availablePromos.asStateFlow()
     // 1. Khai báo OkHttpClient để thêm Header User-Agent
+    private val geocodingApi =
+        RetrofitProvider.geocodingApi
 
-    private val okHttpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .header("User-Agent", "WayWayApp/1.0 (contact: xuanan25032006@gmail.com)") // Thay bằng email của bạn
-                    .build()
-                chain.proceed(request)
-            }
-            .build()
-    }
+    private val osrmApi =
+        RetrofitProvider.osrmApi
 
-    // 2. Cập nhật Retrofit Builder cho geocodingService
-    private val geocodingService: GeocodingService by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://nominatim.openstreetmap.org/")
-            .client(okHttpClient) // Gán OkHttpClient đã cấu hình vào đây
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(GeocodingService::class.java)
-    }
-
-    private val osrmService: OsrmService by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://router.project-osrm.org/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(OsrmService::class.java)
-    }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geocoder: Geocoder
     // Thêm vào BikeViewModel
     private val _searchQuery = MutableStateFlow("")
-    private val _searchResults = MutableStateFlow<List<GeocodingResponse>>(emptyList())
-    val searchResults: StateFlow<List<GeocodingResponse>> = _searchResults.asStateFlow()
+    private val _searchResults = MutableStateFlow<List<GeocodingResponseDto>>(emptyList())
+    val searchResults: StateFlow<List<GeocodingResponseDto>> = _searchResults.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -100,7 +84,7 @@ class BikeViewModel : ViewModel() {
     }
     private suspend fun performAutocomplete(query: String) {
         try {
-            val results = geocodingService.searchAddress(query = query)
+            val results = geocodingApi.searchAddress(query = query)
             _searchResults.value = results
         } catch (e: Exception) {
             Log.e(TAG, "Autocomplete Error: ${e.message}")
@@ -176,7 +160,7 @@ class BikeViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val results = geocodingService.searchAddress(query = query)
+                val results = geocodingApi.searchAddress(query = query)
 
                 if (results.isNotEmpty()) {
                     val firstResult = results[0]
@@ -248,7 +232,7 @@ class BikeViewModel : ViewModel() {
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val coordinates = "${pickup.longitude},${pickup.latitude};${dropoff.longitude},${dropoff.latitude}"
-                val response = osrmService.getRoute(coordinates)
+                val response = osrmApi.getRoute(coordinates)
 
                 if (response.routes.isNotEmpty()) {
                     val route = response.routes[0]

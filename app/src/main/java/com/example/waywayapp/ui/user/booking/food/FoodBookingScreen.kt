@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,18 +21,24 @@ import com.example.waywayapp.ui.user.booking.food.components.FoodCategories
 import com.example.waywayapp.ui.user.booking.food.components.FoodHeader
 import com.example.waywayapp.ui.user.booking.food.component.FoodRestaurantCard
 import com.example.waywayapp.ui.user.booking.food.component.PromoFoodBanners
-import com.example.waywayapp.ui.user.booking.food.component.SectionTitle
 import com.example.waywayapp.ui.user.booking.food.components.FoodCartBottomBar
-import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
-import foodList
 
 @Composable
 fun FoodBookingScreen(
+    selectedFoodId: Int = 0,
     viewModel: FoodViewModel = viewModel(),
     onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(selectedFoodId) {
 
+        if (selectedFoodId != 0) {
+
+            viewModel.addFoodToCartById(
+                selectedFoodId
+            )
+        }
+    }
     Scaffold(
         containerColor = Color(0xF2F3FFFF)
     ) { padding ->

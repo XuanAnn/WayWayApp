@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -55,13 +56,13 @@ fun FoodCategories() {
                             modifier = Modifier
                                 .size(58.dp)
                                 .clip(RoundedCornerShape(20.dp))
-                                .background(Color(0xFFE9FF9A)),
+                                ,
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
                                 painter = painterResource(category.icon),
                                 contentDescription = null,
-                                modifier = Modifier.size(44.dp)
+                                modifier = Modifier.size(60.dp).clip(RoundedCornerShape(50.dp))
                             )
                         }
 

@@ -29,7 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.R
+import com.example.waywayapp.ui.components.WayWayBottomBar
 import com.example.waywayapp.ui.navigation.Routes
 import com.example.waywayapp.ui.theme.BadgeRed
 import com.example.waywayapp.ui.theme.BgLight
@@ -42,47 +44,102 @@ import com.example.waywayapp.ui.theme.LimeGradient
 import com.example.waywayapp.ui.theme.StarYellow
 import com.example.waywayapp.ui.theme.TextDark
 import com.example.waywayapp.ui.theme.TextGray
-
+import com.example.waywayapp.ui.user.booking.food.components.FoodCartBottomBar
+import com.example.waywayapp.ui.user.home.model.ServiceUiModel
+import com.example.waywayapp.ui.user.home.model.BannerUiModel
+import com.example.waywayapp.ui.user.home.model.FoodPreviewUiModel
 @Composable
 fun HomeScreen(
     currentRoute: String? = Routes.USER_HOME,
     onServiceClick: (String) -> Unit = {},
     onWalletClick: () -> Unit = {},
     onBottomNavClick: (String) -> Unit = {},
-    onSearchClick: () -> Unit = {}
+    onSearchClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {},
+    onPromoClick: () -> Unit = {},
+    onFoodClick: (Int) -> Unit = {},
+    viewModel: HomeViewModel = viewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         containerColor = BgLight,
-        bottomBar = { BottomNavigation(
-            currentRoute = currentRoute,
-            onItemClick = onBottomNavClick
-        ) }
-    ) { padding ->
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BgLight)
+            ) {
+                if (uiState.cartItems.isNotEmpty()) {
+                    FoodCartBottomBar(
+                        totalQuantity = uiState.totalCartQuantity,
+                        totalPrice = uiState.totalCartPrice,
+                        onCartClick = {
+                            onServiceClick("food")
+                        }
+                    )
+                }
+
+                WayWayBottomBar(
+                    currentRoute = currentRoute,
+                    onItemClick = onBottomNavClick
+                )
+            }
+        }
+    ) {
+        padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
-            item { HeaderSection() }
+            item {
+                HeaderSection(
+                    onSearchClick = onSearchClick,
+                    onNotificationClick = onNotificationClick
+                )
+            }
             item { FloatingWalletCard(onWalletClick = onWalletClick) }
-            item { ServiceGrid(onServiceClick) }
-            item { PromoBanners() }
-            item { FoodSection() }
+
+            item {
+                ServiceGrid(
+                    services = uiState.services,
+                    onServiceClick = { service ->
+                        onServiceClick(service.type)
+                    }
+                )
+            }
+
+            item {
+                PromoBanners(
+                    banners = uiState.banners,
+                    onPromoClick = onPromoClick
+                )
+            }
+
+            item {
+                FoodSection(
+                    foods = uiState.foods,
+                    onFoodClick = onFoodClick
+                )
+            }
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
         }
     }
 }
+
 @Composable
-fun HeaderSection() {
+fun HeaderSection(
+    onSearchClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(BgLight)
     ) {
         Column {
-
-            // TOP BAR
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -106,7 +163,8 @@ fun HeaderSection() {
                 Spacer(modifier = Modifier.width(10.dp))
 
                 SearchBox(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onSearchClick = onSearchClick
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
@@ -116,7 +174,7 @@ fun HeaderSection() {
                         .size(42.dp)
                         .clip(CircleShape)
                         .background(DarkCard)
-                        .clickable { },
+                        .clickable { onNotificationClick() },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -139,16 +197,14 @@ fun HeaderSection() {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // BANNER
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp)
-                    .offset(y= (-10).dp),
+                    .offset(y = (-10).dp),
                 shape = RoundedCornerShape(28.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                onClick = {  }
-
+                onClick = {}
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.banner),
@@ -274,33 +330,10 @@ fun FloatingWalletCard(
     Spacer(modifier = Modifier.height(20.dp))
 }
 
-data class ServiceItemData(
-    val name: String,
-    val icon: Int,
-)
-private val serviceList = listOf(
-
-    ServiceItemData(
-        "Xe máy",
-        R.drawable.bike_icon,
-    ),
-    ServiceItemData(
-        "Đồ ăn",
-        R.drawable.food_icon,
-    ),
-    ServiceItemData(
-        "Ô tô",
-        R.drawable.car_icon,
-    ),
-    ServiceItemData(
-        "Giao hàng",
-        R.drawable.express_icon,
-    ),
-)
-
 @Composable
 fun ServiceGrid(
-    onServiceClick: (String) -> Unit
+    services: List<ServiceUiModel>,
+    onServiceClick: (ServiceUiModel) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -328,7 +361,7 @@ fun ServiceGrid(
             Column(
                 modifier = Modifier.padding(vertical = 18.dp)
             ) {
-                serviceList.chunked(4).forEach { row ->
+                services.chunked(4).forEach { row ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -336,23 +369,20 @@ fun ServiceGrid(
                         row.forEach { service ->
                             ServiceItem(
                                 service = service,
-                                onClick = { onServiceClick(service.name) }
+                                onClick = {
+                                    onServiceClick(service)
+                                }
                             )
                         }
-                    }
-
-                    if (row != serviceList.chunked(4).last()) {
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
         }
     }
 }
-
 @Composable
 fun ServiceItem(
-    service: ServiceItemData,
+    service: ServiceUiModel,
     onClick: () -> Unit
 ) {
     Column(
@@ -366,12 +396,12 @@ fun ServiceItem(
         Box(
             modifier = Modifier
                 .size(58.dp)
-                .clip(RoundedCornerShape(22.dp)) ,
+                .clip(RoundedCornerShape(22.dp)),
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = service.icon),
-                contentDescription = service.name,
+                painter = painterResource(id = service.iconRes),
+                contentDescription = service.title,
                 modifier = Modifier.size(80.dp)
             )
         }
@@ -379,38 +409,19 @@ fun ServiceItem(
         Spacer(modifier = Modifier.height(7.dp))
 
         Text(
-            text = service.name,
+            text = service.title,
             fontSize = 13.sp,
             color = TextDark,
-            fontWeight = FontWeight.Medium  ,
+            fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             lineHeight = 13.sp
         )
     }
-}
-
-private data class BannerData(
-    val tag: String,
-    val title: String,
-    val imageUrl: Int,
-)
-
-private val banners = listOf(
-    BannerData(
-        tag = "Khuyến mãi",
-        title = "Giảm 30% đơn đầu tiên",
-        imageUrl = R.drawable.banner
-    ),
-    BannerData(
-        tag = "Hot deal",
-        title = "Freeship cuối tuần",
-        imageUrl = R.drawable.banner
-
-    )
-)
-
-@Composable
-fun PromoBanners() {
+}@Composable
+fun PromoBanners(
+    banners: List<BannerUiModel>,
+    onPromoClick: () -> Unit = {}
+) {
     Column(
         modifier = Modifier.padding(bottom = 10.dp)
     ) {
@@ -427,14 +438,19 @@ fun PromoBanners() {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(banners) { banner ->
-                BannerItem(data = banner)
+                BannerItem(
+                    data = banner,
+                    onClick = onPromoClick
+                )
             }
         }
     }
 }
+
 @Composable
 private fun BannerItem(
-    data: BannerData
+    data: BannerUiModel,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -446,49 +462,22 @@ private fun BannerItem(
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 5.dp
-        )
+        ),
+        onClick = onClick
     ) {
         Image(
-            painter = painterResource(data.imageUrl),
+            painter = painterResource(data.imageRes),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-
     }
 }
-data class FoodItemData(
-    val name: String,
-    val price: String,
-    val badge: String,
-    val imageUrl: Int
-)
-
-private val foodItems = listOf(
-    FoodItemData("Trà sữa Sài Gòn",
-        "từ 35.000đ",
-        "Mới",
-        R.drawable.banner_promo1,
-         ),
-    FoodItemData("Cơm thố Nhật",
-        "từ 55.000đ",
-        "Mới",
-        R.drawable.banner_promo1,
-    ),
-    FoodItemData("Trà sữa Sài Gòn",
-        "từ 35.000đ",
-        "Mới",
-        R.drawable.banner_promo1,
-    ),
-    FoodItemData("Trà sữa Sài Gòn",
-        "từ 35.000đ",
-        "Mới",
-        R.drawable.banner_promo1,
-    ),
-)
-
 @Composable
-fun FoodSection() {
+fun FoodSection(
+    foods: List<FoodPreviewUiModel>,
+    onFoodClick: (Int) -> Unit = {}
+) {
     Column(
         modifier = Modifier.padding(vertical = 12.dp)
     ) {
@@ -504,19 +493,24 @@ fun FoodSection() {
             contentPadding = PaddingValues(horizontal = 18.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            items(foodItems) { food ->
-                FoodCard(data = food)
+            items(foods) { food ->
+                FoodCard(
+                    data = food,
+                    onClick =  {onFoodClick(food.id)}
+                )
             }
         }
     }
 }
-
 @Composable
 fun FoodCard(
-    data: FoodItemData
+    data: FoodPreviewUiModel,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = Modifier.width(150.dp),
+        modifier = Modifier
+            .width(150.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = CardWhite
@@ -533,7 +527,7 @@ fun FoodCard(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painterResource(data.imageUrl),
+                    painter = painterResource(data.imageRes),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -575,14 +569,10 @@ fun FoodCard(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
             }
         }
     }
 }
-
 @Composable
 fun SectionTitle(
     title: String,
@@ -614,120 +604,6 @@ fun SectionTitle(
             contentDescription = null,
             tint = TextGray,
             modifier = Modifier.size(18.dp)
-        )
-    }
-}
-@Composable
-fun BottomNavigation(
-    currentRoute: String?,
-    onItemClick: (String) -> Unit
-) {
-    val items = listOf(
-        BottomNavItem(
-            title = "Trang chủ",
-            route = Routes.USER_HOME,
-            icon = Icons.Default.Home
-        ),
-        BottomNavItem(
-            title = "Gần đây",
-            route = Routes.RECENTLY_SERVICE,
-            icon = Icons.Default.History
-        ),
-        BottomNavItem(
-            title = "Thông báo",
-            route = Routes.NOTIFICATION,
-            icon = Icons.Default.Notifications
-        ),
-        BottomNavItem(
-            title = "Tôi",
-            route = Routes.PROFILE,
-            icon = Icons.Default.Person,
-            badgeCount = 2
-        )
-    )
-
-    NavigationBar(
-        containerColor = CardWhite,
-        tonalElevation = 8.dp
-    ) {
-        items.forEach { item ->
-            val selected = currentRoute == item.route
-
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    onItemClick(item.route)
-                },
-                icon = {
-                    if (item.badgeCount != null) {
-                        BadgedBox(
-                            badge = {
-                                Badge(
-                                    containerColor = BadgeRed,
-                                    contentColor = Color.White
-                                ) {
-                                    Text(
-                                        text = item.badgeCount.toString(),
-                                        fontSize = 9.sp
-                                    )
-                                }
-                            }
-                        ) {
-                            BottomIcon(
-                                icon = item.icon,
-                                selected = selected
-                            )
-                        }
-                    } else {
-                        BottomIcon(
-                            icon = item.icon,
-                            selected = selected
-                        )
-                    }
-                },
-                label = {
-                    Text(
-                        text = item.title,
-                        fontSize = 10.sp,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedTextColor = TextDark,
-                    unselectedTextColor = TextGray,
-                    unselectedIconColor = TextGray,
-                    indicatorColor = Color.Transparent
-                )
-            )
-        }
-    }
-}
-@Composable
-fun BottomIcon(
-    icon: ImageVector,
-    selected: Boolean
-) {
-    if (selected) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .background(DarkCard),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Lime,
-                modifier = Modifier.size(21.dp)
-            )
-        }
-    } else {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = TextGray,
-            modifier = Modifier.size(22.dp)
         )
     }
 }

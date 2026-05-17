@@ -1,13 +1,15 @@
 package com.example.waywayapp.ui.user.booking.food
 
 import androidx.lifecycle.ViewModel
-import com.example.waywayapp.ui.user.booking.food.model.CartItemUiModel
+import androidx.lifecycle.viewModelScope
+import com.example.waywayapp.ui.user.booking.food.cart.FoodCartStore
 import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
 import foodList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class FoodViewModel : ViewModel() {
 
@@ -16,6 +18,7 @@ class FoodViewModel : ViewModel() {
 
     init {
         loadMockFoods()
+        observeCart()
     }
 
     private fun loadMockFoods() {
@@ -26,28 +29,36 @@ class FoodViewModel : ViewModel() {
             )
         }
     }
-    fun addToCart(food: FoodItemUiModel) {
-        _uiState.update { state ->
-            val existedItem = state.cartItems.find {
-                it.food.id == food.id
-            }
 
-            val newCart = if (existedItem == null) {
-                state.cartItems + CartItemUiModel(
-                    food = food,
-                    quantity = 1
-                )
-            } else {
-                state.cartItems.map { item ->
-                    if (item.food.id == food.id) {
-                        item.copy(quantity = item.quantity + 1)
-                    } else {
-                        item
-                    }
+    private fun observeCart() {
+        viewModelScope.launch {
+            FoodCartStore.cartItems.collect { cart ->
+                _uiState.update {
+                    it.copy(cartItems = cart)
                 }
             }
+        }
+    }
 
-            state.copy(cartItems = newCart)
+    fun addToCart(food: FoodItemUiModel) {
+        FoodCartStore.addFood(food)
+    }
+
+    fun removeFromCart(foodId: Int) {
+        FoodCartStore.removeFood(foodId)
+    }
+
+    fun clearCart() {
+        FoodCartStore.clearCart()
+    }
+
+    fun addFoodToCartById(foodId: Int) {
+        val food = _uiState.value.foods.find {
+            it.id == foodId
+        }
+
+        food?.let {
+            addToCart(it)
         }
     }
 }

@@ -2,6 +2,7 @@ import com.example.waywayapp.R
 import com.example.waywayapp.ui.user.booking.food.model.FoodBannerUiModel
 import com.example.waywayapp.ui.user.booking.food.model.FoodCategoryUiModel
 import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
+import com.example.waywayapp.ui.user.home.model.FoodPreviewUiModel
 
 val foodList = listOf(
     FoodItemUiModel(
@@ -42,19 +43,21 @@ val foodList = listOf(
 val foodCategories = listOf(
     FoodCategoryUiModel(
         name = "Cơm",
-        icon = R.drawable.food_icon
+        icon = R.drawable.rice
     ),
     FoodCategoryUiModel(
         name = "Burger",
-        icon = R.drawable.food_icon
+        icon = R.drawable.rice
+
     ),
     FoodCategoryUiModel(
         name = "Trà sữa",
-        icon = R.drawable.food_icon
+        icon = R.drawable.rice
     ),
     FoodCategoryUiModel(
         name = "Phở",
-        icon = R.drawable.food_icon
+        icon = R.drawable.rice
+
     ),
 
 )
@@ -62,4 +65,21 @@ val foodBanners = listOf(
     FoodBannerUiModel(R.drawable.banner_promo1),
     FoodBannerUiModel(R.drawable.banner_promo1),
     FoodBannerUiModel(R.drawable.banner_promo1)
+)
+val mockFoods = listOf(
+    FoodPreviewUiModel(
+        id = 1,
+        name = "Trà sữa Sài Gòn",
+        price = "từ 35.000đ",
+        badge = "Mới",
+        imageRes = R.drawable.banner_promo1
+    ),
+
+    FoodPreviewUiModel(
+        id = 2,
+        name = "Cơm thố Nhật",
+        price = "từ 55.000đ",
+        badge = "Hot",
+        imageRes = R.drawable.banner_promo1
+    )
 )
