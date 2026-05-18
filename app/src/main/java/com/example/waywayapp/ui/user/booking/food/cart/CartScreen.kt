@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,16 +26,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.waywayapp.ui.user.booking.food.component.QuantityControl
 import java.text.DecimalFormat
 
 @Composable
 fun FoodCartScreen(
     onBackClick: () -> Unit = {},
+    onPlaceOrderClick: () -> Unit = {},
     viewModel: FoodCartViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val formatter = DecimalFormat("#,###")
-
+    LaunchedEffect(uiState.isCheckoutSuccess) {
+        if (uiState.isCheckoutSuccess) {
+            onPlaceOrderClick()
+            viewModel.clearCheckoutSuccess()
+        }
+    }
     Scaffold(
         containerColor = Color(0xFFF5F7F2),
         bottomBar = {
@@ -186,12 +194,13 @@ private fun CartItemCard(
                     color = Color(0xFF20242A)
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
 
-                QuantityRow(
+                QuantityControl(
                     quantity = quantity,
                     onAddClick = onAddClick,
-                    onRemoveClick = onRemoveClick
+                    onRemoveClick = onRemoveClick,
+                    onQuantityChange = {  },
+                    modifier = Modifier.offset(y = (-25).dp)
                 )
             }
 
@@ -208,51 +217,6 @@ private fun CartItemCard(
     }
 }
 
-@Composable
-private fun QuantityRow(
-    quantity: Int,
-    onAddClick: () -> Unit,
-    onRemoveClick: () -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onRemoveClick,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFEFEFEF))
-        ) {
-            Icon(
-                imageVector = Icons.Default.Remove,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        Text(
-            text = quantity.toString(),
-            modifier = Modifier.padding(horizontal = 12.dp),
-            fontWeight = FontWeight.Bold
-        )
-
-        IconButton(
-            onClick = onAddClick,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF20242A))
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                tint = Color(0xFFD8FF4F),
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
-}
 
 @Composable
 private fun CartCheckoutBar(

@@ -9,6 +9,8 @@ object Routes {
     const val USER_HOME = "user_home"
     const val FOOD = "food/{foodId}"
     const val FOOD_CART = "food_cart"
+    const val CHECKOUT_SUCCESS = "checkout_success"
+    const val FOOD_ORDER_TRACKING = "food_order_tracking"
     fun createFoodRoute(
         foodId: Int
     ): String {

@@ -2,8 +2,8 @@ package com.example.waywayapp.ui.user.booking.food.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.waywayapp.ui.user.booking.food.model.CartItemUiModel
 import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -37,12 +37,42 @@ class FoodCartViewModel : ViewModel() {
     }
 
     fun deleteFood(foodId: Int) {
-        FoodCartStore.removeFood(foodId)
+        FoodCartStore.deleteFood(foodId)
     }
 
     fun checkout() {
-        // Sau này gọi backend tạo order
-        FoodCartStore.clearCart()
+        val currentCart = _uiState.value.cartItems
+
+        if (currentCart.isEmpty()) {
+            _uiState.update {
+                it.copy(errorMessage = "Giỏ hàng đang trống")
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            delay(800) // mock gọi backend tạo order
+
+            FoodCartStore.clearCart()
+
+            _uiState.update {
+                it.copy(
+                    isCheckoutSuccess = true,
+                    errorMessage = null
+                )
+            }
+        }
+    }
+
+    fun clearCheckoutSuccess() {
+        _uiState.update {
+            it.copy(isCheckoutSuccess = false)
+        }
+    }
+
+    fun clearError() {
+        _uiState.update {
+            it.copy(errorMessage = null)
+        }
     }
 }
-

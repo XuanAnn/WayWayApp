@@ -30,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.waywayapp.ui.theme.Lime
 import com.example.waywayapp.ui.user.booking.food.FoodViewModel
 import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
 import java.text.DecimalFormat
@@ -159,37 +160,48 @@ fun FoodRestaurantCard(
 }
 
 @Composable
-private fun QuantityControl(
+fun QuantityControl(
     quantity: Int,
     onAddClick: () -> Unit,
     onRemoveClick: () -> Unit,
-    onQuantityChange: (Int) -> Unit
+    onQuantityChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier.offset(y = (30).dp)
 
     ) {
         if (quantity > 0) {
-            IconButton(
-                onClick = onRemoveClick,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFEFEFEF))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Remove,
-                    contentDescription = null,
-                    tint = Color(0xFF20242A),
-                    modifier = Modifier.size(18.dp)
-                )
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(Color(0xFFEFEFEF))
+                .clickable {
+                    onRemoveClick()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = null,
+                        tint = Color(0xFF20242A),
+                        modifier = Modifier.size(18.dp)
+            )
             }
-
         }
-        Spacer(Modifier.size(10.dp ))
 
-        BasicTextField(
+        if (quantity > 0) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape),
+
+            contentAlignment = Alignment.Center
+        ) {
+            BasicTextField(
             value = quantity.toString(),
             onValueChange = { value ->
                 val newQuantity = value.toIntOrNull()
@@ -198,26 +210,31 @@ private fun QuantityControl(
                     onQuantityChange(newQuantity)
                 }
             },
-            modifier = Modifier.size(24.dp).offset(x = 4.dp),
+            modifier = Modifier.size(20.dp),
             textStyle = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Lime
             ),
             singleLine = true
         )
-        Spacer(Modifier.size(10.dp ))
-        IconButton(
-            onClick = onAddClick,
+            }
+        }
+        Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF20242A))
+                .clickable {
+                    onAddClick()
+                },
+            contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
                 tint = Color(0xFFD8FF4F),
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
             )
         }
     }

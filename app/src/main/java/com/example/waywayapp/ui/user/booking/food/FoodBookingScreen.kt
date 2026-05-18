@@ -116,11 +116,13 @@ fun FoodBookingScreen(
                     totalQuantity = uiState.totalQuantity,
                     totalPrice = uiState.totalPrice,
                     onCartClick = onCartClick,
-                    Modifier.align(Alignment.BottomStart)
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
                         .padding(
                             start = 16.dp,
                             bottom = 18.dp
-                        ).width(220.dp)
+                        )
+                        .width(220.dp)
                 )
 
             }

@@ -14,7 +14,9 @@ import com.example.waywayapp.ui.auth.register.RegisterScreen
 import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
 import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
+import com.example.waywayapp.ui.user.booking.food.cart.CheckoutSuccessScreen
 import com.example.waywayapp.ui.user.booking.food.cart.FoodCartScreen
+import com.example.waywayapp.ui.user.booking.food.order.FoodOrderTrackingScreen
 import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
@@ -30,7 +32,10 @@ fun AppNavHost(
         startDestination = Routes.USER_HOME,
         modifier = modifier
     ) {
-        //Login
+        /*----------------------------------------------------
+        AUTH
+        ------------------------------------------------------*/
+        //LOGIN
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
@@ -43,7 +48,7 @@ fun AppNavHost(
                 }
             )
         }
-
+        //REGISTER
         composable(Routes.REGISTER) {
             RegisterScreen(
                 onBackClick = { navController.popBackStack() },
@@ -137,8 +142,36 @@ fun AppNavHost(
             FoodCartScreen(
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onPlaceOrderClick = {
+                    navController.navigate(Routes.FOOD_ORDER_TRACKING)
                 }
 
+            )
+        }
+
+        composable(Routes.CHECKOUT_SUCCESS) {
+            CheckoutSuccessScreen(
+                onBackHomeClick = {
+                    navController.navigate(Routes.USER_HOME) {
+                        popUpTo(Routes.USER_HOME) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable(Routes.FOOD_ORDER_TRACKING) {
+            FoodOrderTrackingScreen(
+                onBackHomeClick = {
+                    navController.navigate(Routes.USER_HOME) {
+                        popUpTo(Routes.USER_HOME) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
         composable("add_payment") {
