@@ -10,7 +10,8 @@ import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
 @Composable
 fun BookingRoute(
     type: String,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onCartClick: () -> Unit = {}
 ) {
     when (type) {
         "bike" -> {
@@ -20,7 +21,8 @@ fun BookingRoute(
 
         "food" -> {
             FoodBookingScreen(
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                onCartClick = onCartClick
             )
         }
 

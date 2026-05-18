@@ -14,6 +14,7 @@ import com.example.waywayapp.ui.auth.register.RegisterScreen
 import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
 import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
+import com.example.waywayapp.ui.user.booking.food.cart.FoodCartScreen
 import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
@@ -94,7 +95,13 @@ fun AppNavHost(
             BookingRoute(type = bookingType,
                 onBackClick = {
                     navController.popBackStack()
-                })
+                },
+                onCartClick = {
+                    navController.navigate(Routes.FOOD_CART)
+                }
+            )
+
+
         }
 
         composable(Routes.NOTIFICATION) {
@@ -120,7 +127,18 @@ fun AppNavHost(
                 selectedFoodId = foodId,
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onCartClick = {
+                    navController.navigate(Routes.FOOD_CART)
                 }
+            )
+        }
+        composable(Routes.FOOD_CART) {
+            FoodCartScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+
             )
         }
         composable("add_payment") {

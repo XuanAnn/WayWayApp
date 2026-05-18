@@ -21,6 +21,7 @@ class FoodViewModel : ViewModel() {
         observeCart()
     }
 
+
     private fun loadMockFoods() {
         _uiState.update {
             it.copy(
@@ -39,9 +40,33 @@ class FoodViewModel : ViewModel() {
             }
         }
     }
+    fun onQuantityChange(foodId: Int, quantity: Int) {
+        FoodCartStore.setFoodQuantity(
+            foodId = foodId,
+            quantity = quantity
+        )
+    }
+    fun addToCart(
+        food: FoodItemUiModel
+    ) {
 
-    fun addToCart(food: FoodItemUiModel) {
-        FoodCartStore.addFood(food)
+        val success =
+            FoodCartStore.addFood(food)
+
+        if (!success) {
+
+            _uiState.update {
+                it.copy(
+                    errorMessage =
+                        "Đơn hàng vượt quá 1.000.000đ"
+                )
+            }
+        }
+    }
+    fun clearError() {
+        _uiState.update {
+            it.copy(errorMessage = null)
+        }
     }
 
     fun removeFromCart(foodId: Int) {

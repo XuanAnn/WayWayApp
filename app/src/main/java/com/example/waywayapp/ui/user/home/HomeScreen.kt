@@ -76,7 +76,8 @@ fun HomeScreen(
                         totalPrice = uiState.totalCartPrice,
                         onCartClick = {
                             onServiceClick("food")
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 
@@ -505,7 +506,8 @@ fun FoodSection(
 @Composable
 fun FoodCard(
     data: FoodPreviewUiModel,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+
 ) {
     Card(
         modifier = Modifier

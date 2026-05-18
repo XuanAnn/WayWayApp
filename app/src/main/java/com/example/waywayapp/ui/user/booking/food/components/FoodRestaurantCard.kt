@@ -4,13 +4,21 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,17 +26,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.waywayapp.ui.user.booking.food.FoodViewModel
 import com.example.waywayapp.ui.user.booking.food.model.FoodItemUiModel
 import java.text.DecimalFormat
 
 @Composable
 fun FoodRestaurantCard(
     data: FoodItemUiModel,
-    onClick: () -> Unit
+    quantity: Int,
+    onAddClick: () -> Unit,
+    onRemoveClick: () -> Unit,
+    onClick: () -> Unit = {},
+    onQuantityChange: (Int) -> Unit
 ) {
+    val formatter = DecimalFormat("#,###")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -42,7 +58,6 @@ fun FoodRestaurantCard(
             defaultElevation = 4.dp
         )
     ) {
-
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -94,9 +109,9 @@ fun FoodRestaurantCard(
                     fontSize = 12.sp,
                     color = Color(0xFF8B918A)
                 )
-                val formatter = DecimalFormat("#,###")
 
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = "từ ${formatter.format(data.price)}đ",
                     fontSize = 13.sp,
@@ -132,6 +147,78 @@ fun FoodRestaurantCard(
                     )
                 }
             }
+
+            QuantityControl(
+                quantity = quantity,
+                onAddClick = onAddClick,
+                onRemoveClick = onRemoveClick,
+                onQuantityChange = onQuantityChange
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuantityControl(
+    quantity: Int,
+    onAddClick: () -> Unit,
+    onRemoveClick: () -> Unit,
+    onQuantityChange: (Int) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+
+    ) {
+        if (quantity > 0) {
+            IconButton(
+                onClick = onRemoveClick,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFEFEFEF))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = null,
+                    tint = Color(0xFF20242A),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+
+        }
+        Spacer(Modifier.size(10.dp ))
+
+        BasicTextField(
+            value = quantity.toString(),
+            onValueChange = { value ->
+                val newQuantity = value.toIntOrNull()
+
+                if (newQuantity != null) {
+                    onQuantityChange(newQuantity)
+                }
+            },
+            modifier = Modifier.size(24.dp).offset(x = 4.dp),
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+            singleLine = true
+        )
+        Spacer(Modifier.size(10.dp ))
+        IconButton(
+            onClick = onAddClick,
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF20242A))
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = Color(0xFFD8FF4F),
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }

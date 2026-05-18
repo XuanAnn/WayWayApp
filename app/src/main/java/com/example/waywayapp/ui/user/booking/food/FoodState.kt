@@ -10,7 +10,8 @@ data class FoodState(
     val foods: List<FoodItemUiModel> = emptyList(),
     val cartItems: List<CartItemUiModel> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val errorMessage: String? = null
 ) {
     val totalPrice: Double
         get() = cartItems.sumOf { item ->

@@ -13,12 +13,12 @@ val mockServices = listOf(
 )
 
 val mockBanners = listOf(
-    BannerUiModel("Khuyến mãi", "Giảm 30% đơn đầu tiên", R.drawable.banner),
-    BannerUiModel("Hot deal", "Freeship cuối tuần", R.drawable.banner),
+    BannerUiModel("Khuyến mãi", "Giảm 30% đơn đầu tiên", R.drawable.food_banner),
+    BannerUiModel("Hot deal", "Freeship cuối tuần", R.drawable.banner_promo1),
 )
 
 val mockFoods = listOf(
-    FoodPreviewUiModel(1,"Trà sữa Sài Gòn", "từ 35.000đ", "Mới", R.drawable.banner_promo1),
-    FoodPreviewUiModel(2,"Cơm thố Nhật", "từ 55.000đ", "Mới", R.drawable.banner_promo1),
-    FoodPreviewUiModel(3,"Burger bò phô mai", "từ 39.000đ", "Hot", R.drawable.banner_promo1)
+    FoodPreviewUiModel(1,"Trà sữa Sài Gòn", "từ 35.000đ", "Mới", R.drawable.rice),
+    FoodPreviewUiModel(2,"Cơm thố Nhật", "từ 55.000đ", "Mới", R.drawable.rice),
+    FoodPreviewUiModel(3,"Burger bò phô mai", "từ 39.000đ", "Hot", R.drawable.rice)
 )

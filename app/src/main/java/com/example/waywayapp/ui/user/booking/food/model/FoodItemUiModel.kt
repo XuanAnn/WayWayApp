@@ -10,4 +10,5 @@ data class FoodItemUiModel(
     val rating: Double,
     val imageRes: Int,
     val badge: String
+
 )

@@ -25,7 +25,7 @@ fun FoodCartBottomBar(
 
     Card(
         modifier = modifier
-            .fillMaxWidth()
+            .width(250.dp)
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(58.dp)
             .clickable { onCartClick() },
@@ -41,7 +41,8 @@ fun FoodCartBottomBar(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.ShoppingCart,
