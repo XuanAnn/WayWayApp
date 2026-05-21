@@ -34,6 +34,8 @@ import com.example.waywayapp.data.remote.api.GeocodingApi
 import com.example.waywayapp.data.remote.api.OsrmApi
 import com.example.waywayapp.data.remote.dto.geocoding.GeocodingResponseDto
 import com.example.waywayapp.core.network.RetrofitProvider
+import com.example.waywayapp.ui.user.booking.bike.model.BikeLocationType
+
 class BikeViewModel(
 
 ) : ViewModel(
@@ -286,7 +288,61 @@ class BikeViewModel(
             )
         }
     }
+    fun setPickupLocation(
+        latLng: LatLng,
+        address: String
+    ) {
+        _uiState.update {
+            it.copy(
+                pickupLatLng = latLng,
+                pickupAddress = address,
+                error = null
+            )
+        }
 
+        calculateRoute()
+    }
+
+    fun setBikeLocationFromMap(
+        type: BikeLocationType,
+        latLng: LatLng
+    ) {
+        when (type) {
+            BikeLocationType.PICKUP -> {
+                _uiState.update {
+                    it.copy(
+                        pickupLatLng = latLng,
+                        pickupAddress = "Đang lấy địa chỉ..."
+                    )
+                }
+
+                getAddressFromLatLng(latLng) { address ->
+                    _uiState.update {
+                        it.copy(pickupAddress = address)
+                    }
+
+                    calculateRoute()
+                }
+            }
+
+            BikeLocationType.DROPOFF -> {
+                _uiState.update {
+                    it.copy(
+                        dropoffLatLng = latLng,
+                        dropoffAddress = "Đang lấy địa chỉ..."
+                    )
+                }
+
+                getAddressFromLatLng(latLng) { address ->
+                    _uiState.update {
+                        it.copy(dropoffAddress = address)
+                    }
+
+                    calculateRoute()
+                }
+            }
+        }
+    }
     fun cancelBooking() {
         Log.i(TAG, "Booking canceled")
         _uiState.update { it.copy(status = BookingStatus.IDLE) }

@@ -11,6 +11,22 @@ object Routes {
     const val FOOD_CART = "food_cart"
     const val CHECKOUT_SUCCESS = "checkout_success"
     const val FOOD_ORDER_TRACKING = "food_order_tracking"
+
+    const val EXPRESS_FORM = "express_form"
+    const val EXPRESS_PICKUP = "express_pickup"
+    const val EXPRESS_DROPOFF = "express_dropoff"
+    const val EXPRESS_CONFIRM = "express_confirm"
+
+    const val BIKE_HOME = "bike_home"
+    const val BIKE_SEARCH = "bike_search"
+    const val BIKE_PICKUP_MAP = "bike_pickup_map"
+    const val BIKE_DROPOFF_MAP = "bike_dropoff_map"
+    const val BIKE_CONFIRM = "bike_confirm"
+
+    const val CAR_SEARCH = "car_search"
+    const val CAR_PICKUP_MAP = "car_pickup_map"
+    const val CAR_DROPOFF_MAP = "car_dropoff_map"
+    const val CAR_CONFIRM = "car_confirm"
     fun createFoodRoute(
         foodId: Int
     ): String {

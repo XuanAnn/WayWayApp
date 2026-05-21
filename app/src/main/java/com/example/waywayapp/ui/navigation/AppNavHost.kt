@@ -11,8 +11,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
-import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
+import com.example.waywayapp.ui.user.booking.express.model.ExpressLocationType
+import com.example.waywayapp.ui.user.booking.express.picker.LocationPickerScreen
 import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
 import com.example.waywayapp.ui.user.booking.food.cart.CheckoutSuccessScreen
 import com.example.waywayapp.ui.user.booking.food.cart.FoodCartScreen
@@ -21,6 +22,14 @@ import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
 import com.example.waywayapp.ui.user.profile.ProfileScreen
+import com.example.waywayapp.ui.user.booking.bike.search.BikeSearchScreen
+import com.example.waywayapp.ui.user.booking.bike.map.BikeLocationPickerScreen
+import com.example.waywayapp.ui.user.booking.bike.confirm.BikeConfirmScreen
+import com.example.waywayapp.ui.user.booking.bike.model.BikeLocationType
+import com.example.waywayapp.ui.user.booking.car.confirm.CarConfirmScreen
+import com.example.waywayapp.ui.user.booking.car.map.CarLocationPickerScreen
+import com.example.waywayapp.ui.user.booking.car.model.CarLocationType
+import com.example.waywayapp.ui.user.booking.car.search.CarSearchScreen
 
 @Composable
 fun AppNavHost(
@@ -97,18 +106,96 @@ fun AppNavHost(
 
         ) { backStackEntry ->
             val bookingType = backStackEntry.arguments?.getString("type") ?: "bike"
-            BookingRoute(type = bookingType,
+            BookingRoute(
+                type = bookingType,
                 onBackClick = {
                     navController.popBackStack()
                 },
                 onCartClick = {
                     navController.navigate(Routes.FOOD_CART)
+                },
+                onBikePickupClick = {
+                    navController.navigate(Routes.BIKE_PICKUP_MAP)
+                },
+                onBikeDropoffClick = {
+                    navController.navigate(Routes.BIKE_DROPOFF_MAP)
+                },
+                onBikeConfirmClick = {
+                    navController.navigate(Routes.BIKE_CONFIRM)
+                },
+                onExpressPickupClick = {
+                    navController.navigate(Routes.EXPRESS_PICKUP)
+                },
+                onExpressDropoffClick = {
+                    navController.navigate(Routes.EXPRESS_DROPOFF)
+                },
+                onExpressConfirmClick = {
+                    navController.navigate(Routes.EXPRESS_CONFIRM)
+                },
+                onCarPickupClick = {
+                    navController.navigate(Routes.CAR_PICKUP_MAP)
+                },
+                onCarDropoffClick = {
+                    navController.navigate(Routes.CAR_DROPOFF_MAP)
+                },
+                onCarConfirmClick = {
+                    navController.navigate(Routes.CAR_CONFIRM)
                 }
             )
-
-
+        }
+        composable(Routes.BIKE_SEARCH) {
+            BikeSearchScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onPickupMapClick = {
+                    navController.navigate(Routes.BIKE_PICKUP_MAP)
+                },
+                onDropoffMapClick = {
+                    navController.navigate(Routes.BIKE_DROPOFF_MAP)
+                },
+                onConfirmClick = {
+                    navController.navigate(Routes.BIKE_CONFIRM)
+                }
+            )
         }
 
+        composable(Routes.BIKE_PICKUP_MAP) {
+            BikeLocationPickerScreen(
+                type = BikeLocationType.PICKUP,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onConfirmClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.BIKE_DROPOFF_MAP) {
+            BikeLocationPickerScreen(
+                type = BikeLocationType.DROPOFF,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onConfirmClick = {
+                    navController.navigate(Routes.BIKE_CONFIRM)
+                }
+            )
+        }
+
+        composable(Routes.BIKE_CONFIRM) {
+            BikeConfirmScreen(
+                onBackHomeClick = {
+                    navController.navigate(Routes.USER_HOME) {
+                        popUpTo(Routes.USER_HOME) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
         composable(Routes.NOTIFICATION) {
             NotificationScreen()
         }
@@ -149,7 +236,29 @@ fun AppNavHost(
 
             )
         }
+        composable(Routes.EXPRESS_PICKUP) {
+            LocationPickerScreen(
+                type = ExpressLocationType.PICKUP,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onConfirmClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
+        composable(Routes.EXPRESS_DROPOFF) {
+            LocationPickerScreen(
+                type = ExpressLocationType.DROPOFF,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onConfirmClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
         composable(Routes.CHECKOUT_SUCCESS) {
             CheckoutSuccessScreen(
                 onBackHomeClick = {
@@ -184,6 +293,59 @@ fun AppNavHost(
                 },
                 onBankClick = {
                     navController.navigate("bank_payment")
+                }
+            )
+        }
+        composable(Routes.CAR_SEARCH) {
+            CarSearchScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onPickupMapClick = {
+                    navController.navigate(Routes.CAR_PICKUP_MAP)
+                },
+                onDropoffMapClick = {
+                    navController.navigate(Routes.CAR_DROPOFF_MAP)
+                },
+                onConfirmClick = {
+                    navController.navigate(Routes.CAR_CONFIRM)
+                }
+            )
+        }
+
+        composable(Routes.CAR_PICKUP_MAP) {
+            CarLocationPickerScreen(
+                type = CarLocationType.PICKUP,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onConfirmClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.CAR_DROPOFF_MAP) {
+            CarLocationPickerScreen(
+                type = CarLocationType.DROPOFF,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onConfirmClick = {
+                    navController.navigate(Routes.CAR_CONFIRM)
+                }
+            )
+        }
+
+        composable(Routes.CAR_CONFIRM) {
+            CarConfirmScreen(
+                onBackHomeClick = {
+                    navController.navigate(Routes.USER_HOME) {
+                        popUpTo(Routes.USER_HOME) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
