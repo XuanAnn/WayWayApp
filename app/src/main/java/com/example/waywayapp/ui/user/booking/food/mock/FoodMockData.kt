@@ -38,8 +38,8 @@ val foodList = listOf(
         imageRes = R.drawable.banner_promo1,
         badge = "Sale"
     )
-
 )
+
 val foodCategories = listOf(
     FoodCategoryUiModel(
         name = "Cơm",
@@ -48,7 +48,6 @@ val foodCategories = listOf(
     FoodCategoryUiModel(
         name = "Burger",
         icon = R.drawable.rice
-
     ),
     FoodCategoryUiModel(
         name = "Trà sữa",
@@ -57,15 +56,15 @@ val foodCategories = listOf(
     FoodCategoryUiModel(
         name = "Phở",
         icon = R.drawable.rice
-
-    ),
-
+    )
 )
+
 val foodBanners = listOf(
     FoodBannerUiModel(R.drawable.banner_promo1),
     FoodBannerUiModel(R.drawable.banner_promo1),
     FoodBannerUiModel(R.drawable.banner_promo1)
 )
+
 val mockFoods = listOf(
     FoodPreviewUiModel(
         id = 1,
@@ -74,7 +73,6 @@ val mockFoods = listOf(
         badge = "Mới",
         imageRes = R.drawable.banner_promo1
     ),
-
     FoodPreviewUiModel(
         id = 2,
         name = "Cơm thố Nhật",

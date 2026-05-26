@@ -49,4 +49,7 @@ object Routes {
     const val NOTIFICATION = "notification"
     const val RECENTLY_SERVICE = "recent_service"
     const val PROFILE = "profile"
+
+    // admin
+    const val ADMIN_DRIVERS = "admin_drivers"
 }

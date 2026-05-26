@@ -2,29 +2,32 @@ package com.example.waywayapp.ui.user.booking.food.order
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.waywayapp.ui.user.booking.food.cart.FoodCartStore
+import com.example.waywayapp.data.repository.FoodRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class FoodOrderViewModel : ViewModel() {
+class FoodOrderViewModel(
+    private val repository: FoodRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FoodOrderState())
     val uiState = _uiState.asStateFlow()
 
     fun placeOrder() {
-        if (FoodCartStore.cartItems.value.isEmpty()) {
-            _uiState.update {
-                it.copy(
-                    message = "Giỏ hàng đang trống"
-                )
-            }
-            return
-        }
-
         viewModelScope.launch {
+            val cartItems = repository.getCartItems().first()
+
+            if (cartItems.isEmpty()) {
+                _uiState.update {
+                    it.copy(message = "Giỏ hàng đang trống")
+                }
+                return@launch
+            }
+
             _uiState.update {
                 it.copy(
                     status = FoodOrderStatus.FINDING_DRIVER,
@@ -65,7 +68,7 @@ class FoodOrderViewModel : ViewModel() {
 
             delay(5000)
 
-            FoodCartStore.clearCart()
+            repository.clearCart()
 
             _uiState.update {
                 it.copy(

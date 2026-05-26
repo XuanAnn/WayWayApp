@@ -26,15 +26,25 @@ import com.example.waywayapp.ui.user.booking.food.component.FoodRestaurantCard
 import com.example.waywayapp.ui.user.booking.food.component.PromoFoodBanners
 import com.example.waywayapp.ui.user.booking.food.components.FoodCartBottomBar
 import androidx.compose.ui.platform.LocalContext
+import com.example.waywayapp.core.di.AppContainer
+
 @Composable
 fun FoodBookingScreen(
     selectedFoodId: Int = 0,
-    viewModel: FoodViewModel = viewModel(),
     onBackClick: () -> Unit = {},
     onCartClick: () -> Unit = {}
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    val viewModel: FoodViewModel = viewModel(
+        factory = FoodViewModelFactory(
+            repository = AppContainer.provideFoodRepository(
+                context.applicationContext
+            )
+        )
+    )
+    val uiState by viewModel.uiState.collectAsState()
+
 
     uiState.errorMessage?.let { message ->
         LaunchedEffect(message) {

@@ -2,15 +2,16 @@ package com.example.waywayapp.ui.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
+import com.example.waywayapp.data.repository.FirebaseAuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class LoginViewModel(
+    private val authRepository: FirebaseAuthRepository = FirebaseAuthRepository()
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginState())
     val uiState: StateFlow<LoginState> = _uiState.asStateFlow()
@@ -24,23 +25,74 @@ class LoginViewModel : ViewModel() {
     }
 
     fun login() {
-        val email = _uiState.value.email
+        val email = _uiState.value.email.trim()
         val password = _uiState.value.password
 
         if (email.isBlank() || password.isBlank()) {
-            _uiState.update { it.copy(error = "Vui lòng nhập đầy đủ thông tin") }
+            _uiState.update {
+                it.copy(error = "Vui lòng nhập đầy đủ thông tin")
+            }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true, error = null) }
+        runAuth {
+            authRepository.signInWithEmail(email, password)
+        }
+    }
 
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
-                } else {
-                    _uiState.update { it.copy(isLoading = false, error = task.exception?.message ?: "Đăng nhập thất bại") }
+    fun loginWithGoogleIdToken(
+        idToken: String
+    ) {
+        runAuth {
+            authRepository.signInWithGoogleIdToken(idToken)
+        }
+    }
+
+    fun loginWithFacebookAccessToken(
+        accessToken: String
+    ) {
+        runAuth {
+            authRepository.signInWithFacebookAccessToken(accessToken)
+        }
+    }
+
+    fun setError(
+        message: String
+    ) {
+        _uiState.update {
+            it.copy(isLoading = false, error = message)
+        }
+    }
+
+    private fun runAuth(
+        block: suspend () -> Unit
+    ) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(isLoading = true, error = null)
+            }
+
+            runCatching {
+                block()
+            }.onSuccess {
+                val role = runCatching {
+                    authRepository.getCurrentUserRole()
+                }.getOrDefault("USER")
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isLoginSuccess = true,
+                        role = role
+                    )
+                }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = throwable.localizedMessage ?: "Đăng nhập thất bại"
+                    )
                 }
             }
+        }
     }
 }

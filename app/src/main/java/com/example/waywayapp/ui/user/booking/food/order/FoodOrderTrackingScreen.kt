@@ -17,19 +17,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.waywayapp.core.di.AppContainer
 
 @Composable
 fun FoodOrderTrackingScreen(
-    onBackHomeClick: () -> Unit = {},
-    viewModel: FoodOrderViewModel = viewModel()
+    onBackHomeClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val viewModel: FoodOrderViewModel = viewModel(
+        factory = FoodOrderViewModelFactory(
+            repository = AppContainer.provideFoodRepository(
+                context.applicationContext
+            )
+        )
+    )
     val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.placeOrder()
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -78,7 +90,8 @@ fun FoodOrderTrackingScreen(
                     text = uiState.message,
                     fontWeight = FontWeight.ExtraBold,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF20242A)
+                    color = Color(0xFF20242A),
+                    textAlign = TextAlign.Center
                 )
 
                 if (uiState.driverName.isNotBlank()) {
@@ -100,7 +113,10 @@ fun FoodOrderTrackingScreen(
                     )
                 }
 
-                if (uiState.status == FoodOrderStatus.COMPLETED) {
+                if (
+                    uiState.status == FoodOrderStatus.COMPLETED ||
+                    uiState.message == "Giỏ hàng đang trống"
+                ) {
                     Spacer(modifier = Modifier.height(26.dp))
 
                     Button(

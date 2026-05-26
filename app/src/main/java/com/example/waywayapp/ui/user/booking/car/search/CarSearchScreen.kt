@@ -1,5 +1,7 @@
 package com.example.waywayapp.ui.user.booking.car.search
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +14,9 @@ import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.example.waywayapp.ui.user.booking.car.CarSharedViewModel
 import com.example.waywayapp.ui.user.booking.car.CarViewModel
 
@@ -24,8 +28,24 @@ fun CarSearchScreen(
     onConfirmClick: () -> Unit = {},
     viewModel: CarViewModel = CarSharedViewModel.viewModel
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
+    val hasLocationPermission =
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission && uiState.currentLatLng == null) {
+            viewModel.initLocation(context)
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background

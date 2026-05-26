@@ -24,5 +24,6 @@ data class DriverState(
     val passengerName: String = "",
     val passengerPhone: String = "",
     val tripPrice: Double = 0.0,
+    val currentRideId: String? = null,
     val polylinePoints: List<LatLng> = emptyList()
 )

@@ -9,6 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.waywayapp.data.repository.FirebaseAuthRepository
+import com.example.waywayapp.ui.admin.driver.AdminDriverScreen
+import com.example.waywayapp.ui.driver.home.DriverHomeScreen
 import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
@@ -30,15 +33,24 @@ import com.example.waywayapp.ui.user.booking.car.confirm.CarConfirmScreen
 import com.example.waywayapp.ui.user.booking.car.map.CarLocationPickerScreen
 import com.example.waywayapp.ui.user.booking.car.model.CarLocationType
 import com.example.waywayapp.ui.user.booking.car.search.CarSearchScreen
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val authRepository = FirebaseAuthRepository()
+    val startDestination =
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            Routes.LOGIN
+        } else {
+            routeForRole(authRepository.getFastCurrentUserRole())
+        }
+
     NavHost(
         navController = navController,
-        startDestination = Routes.USER_HOME,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         /*----------------------------------------------------
@@ -47,8 +59,8 @@ fun AppNavHost(
         //LOGIN
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate(Routes.USER_HOME) {
+                onLoginSuccess = { role ->
+                    navController.navigate(routeForRole(role)) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 },
@@ -67,6 +79,14 @@ fun AppNavHost(
                     }
                 }
             )
+        }
+
+        composable(Routes.ADMIN_DRIVERS) {
+            AdminDriverScreen()
+        }
+
+        composable(Routes.DRIVER_HOME) {
+            DriverHomeScreen()
         }
 
         // Placeholder for Home
@@ -349,5 +369,13 @@ fun AppNavHost(
                 }
             )
         }
+    }
+}
+
+private fun routeForRole(role: String): String {
+    return when (role.uppercase()) {
+        "ADMIN" -> Routes.ADMIN_DRIVERS
+        "DRIVER" -> Routes.DRIVER_HOME
+        else -> Routes.USER_HOME
     }
 }

@@ -2,32 +2,35 @@ package com.example.waywayapp.ui.driver.home
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.waywayapp.data.remote.api.OsrmApi
+import com.example.waywayapp.data.repository.DriverLocationRepository
+import com.example.waywayapp.data.repository.FirebaseAuthRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class DriverViewModel : ViewModel() {
+class DriverViewModel(
+    private val authRepository: FirebaseAuthRepository = FirebaseAuthRepository(),
+    private val locationRepository: DriverLocationRepository = DriverLocationRepository()
+) : ViewModel() {
     private val _uiState = MutableStateFlow(DriverState())
     val uiState: StateFlow<DriverState> = _uiState.asStateFlow()
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var locationJob: Job? = null
 
     private val osrmApi: OsrmApi by lazy {
         Retrofit.Builder()
@@ -44,29 +47,56 @@ class DriverViewModel : ViewModel() {
 
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
-        viewModelScope.launch {
+        if (locationJob?.isActive == true) {
+            return
+        }
+
+        locationJob = viewModelScope.launch {
             while (true) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    location?.let {
-                        val latLng = LatLng(it.latitude, it.longitude)
-                        _uiState.update { state -> state.copy(currentLatLng = latLng) }
+                runCatching {
+                    fusedLocationClient.lastLocation.await()
+                }.getOrNull()?.let { location ->
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    _uiState.update { state ->
+                        state.copy(currentLatLng = latLng)
+                    }
+
+                    if (_uiState.value.status != DriverStatus.OFFLINE) {
+                        val driverId = authRepository.currentUser?.uid ?: "demo-driver"
+                        runCatching {
+                            locationRepository.publishDriverLocation(
+                                driverId = driverId,
+                                activeRideId = _uiState.value.currentRideId,
+                                location = location
+                            )
+                        }
                     }
                 }
                 delay(5000)
             }
         }
-
     }
-
 
     fun toggleOnlineStatus() {
         _uiState.update {
-            val newStatus = if (it.status == DriverStatus.OFFLINE) DriverStatus.ONLINE else DriverStatus.OFFLINE
+            val newStatus =
+                if (it.status == DriverStatus.OFFLINE) DriverStatus.ONLINE
+                else DriverStatus.OFFLINE
             it.copy(status = newStatus)
         }
 
-        if (_uiState.value.status == DriverStatus.ONLINE) {
-            viewModelScope.launch {
+        val isOnline = _uiState.value.status == DriverStatus.ONLINE
+        viewModelScope.launch {
+            val driverId = authRepository.currentUser?.uid ?: "demo-driver"
+            runCatching {
+                locationRepository.setDriverAvailability(
+                    driverId = driverId,
+                    isOnline = isOnline,
+                    isAvailable = isOnline
+                )
+            }
+
+            if (isOnline) {
                 delay(3000)
                 simulateIncomingTrip()
             }
@@ -76,6 +106,7 @@ class DriverViewModel : ViewModel() {
     private fun simulateIncomingTrip() {
         _uiState.update {
             it.copy(
+                currentRideId = "demo-ride",
                 pickupAddress = "123 Đường Lê Lợi, Quận 1",
                 dropoffAddress = "Landmark 81, Bình Thạnh",
                 passengerName = "Trần Thị B",
@@ -99,7 +130,6 @@ class DriverViewModel : ViewModel() {
     }
 
     fun arrivedAtPickup() {
-        // Driver reached pickup point, now calculate route to dropoff
         val pickup = _uiState.value.pickupLatLng ?: return
         val dropoff = _uiState.value.dropoffLatLng ?: return
         calculateRoute(pickup, dropoff)
@@ -111,15 +141,14 @@ class DriverViewModel : ViewModel() {
 
     private fun calculateRoute(start: LatLng, end: LatLng) {
         viewModelScope.launch {
-            try {
-                val coordinates = "${start.longitude},${start.latitude};${end.longitude},${end.latitude}"
+            runCatching {
+                val coordinates =
+                    "${start.longitude},${start.latitude};${end.longitude},${end.latitude}"
                 val response = osrmApi.getRoute(coordinates)
                 if (response.routes.isNotEmpty()) {
                     val points = PolyUtil.decode(response.routes[0].geometry)
                     _uiState.update { it.copy(polylinePoints = points) }
                 }
-            } catch (e: Exception) {
-                // Handle error
             }
         }
     }
@@ -132,6 +161,7 @@ class DriverViewModel : ViewModel() {
                 currentTrips = state.currentTrips + 1,
                 pickupLatLng = null,
                 dropoffLatLng = null,
+                currentRideId = null,
                 polylinePoints = emptyList()
             )
         }
@@ -142,6 +172,7 @@ class DriverViewModel : ViewModel() {
             it.copy(
                 pickupLatLng = null,
                 dropoffLatLng = null,
+                currentRideId = null,
                 pickupAddress = "",
                 dropoffAddress = ""
             )

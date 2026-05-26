@@ -8,13 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,36 +19,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.waywayapp.core.di.AppContainer
+import com.example.waywayapp.ui.user.booking.food.FoodViewModel
+import com.example.waywayapp.ui.user.booking.food.FoodViewModelFactory
 import com.example.waywayapp.ui.user.booking.food.component.QuantityControl
 import java.text.DecimalFormat
 
 @Composable
 fun FoodCartScreen(
     onBackClick: () -> Unit = {},
-    onPlaceOrderClick: () -> Unit = {},
-    viewModel: FoodCartViewModel = viewModel()
+    onPlaceOrderClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
+    val viewModel: FoodViewModel = viewModel(
+        factory = FoodViewModelFactory(
+            repository = AppContainer.provideFoodRepository(
+                context.applicationContext
+            )
+        )
+    )
     val uiState by viewModel.uiState.collectAsState()
     val formatter = DecimalFormat("#,###")
-    LaunchedEffect(uiState.isCheckoutSuccess) {
-        if (uiState.isCheckoutSuccess) {
-            onPlaceOrderClick()
-            viewModel.clearCheckoutSuccess()
-        }
-    }
+
     Scaffold(
         containerColor = Color(0xFFF5F7F2),
         bottomBar = {
             if (uiState.cartItems.isNotEmpty()) {
                 CartCheckoutBar(
                     totalPrice = uiState.totalPrice,
-                    onCheckoutClick = {
-                        viewModel.checkout()
-                    }
+                    onCheckoutClick = onPlaceOrderClick
                 )
             }
         }
@@ -61,9 +63,7 @@ fun FoodCartScreen(
                 .fillMaxSize()
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
-            CartHeader(
-                onBackClick = onBackClick
-            )
+            CartHeader(onBackClick = onBackClick)
 
             if (uiState.cartItems.isEmpty()) {
                 EmptyCartContent()
@@ -84,13 +84,16 @@ fun FoodCartScreen(
                             priceText = "${formatter.format(item.food.price)}đ",
                             quantity = item.quantity,
                             onAddClick = {
-                                viewModel.addFood(item.food)
+                                viewModel.addToCart(item.food)
                             },
                             onRemoveClick = {
-                                viewModel.removeFood(item.food.id)
+                                viewModel.removeFromCart(item.food.id)
                             },
                             onDeleteClick = {
-                                viewModel.deleteFood(item.food.id)
+                                viewModel.onQuantityChange(
+                                    foodId = item.food.id,
+                                    quantity = 0
+                                )
                             }
                         )
                     }
@@ -180,11 +183,13 @@ private fun CartItemCard(
                     color = Color(0xFF20242A)
                 )
 
-                Text(
-                    text = store,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
+                if (store.isNotBlank()) {
+                    Text(
+                        text = store,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -194,12 +199,11 @@ private fun CartItemCard(
                     color = Color(0xFF20242A)
                 )
 
-
                 QuantityControl(
                     quantity = quantity,
                     onAddClick = onAddClick,
                     onRemoveClick = onRemoveClick,
-                    onQuantityChange = {  },
+                    onQuantityChange = { },
                     modifier = Modifier.offset(y = (-25).dp)
                 )
             }
@@ -216,7 +220,6 @@ private fun CartItemCard(
         }
     }
 }
-
 
 @Composable
 private fun CartCheckoutBar(

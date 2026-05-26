@@ -1,54 +1,75 @@
- package com.example.waywayapp.ui.auth.register
+package com.example.waywayapp.ui.auth.register
 
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewModelScope
+import com.example.waywayapp.data.repository.FirebaseAuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class RegisterViewModel : ViewModel() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class RegisterViewModel(
+    private val authRepository: FirebaseAuthRepository = FirebaseAuthRepository()
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterState())
     val uiState: StateFlow<RegisterState> = _uiState.asStateFlow()
 
     fun onEmailChange(newValue: String) {
-        _uiState.update { it.copy(email = newValue) }
+        _uiState.update { it.copy(email = newValue, error = null) }
     }
 
     fun onPasswordChange(newValue: String) {
-        _uiState.update { it.copy(password = newValue) }
+        _uiState.update { it.copy(password = newValue, error = null) }
     }
 
     fun onConfirmPasswordChange(newValue: String) {
-        _uiState.update { it.copy(confirmPassword = newValue) }
+        _uiState.update { it.copy(confirmPassword = newValue, error = null) }
     }
 
     fun onPhoneChange(newValue: String) {
-        _uiState.update { it.copy(phone = newValue) }
+        _uiState.update { it.copy(phone = newValue, error = null) }
     }
 
     fun register() {
         val state = _uiState.value
         if (state.email.isBlank() || state.password.isBlank()) {
-            _uiState.update { it.copy(error = "Vui lòng điền đầy đủ thông tin") }
+            _uiState.update {
+                it.copy(error = "Vui lòng điền đầy đủ thông tin")
+            }
             return
         }
         if (state.password != state.confirmPassword) {
-            _uiState.update { it.copy(error = "Mật khẩu không khớp") }
+            _uiState.update {
+                it.copy(error = "Mật khẩu không khớp")
+            }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true, error = null) }
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(isLoading = true, error = null)
+            }
 
-        auth.createUserWithEmailAndPassword(state.email, state.password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _uiState.update { it.copy(isLoading = false, isRegisterSuccess = true) }
-                } else {
-                    _uiState.update { it.copy(isLoading = false, error = task.exception?.message) }
+            runCatching {
+                authRepository.registerWithEmail(
+                    email = state.email.trim(),
+                    password = state.password,
+                    phone = state.phone.ifBlank { null }
+                )
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(isLoading = false, isRegisterSuccess = true)
+                }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = throwable.localizedMessage ?: "Đăng ký thất bại"
+                    )
                 }
             }
+        }
     }
 }
