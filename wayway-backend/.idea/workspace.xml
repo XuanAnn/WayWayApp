@@ -5,12 +5,48 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="568a24c8-a430-4595-ad4e-def620b70874" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/di/AppContainer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/di/AppContainer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/network/ApiConstants.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/network/ApiConstants.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/AdminDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/AdminDriver.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/Ride.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/Ride.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminDriverRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminDriverRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/DriverLocationRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/DriverLocationRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/FirebaseAuthRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/FirebaseAuthRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModelFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModelFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverHomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/AppNavHost.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/AppNavHost.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/theme/Color.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/theme/Color.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/BookingRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/BookingRoute.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/ui/BookingContent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/ui/BookingContent.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodBookingFlow.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodBookingFlow.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/Routes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/Routes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingConfirmCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingConfirmCard.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingInputOverlay.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingInputOverlay.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/MainMapContent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/MainMapContent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/OnTripUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/OnTripUI.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/confirm/BikeConfirmScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/confirm/BikeConfirmScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/profile/ProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/profile/ProfileScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../firebase/firestore.rules" beforeDir="false" afterPath="$PROJECT_DIR$/../firebase/firestore.rules" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,31 +62,61 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.4.1-bin/arn2x92ynaizyzdaamcbpbhtj/gradle-9.4.1" javaHome="C:/Program Files/Java/jdk-25" gradleVersion="9.4.1" />
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="3DngeEHZkIiHyiBbYnj9k0jGsw5" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.WayWayBackendApplication.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/Workspace/WayWayApp/wayway-backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager">
+}</component>
+  <component name="RunManager" selected="Application.WayWayBackendApplication">
+    <configuration name="WayWayBackendApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.waywaybackend.WayWayBackendApplication" />
+      <module name="wayway-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.waywaybackend.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WayWayBackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="wayway-backend" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.waywaybackend.WayWayBackendApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="WaywayBackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="wayway-backend.main" />
@@ -59,6 +125,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.WayWayBackendApplication" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -76,10 +147,27 @@
       <option name="presentableId" value="Default" />
       <updated>1778923344353</updated>
       <workItem from="1778923345602" duration="428000" />
+      <workItem from="1780222477695" duration="4023000" />
+      <workItem from="1780226678207" duration="1641000" />
+      <workItem from="1780228516504" duration="408000" />
+      <workItem from="1780230842829" duration="1028000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="java:jakarta.validation:jakarta.validation-api" />
+    <option featureType="dependencySupport" implementationName="java:jakarta.persistence:jakarta.persistence-api" />
+    <option featureType="dependencySupport" implementationName="java:io.projectreactor:reactor-core" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.data:spring-data-commons" />
+    <option featureType="dependencySupport" implementationName="java:org.hibernate.validator:hibernate-validator" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+    <option featureType="dependencySupport" implementationName="java:org.projectlombok:lombok" />
   </component>
 </project>

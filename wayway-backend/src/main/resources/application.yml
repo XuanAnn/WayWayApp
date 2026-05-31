@@ -1,0 +1,17 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  application:
+    name: wayway-backend
+
+wayway:
+  momo:
+    endpoint: ${MOMO_ENDPOINT:https://test-payment.momo.vn/v2/gateway/api/create}
+    partnerCode: ${MOMO_PARTNER_CODE:MOMOBKUN20180529}
+    accessKey: ${MOMO_ACCESS_KEY:klm05TvNBzhg7h7j}
+    secretKey: ${MOMO_SECRET_KEY:at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa}
+    redirectUrl: ${MOMO_REDIRECT_URL:https://interoceptive-marty-pelitic.ngrok-free.dev/api/momo/return}
+    ipnUrl: ${MOMO_IPN_URL:https://interoceptive-marty-pelitic.ngrok-free.dev/api/momo/ipn}
+    requestType: ${MOMO_REQUEST_TYPE:captureWallet}
+    lang: ${MOMO_LANG:vi}
