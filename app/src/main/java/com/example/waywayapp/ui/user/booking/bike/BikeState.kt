@@ -21,13 +21,25 @@ data class BikeState(
     val error: String? = null,
 
     val promo: Double = 1.0,
-    val driverName: String = "Nguyễn Văn A",
-    val driverPlate: String = "29-A1 123.45",
-    val driverRating: Double = 4.9,
+    val driverName: String = "",
+    val driverPhone: String = "",
+    val driverPlate: String = "",
+    val driverRating: Double = 0.0,
+    val driverLatLng: LatLng? = null,
+    val ridePhase: String = "",
+    val rideStatus: String = "",
+    val etaToPickup: String = "",
+    val etaToDropoff: String = "",
 
     val promoCode: String = "Áp mã",
     val discount: Double = 0.0,
-    val finalPrice: Double = 0.0
+    val finalPrice: Double = 0.0,
+    val currentRideId: String? = null,
+
+    val momoOrderId: String? = null,
+    val momoPayUrl: String? = null,
+    val momoStatus: String = "IDLE",
+    val momoMessage: String? = null
 ) {
     val canConfirmRide: Boolean
         get() = pickupLatLng != null &&

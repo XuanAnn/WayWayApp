@@ -2,6 +2,7 @@ package com.example.waywayapp.core.di
 
 import android.content.Context
 import com.example.waywayapp.core.database.DatabaseProvider
+import com.example.waywayapp.data.repository.AdminRepository
 import com.example.waywayapp.data.repository.AdminDriverRepository
 import com.example.waywayapp.data.repository.DriverLocationRepository
 import com.example.waywayapp.data.repository.FirebaseAuthRepository
@@ -17,6 +18,8 @@ object AppContainer {
             DriverLocationRepository? = null
     private var adminDriverRepository:
             AdminDriverRepository? = null
+    private var adminRepository:
+            AdminRepository? = null
 
     fun provideFoodRepository(
         context: Context
@@ -63,6 +66,15 @@ object AppContainer {
             ?: synchronized(this) {
                 val repo = AdminDriverRepository()
                 adminDriverRepository = repo
+                repo
+            }
+    }
+
+    fun provideAdminRepository(): AdminRepository {
+        return adminRepository
+            ?: synchronized(this) {
+                val repo = AdminRepository()
+                adminRepository = repo
                 repo
             }
     }

@@ -19,7 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +34,11 @@ import com.example.waywayapp.ui.user.booking.bike.BikeState
 import java.text.DecimalFormat
 
 @Composable
-fun CompletedUI(state: BikeState, onFinish: () -> Unit) {
+fun CompletedUI(
+    state: BikeState,
+    onFinish: () -> Unit,
+    onRateRide: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -58,13 +62,18 @@ fun CompletedUI(state: BikeState, onFinish: () -> Unit) {
                         .background(Color(0xFF00B1A7), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(40.dp))
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(40.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Chuyến đi hoàn tất!",
+                    text = "Chuyen di hoan tat!",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -73,7 +82,7 @@ fun CompletedUI(state: BikeState, onFinish: () -> Unit) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Cảm ơn bạn đã sử dụng WayWay Bike.\nHy vọng bạn đã có một trải nghiệm tuyệt vời!",
+                    text = "Cam on ban da su dung WayWay Bike.\nHay danh gia tai xe de cai thien trai nghiem.",
                     fontSize = 14.sp,
                     color = Color.Gray,
                     textAlign = TextAlign.Center
@@ -81,7 +90,7 @@ fun CompletedUI(state: BikeState, onFinish: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Divider()
+                HorizontalDivider()
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -89,10 +98,10 @@ fun CompletedUI(state: BikeState, onFinish: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Tổng thanh toán", color = Color.Gray)
+                    Text(text = "Tong thanh toan", color = Color.Gray)
                     val formatter = DecimalFormat("#,###")
                     Text(
-                        text = "${formatter.format(state.price.toInt())} đ",
+                        text = "${formatter.format(state.price.toInt())} d",
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         color = Color(0xFF00B1A7)
@@ -102,14 +111,27 @@ fun CompletedUI(state: BikeState, onFinish: () -> Unit) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = onFinish,
+                    onClick = onRateRide,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B1A7)),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = "Về trang chủ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "Danh gia tai xe", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = onFinish,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF20242A)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(text = "Ve trang chu", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

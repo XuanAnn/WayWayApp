@@ -45,6 +45,11 @@ android {
             localProperties.getProperty("FACEBOOK_APP_ID", "")
         manifestPlaceholders["FACEBOOK_CLIENT_TOKEN"] =
             localProperties.getProperty("FACEBOOK_CLIENT_TOKEN", "")
+        buildConfigField(
+            "String",
+            "FACEBOOK_APP_ID",
+            "\"${localProperties.getProperty("FACEBOOK_APP_ID", "")}\""
+        )
         resValue(
             "string",
             "google_web_client_id",
@@ -52,13 +57,18 @@ android {
         )
         resValue(
             "string",
-            "facebook_app_id",
+            "facebook_application_id",
             localProperties.getProperty("FACEBOOK_APP_ID", "")
         )
         resValue(
             "string",
             "facebook_client_token",
             localProperties.getProperty("FACEBOOK_CLIENT_TOKEN", "")
+        )
+        resValue(
+            "string",
+            "facebook_login_protocol_scheme",
+            "fb${localProperties.getProperty("FACEBOOK_APP_ID", "")}"
         )
     }
 

@@ -39,9 +39,22 @@ object Routes {
     }
 
     const val TRACKING = "tracking"
+    const val AI_ASSISTANT = "ai_assistant/{role}"
+    fun createAiAssistantRoute(role: String): String {
+        return "ai_assistant/$role"
+    }
+    const val RIDE_CHAT = "ride_chat/{rideId}"
+    fun createRideChatRoute(rideId: String): String {
+        return "ride_chat/$rideId"
+    }
+    const val RIDE_RATING = "ride_rating/{rideId}"
+    fun createRideRatingRoute(rideId: String): String {
+        return "ride_rating/$rideId"
+    }
 
     // driver
     const val DRIVER_HOME = "driver_home"
+    const val DRIVER_INCOME = "driver_income"
     const val INCOMING = "incoming_ride"
     const val TRIP = "trip"
 

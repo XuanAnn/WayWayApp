@@ -1,7 +1,12 @@
 package com.example.waywayapp.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -11,7 +16,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.waywayapp.data.repository.FirebaseAuthRepository
 import com.example.waywayapp.ui.admin.driver.AdminDriverScreen
+import com.example.waywayapp.ui.ai.AiAssistantScreen
+import com.example.waywayapp.ui.chat.RideChatScreen
 import com.example.waywayapp.ui.driver.home.DriverHomeScreen
+import com.example.waywayapp.ui.driver.income.DriverIncomeScreen
 import com.example.waywayapp.ui.auth.login.LoginScreen
 import com.example.waywayapp.ui.auth.register.RegisterScreen
 import com.example.waywayapp.ui.user.booking.BookingRoute
@@ -24,7 +32,9 @@ import com.example.waywayapp.ui.user.booking.food.order.FoodOrderTrackingScreen
 import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
+import com.example.waywayapp.ui.user.payment.MomoLinkScreen
 import com.example.waywayapp.ui.user.profile.ProfileScreen
+import com.example.waywayapp.ui.user.rating.RideRatingScreen
 import com.example.waywayapp.ui.user.booking.bike.search.BikeSearchScreen
 import com.example.waywayapp.ui.user.booking.bike.map.BikeLocationPickerScreen
 import com.example.waywayapp.ui.user.booking.bike.confirm.BikeConfirmScreen
@@ -33,6 +43,7 @@ import com.example.waywayapp.ui.user.booking.car.confirm.CarConfirmScreen
 import com.example.waywayapp.ui.user.booking.car.map.CarLocationPickerScreen
 import com.example.waywayapp.ui.user.booking.car.model.CarLocationType
 import com.example.waywayapp.ui.user.booking.car.search.CarSearchScreen
+import com.example.waywayapp.ui.user.history.HistoryScreen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -41,16 +52,36 @@ fun AppNavHost(
     modifier: Modifier = Modifier
 ) {
     val authRepository = FirebaseAuthRepository()
-    val startDestination =
-        if (FirebaseAuth.getInstance().currentUser == null) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val startDestination by produceState<String?>(
+        initialValue = null,
+        key1 = currentUser
+    ) {
+        value = if (currentUser == null) {
             Routes.LOGIN
         } else {
-            routeForRole(authRepository.getFastCurrentUserRole())
+            runCatching {
+                routeForRole(authRepository.getCurrentUserRole())
+            }.getOrElse {
+                authRepository.signOut()
+                Routes.LOGIN
+            }
         }
+    }
+
+    if (startDestination == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = startDestination.orEmpty(),
         modifier = modifier
     ) {
         /*----------------------------------------------------
@@ -82,11 +113,49 @@ fun AppNavHost(
         }
 
         composable(Routes.ADMIN_DRIVERS) {
-            AdminDriverScreen()
+            AdminDriverScreen(
+                onProfileClick = {
+                    navController.navigate(Routes.PROFILE)
+                }
+            )
         }
 
         composable(Routes.DRIVER_HOME) {
-            DriverHomeScreen()
+            DriverHomeScreen(
+                onIncomeClick = {
+                    navController.navigate(Routes.DRIVER_INCOME) {
+                        launchSingleTop = true
+                    }
+                },
+                onProfileClick = {
+                    navController.navigate(Routes.PROFILE)
+                },
+                onOpenChat = { rideId ->
+                    navController.navigate(Routes.createRideChatRoute(rideId))
+                },
+                onAiAssistantClick = {
+                    navController.navigate(Routes.createAiAssistantRoute("DRIVER"))
+                }
+            )
+        }
+
+        composable(Routes.DRIVER_INCOME) {
+            DriverIncomeScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onHomeClick = {
+                    navController.navigate(Routes.DRIVER_HOME) {
+                        popUpTo(Routes.DRIVER_HOME) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onProfileClick = {
+                    navController.navigate(Routes.PROFILE)
+                }
+            )
         }
 
         // Placeholder for Home
@@ -112,6 +181,24 @@ fun AppNavHost(
                     navController.navigate(
                         Routes.createFoodRoute(foodId)
                     )
+                },
+                onAiAssistantClick = {
+                    navController.navigate(Routes.createAiAssistantRoute("USER"))
+                }
+            )
+        }
+        composable(
+            route = Routes.AI_ASSISTANT,
+            arguments = listOf(
+                navArgument("role") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            AiAssistantScreen(
+                role = backStackEntry.arguments?.getString("role").orEmpty(),
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -213,14 +300,76 @@ fun AppNavHost(
                         }
                         launchSingleTop = true
                     }
+                },
+                onOpenChat = { rideId ->
+                    navController.navigate(Routes.createRideChatRoute(rideId))
+                },
+                onRateRide = { rideId ->
+                    navController.navigate(Routes.createRideRatingRoute(rideId))
+                }
+            )
+        }
+        composable(
+            route = Routes.RIDE_CHAT,
+            arguments = listOf(
+                navArgument("rideId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            RideChatScreen(
+                rideId = backStackEntry.arguments?.getString("rideId").orEmpty(),
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = Routes.RIDE_RATING,
+            arguments = listOf(
+                navArgument("rideId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            RideRatingScreen(
+                rideId = backStackEntry.arguments?.getString("rideId").orEmpty(),
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onDone = {
+                    navController.navigate(Routes.RECENTLY_SERVICE) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
         composable(Routes.NOTIFICATION) {
             NotificationScreen()
         }
+        composable(Routes.RECENTLY_SERVICE) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+            HistoryScreen(
+                currentRoute = currentRoute,
+                onBottomNavClick = { route ->
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                    }
+                },
+                onRateRide = { rideId ->
+                    navController.navigate(Routes.createRideRatingRoute(rideId))
+                }
+            )
+        }
         composable(Routes.PROFILE) {
-            ProfileScreen()
+            ProfileScreen(
+                onSignOut = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(
@@ -313,6 +462,13 @@ fun AppNavHost(
                 },
                 onBankClick = {
                     navController.navigate("bank_payment")
+                }
+            )
+        }
+        composable("momo_payment") {
+            MomoLinkScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }

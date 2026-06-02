@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.ui.user.booking.bike.components.CompletedUI
 import com.example.waywayapp.ui.user.booking.bike.components.OnTripUI
@@ -27,6 +29,7 @@ fun CarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val cameraPositionState = rememberCameraPositionState()
+    val configuration = LocalConfiguration.current
 
     LaunchedEffect(uiState.currentLatLng) {
         uiState.currentLatLng?.let { current ->
@@ -63,6 +66,7 @@ fun CarScreen(
             BookingStatus.ON_TRIP -> {
                 OnTripUI(
                     state = uiState.toBikeState(),
+                    cardHeight = (configuration.screenHeightDp * 0.4f).dp,
                     onBack = viewModel::cancelBooking
                 )
             }

@@ -52,7 +52,7 @@ import com.google.android.gms.maps.model.LatLng
 @Composable
 fun BookingInputOverlay(
     viewModel: BikeViewModel,
-    onConfirmBooking: () -> Unit,
+    onConfirmBooking: (String) -> Unit,
     onSelectPromo: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()

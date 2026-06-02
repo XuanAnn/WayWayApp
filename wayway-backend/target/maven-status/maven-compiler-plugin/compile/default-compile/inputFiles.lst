@@ -1,3 +1,11 @@
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\AiChatController.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\AiChatService.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\AiConfig.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\AiProperties.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\api\AiChatRequest.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\api\AiChatResponse.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\OllamaClient.java
+E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\ai\OpenAiClient.java
 E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\common\ApiError.java
 E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\common\GlobalExceptionHandler.java
 E:\Workspace\WayWayApp\wayway-backend\src\main\java\com\example\waywaybackend\momo\api\MomoCreateRequest.java

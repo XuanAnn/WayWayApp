@@ -58,6 +58,7 @@ fun HomeScreen(
     onNotificationClick: () -> Unit = {},
     onPromoClick: () -> Unit = {},
     onFoodClick: (Int) -> Unit = {},
+    onAiAssistantClick: () -> Unit = {},
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -87,45 +88,60 @@ fun HomeScreen(
                 )
             }
         }
-    ) {
-        padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = padding.calculateBottomPadding())
-        ) {
-            item {
-                HeaderSection(
-                    onSearchClick = onSearchClick,
-                    onNotificationClick = onNotificationClick
-                )
-            }
-            item { FloatingWalletCard(onWalletClick = onWalletClick) }
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding())
+            ) {
+                item {
+                    HeaderSection(
+                        onSearchClick = onSearchClick,
+                        onNotificationClick = onNotificationClick
+                    )
+                }
+                item { FloatingWalletCard(onWalletClick = onWalletClick) }
 
-            item {
-                ServiceGrid(
-                    services = uiState.services,
-                    onServiceClick = { service ->
-                        onServiceClick(service.type)
-                    }
-                )
+                item {
+                    ServiceGrid(
+                        services = uiState.services,
+                        onServiceClick = { service ->
+                            onServiceClick(service.type)
+                        }
+                    )
+                }
+
+                item {
+                    PromoBanners(
+                        banners = uiState.banners,
+                        onPromoClick = onPromoClick
+                    )
+                }
+
+                item {
+                    FoodSection(
+                        foods = uiState.foods,
+                        onFoodClick = onFoodClick
+                    )
+                }
+
+                item { Spacer(modifier = Modifier.height(24.dp)) }
             }
 
-            item {
-                PromoBanners(
-                    banners = uiState.banners,
-                    onPromoClick = onPromoClick
-                )
+            FloatingActionButton(
+                onClick = onAiAssistantClick,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = 18.dp,
+                        bottom = padding.calculateBottomPadding() + 18.dp
+                    ),
+                containerColor = Color(0xFF00B14F),
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.AutoAwesome, contentDescription = "AI assistant")
             }
-
-            item {
-                FoodSection(
-                    foods = uiState.foods,
-                    onFoodClick = onFoodClick
-                )
-            }
-
-            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
     }
 }

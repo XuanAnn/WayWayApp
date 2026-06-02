@@ -12,8 +12,11 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Service
+// Service tạo payload thanh toán MoMo UAT và ký bằng secret key.
 public class MomoService {
+    // Cấu hình key, endpoint, redirectUrl và ipnUrl lấy từ application.yml/env.
     private final MomoProperties props;
+    // Client WebClient dùng để gọi sang MoMo gateway.
     private final MomoClient client;
 
     public MomoService(MomoProperties props, MomoClient client) {
@@ -21,12 +24,15 @@ public class MomoService {
         this.client = client;
     }
 
+    // Tạo giao dịch MoMo mới từ request của app Android.
     public Mono<MomoCreateResponse> createPayment(MomoCreateRequest req) {
         requireConfigured();
 
+        // requestId cần duy nhất để MoMo phân biệt từng lần tạo giao dịch.
         String requestId = req.orderId() + "-" + Instant.now().toEpochMilli();
         String extraData = Objects.requireNonNullElse(req.extraData(), "");
 
+        // Chuỗi rawSignature phải đúng thứ tự theo tài liệu MoMo để gateway chấp nhận.
         String rawSignature = "accessKey=" + props.accessKey()
                 + "&amount=" + req.amount()
                 + "&extraData=" + extraData
@@ -38,8 +44,10 @@ public class MomoService {
                 + "&requestId=" + requestId
                 + "&requestType=" + props.requestType();
 
+        // Ký HMAC SHA256 bằng secret key test của MoMo.
         String signature = HmacSigner.hmacSha256Hex(props.secretKey(), rawSignature);
 
+        // Payload gửi sang endpoint /v2/gateway/api/create của MoMo.
         MomoGatewayCreatePayload payload = new MomoGatewayCreatePayload(
                 props.partnerCode(),
                 "WayWay",
@@ -60,10 +68,12 @@ public class MomoService {
         System.out.println("MOMO requestType = " + props.requestType());
         System.out.println("MOMO redirectUrl = " + props.redirectUrl());
         System.out.println("MOMO ipnUrl = " + props.ipnUrl());
+        // Trả payUrl/deeplink về app Android để mở màn thanh toán.
         return client.create(payload)
                 .map(result -> mapCreateResult(req, requestId, result));
     }
 
+    // Kiểm tra response từ MoMo và map về DTO gọn cho app Android.
     private MomoCreateResponse mapCreateResult(MomoCreateRequest req, String requestId, MomoGatewayCreateResult result) {
         if (result == null) {
             throw new IllegalStateException("MoMo returned empty response");
@@ -81,14 +91,15 @@ public class MomoService {
         );
     }
 
+    // Chặn tạo payment nếu thiếu key quan trọng của MoMo.
     private void requireConfigured() {
         if (isBlank(props.accessKey()) || isBlank(props.secretKey()) || isBlank(props.partnerCode())) {
             throw new IllegalStateException("MoMo keys are not configured. Set MOMO_PARTNER_CODE, MOMO_ACCESS_KEY, MOMO_SECRET_KEY.");
         }
     }
 
+    // Hàm tiện ích kiểm tra chuỗi rỗng khi validate cấu hình.
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }
 }
-

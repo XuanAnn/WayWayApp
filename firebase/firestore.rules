@@ -21,6 +21,32 @@ service cloud.firestore {
       allow update, delete: if isSelf(userId) || isAdmin();
     }
 
+    match /phoneUsers/{phoneId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && !exists(/databases/$(database)/documents/phoneUsers/$(phoneId));
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    match /momoLinks/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId)
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if isSelf(userId)
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSelf(userId) || isAdmin();
+    }
+
+    match /promos/{promoId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
     match /drivers/{driverId} {
       allow read: if signedIn();
       allow create, update, delete: if isSelf(driverId) || isAdmin();
@@ -32,13 +58,49 @@ service cloud.firestore {
     }
 
     match /rides/{rideId} {
-      allow read, create, update: if signedIn()
+      allow read: if signedIn()
+        && (
+          resource.data.status == 'searching' ||
+          resource.data.userId == request.auth.uid ||
+          resource.data.driverId == request.auth.uid ||
+          isAdmin()
+        );
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if signedIn()
         && (
           resource.data.userId == request.auth.uid ||
           resource.data.driverId == request.auth.uid ||
-          request.resource.data.userId == request.auth.uid ||
-          request.resource.data.driverId == request.auth.uid
+          request.resource.data.driverId == request.auth.uid ||
+          isAdmin()
         );
+
+      match /messages/{messageId} {
+        allow read, create: if signedIn()
+          && (
+            get(/databases/$(database)/documents/rides/$(rideId)).data.userId == request.auth.uid ||
+            get(/databases/$(database)/documents/rides/$(rideId)).data.driverId == request.auth.uid ||
+            isAdmin()
+          );
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    match /messages/{messageId} {
+      allow read: if signedIn()
+        && (
+          get(/databases/$(database)/documents/rides/$(resource.data.rideId)).data.userId == request.auth.uid ||
+          get(/databases/$(database)/documents/rides/$(resource.data.rideId)).data.driverId == request.auth.uid ||
+          isAdmin()
+        );
+      allow create: if signedIn()
+        && (
+          get(/databases/$(database)/documents/rides/$(request.resource.data.rideId)).data.userId == request.auth.uid ||
+          get(/databases/$(database)/documents/rides/$(request.resource.data.rideId)).data.driverId == request.auth.uid ||
+          isAdmin()
+        )
+        && request.resource.data.senderId == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
 
     match /orders/{orderId} {

@@ -2,6 +2,8 @@ package com.example.waywayapp.data.repository
 
 import com.example.waywayapp.data.model.AdminDriver
 import com.example.waywayapp.core.firebase.FirestoreProvider
+import com.example.waywayapp.data.remote.dto.firestore.toAdminDriverDto
+import com.example.waywayapp.data.remote.dto.firestore.toDto
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -23,8 +25,7 @@ class AdminDriverRepository {
                 val drivers = snapshot
                     ?.documents
                     ?.mapNotNull { document ->
-                        document.toObject(AdminDriver::class.java)
-                            ?.copy(id = document.id)
+                        document.toAdminDriverDto()?.toDomain(document.id)
                     }
                     .orEmpty()
 
@@ -53,6 +54,6 @@ class AdminDriverRepository {
             createdAt = if (driver.createdAt == 0L) now else driver.createdAt
         )
 
-        document.set(savedDriver, SetOptions.merge()).await()
+        document.set(savedDriver.toDto(), SetOptions.merge()).await()
     }
 }

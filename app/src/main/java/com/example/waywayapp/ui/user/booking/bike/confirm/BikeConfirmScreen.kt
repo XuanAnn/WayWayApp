@@ -1,5 +1,8 @@
 package com.example.waywayapp.ui.user.booking.bike.confirm
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,11 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.waywayapp.ui.chat.RideMessagePopupListener
 import com.example.waywayapp.ui.user.booking.bike.BikeSharedViewModel
 import com.example.waywayapp.ui.user.booking.bike.BikeViewModel
 import com.example.waywayapp.ui.user.booking.bike.components.BookingConfirmCard
@@ -34,13 +40,17 @@ fun BikeConfirmScreen(
     onBackHomeClick: () -> Unit = {},
     viewModel: BikeViewModel = BikeSharedViewModel.viewModel,
     onBackClick: () -> Unit = {},
-    onConfirmClick: () -> Unit = {}
+    onConfirmClick: () -> Unit = {},
+    onOpenChat: (String) -> Unit = {},
+    onRateRide: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(
         uiState.pickupLatLng,
@@ -98,13 +108,23 @@ fun BikeConfirmScreen(
             BookingStatus.ON_TRIP -> {
                 OnTripUI(
                     state = uiState,
-                    onBack = viewModel::cancelBooking
+                    cardHeight = (screenHeight * 0.4f).dp,
+                    onBack = viewModel::cancelBooking,
+                    onCallClick = {
+                        openDialer(context, uiState.driverPhone)
+                    },
+                    onChatClick = {
+                        uiState.currentRideId?.takeIf { it.isNotBlank() }?.let(onOpenChat)
+                    }
                 )
             }
 
             BookingStatus.COMPLETED -> {
                 CompletedUI(
                     state = uiState,
+                    onRateRide = {
+                        uiState.currentRideId?.takeIf { it.isNotBlank() }?.let(onRateRide)
+                    },
                     onFinish = {
                         viewModel.resetBooking()
                         onBackHomeClick()
@@ -112,6 +132,29 @@ fun BikeConfirmScreen(
                 )
             }
         }
+
+        RideMessagePopupListener(
+            rideId = uiState.currentRideId,
+            enabled = uiState.status == BookingStatus.ON_TRIP,
+            onOpenChat = onOpenChat
+        )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+
+    LaunchedEffect(uiState.status, uiState.rideStatus) {
+        val message = when {
+            uiState.status == BookingStatus.FINDING -> "Dang tim tai xe phu hop."
+            uiState.rideStatus == "accepted" -> "Tai xe da nhan cuoc va dang den diem don."
+            uiState.rideStatus == "arrived" -> "Tai xe da den diem don."
+            uiState.rideStatus == "in_progress" -> "Chuyen xe cua ban dang duoc thuc hien."
+            uiState.status == BookingStatus.COMPLETED -> "Chuyen xe cua ban da hoan thanh."
+            else -> null
+        }
+        message?.let { snackbarHostState.showSnackbar(it) }
     }
 }
 
@@ -188,4 +231,18 @@ private fun RideConfirmBottomSheet(
             }
         }
     }
+}
+
+private fun openDialer(
+    context: Context,
+    phone: String
+) {
+    val normalizedPhone = phone.trim()
+    if (normalizedPhone.isBlank()) return
+
+    val intent = Intent(
+        Intent.ACTION_DIAL,
+        Uri.parse("tel:$normalizedPhone")
+    )
+    context.startActivity(intent)
 }

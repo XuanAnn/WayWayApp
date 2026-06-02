@@ -1,33 +1,55 @@
 package com.example.waywayapp.ui.auth.register
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.waywayapp.ui.theme.*
+import com.example.waywayapp.ui.auth.common.AuthAgreeRow
+import com.example.waywayapp.ui.auth.common.AuthBackButton
+import com.example.waywayapp.ui.auth.common.AuthDivider
+import com.example.waywayapp.ui.auth.common.AuthFieldLabel
+import com.example.waywayapp.ui.auth.common.AuthGreen
+import com.example.waywayapp.ui.auth.common.AuthInlineLink
+import com.example.waywayapp.ui.auth.common.AuthMuted
+import com.example.waywayapp.ui.auth.common.AuthOtpScreenContent
+import com.example.waywayapp.ui.auth.common.AuthPhoneLeading
+import com.example.waywayapp.ui.auth.common.AuthPrimaryButton
+import com.example.waywayapp.ui.auth.common.AuthProvider
+import com.example.waywayapp.ui.auth.common.AuthSocialButton
+import com.example.waywayapp.ui.auth.common.AuthTextField
+import com.example.waywayapp.ui.auth.common.AuthTitle
 
 @Composable
 fun RegisterScreen(
@@ -37,284 +59,211 @@ fun RegisterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    var isPasswordVisible by remember { mutableStateOf(false) }
-    var fullName by remember { mutableStateOf("") }
+    val activity = remember(context) { context.findActivity() }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmVisible by remember { mutableStateOf(false) }
+    var agreed by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isRegisterSuccess) {
         if (uiState.isRegisterSuccess) onRegisterSuccess()
     }
 
     LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-        }
+        uiState.error?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppBg)
+            .background(Color.White)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp)
-            ) {
-                Text(
-                    text = "Sign Up",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = TextDark
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 22.dp, vertical = 18.dp)
+        ) {
+            AuthBackButton(onBackClick)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (uiState.isOtpSent && !uiState.isPhoneVerified) {
+                AuthOtpScreenContent(
+                    phone = uiState.phone,
+                    code = uiState.otpCode,
+                    onCodeChange = viewModel::onOtpCodeChange,
+                    onBackClick = viewModel::backToPhoneEntry,
+                    onVerifyClick = viewModel::verifyOtp,
+                    onResendClick = {
+                        val hostActivity = activity
+                        if (hostActivity == null) {
+                            Toast.makeText(context, "Không mở được OTP trên màn này", Toast.LENGTH_LONG).show()
+                        } else {
+                            viewModel.sendOtp(hostActivity)
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                return@Column
+            }
+
+            AuthTitle(
+                title = if (uiState.isPhoneVerified) "Fill Personal Info" else "Join WayWay Today ✨",
+                subtitle = if (uiState.isPhoneVerified) {
+                    "Phone verified. Add email and password so password reset can work later."
+                } else {
+                    "Let's get started. Enter your phone number to create your WayWay account."
+                }
+            )
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            if (!uiState.isPhoneVerified) {
+                AuthFieldLabel("Phone Number")
+                AuthTextField(
+                    value = uiState.phone,
+                    onValueChange = viewModel::onPhoneChange,
+                    placeholder = "Phone Number",
+                    keyboardType = KeyboardType.Phone,
+                    leading = { AuthPhoneLeading() }
                 )
 
-                Text(
-                    text = "Welcome to WayWay",
-                    fontSize = 14.sp,
-                    color = TextGray
+                Spacer(modifier = Modifier.height(12.dp))
+
+                AuthAgreeRow(
+                    checked = agreed,
+                    onCheckedChange = { agreed = it },
+                    text = "I agree to WayWay ",
+                    linkText = "Terms & Conditions."
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                AuthPrimaryButton(
+                    text = "Send OTP",
+                    enabled = agreed,
+                    onClick = {
+                        val hostActivity = activity
+                        if (hostActivity == null) {
+                            Toast.makeText(context, "Không mở được OTP trên màn này", Toast.LENGTH_LONG).show()
+                        } else {
+                            viewModel.sendOtp(hostActivity)
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                AuthInlineLink(
+                    prefix = "Already have an account? ",
+                    action = "Sign in",
+                    onClick = onBackClick
+                )
+
+                Spacer(modifier = Modifier.height(22.dp))
+                AuthDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AuthSocialButton(AuthProvider.Google) {}
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthSocialButton(AuthProvider.Apple) {}
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthSocialButton(AuthProvider.Facebook) {}
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthSocialButton(AuthProvider.X) {}
+            } else {
+                AuthFieldLabel("Full Name")
+                AuthTextField(
+                    value = uiState.fullName,
+                    onValueChange = viewModel::onFullNameChange,
+                    placeholder = "Full Name"
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthFieldLabel("Age")
+                AuthTextField(
+                    value = uiState.age,
+                    onValueChange = viewModel::onAgeChange,
+                    placeholder = "Age",
+                    keyboardType = KeyboardType.Number
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthFieldLabel("Email")
+                AuthTextField(
+                    value = uiState.email,
+                    onValueChange = viewModel::onEmailChange,
+                    placeholder = "Email",
+                    keyboardType = KeyboardType.Email
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthFieldLabel("Password")
+                AuthTextField(
+                    value = uiState.password,
+                    onValueChange = viewModel::onPasswordChange,
+                    placeholder = "Password",
+                    keyboardType = KeyboardType.Password,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailing = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = AuthMuted
+                            )
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                AuthFieldLabel("Confirm Password")
+                AuthTextField(
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChange,
+                    placeholder = "Confirm Password",
+                    keyboardType = KeyboardType.Password,
+                    visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailing = {
+                        IconButton(onClick = { confirmVisible = !confirmVisible }) {
+                            Icon(
+                                imageVector = if (confirmVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = AuthMuted
+                            )
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                AuthPrimaryButton(
+                    text = "Sign up",
+                    onClick = viewModel::register
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(130.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .padding(end = 16.dp)
-                        .background(Color.White.copy(alpha = 0.25f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("🍕🍟", fontSize = 50.sp)
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    .background(CardWhite)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Create an account",
-                        fontSize = 21.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextDark,
-                        modifier = Modifier.align(Alignment.Start)
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    TextField(
-                        value = uiState.email,
-                        onValueChange = viewModel::onEmailChange,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text("Enter your email", color = TextGray)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Email,
-                                contentDescription = null,
-                                tint = TextGray
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email
-                        ),
-                        colors = appTextFieldColors(),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    TextField(
-                        value = fullName,
-                        onValueChange = { fullName = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text("Enter your full name", color = TextGray)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                tint = TextGray
-                            )
-                        },
-                        colors = appTextFieldColors(),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    TextField(
-                        value = uiState.password,
-                        onValueChange = viewModel::onPasswordChange,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text("Enter password", color = TextGray)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Lock,
-                                contentDescription = null,
-                                tint = TextGray
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    isPasswordVisible = !isPasswordVisible
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = if (isPasswordVisible)
-                                        Icons.Default.Visibility
-                                    else
-                                        Icons.Default.VisibilityOff,
-                                    contentDescription = null,
-                                    tint = TextGray
-                                )
-                            }
-                        },
-                        visualTransformation = if (isPasswordVisible)
-                            VisualTransformation.None
-                        else
-                            PasswordVisualTransformation(),
-                        colors = appTextFieldColors(),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = false,
-                            onCheckedChange = {},
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = Lime,
-                                uncheckedColor = TextGray,
-                                checkmarkColor = TextDark
-                            )
-                        )
-
-                        Text(
-                            text = "Remember me next time",
-                            fontSize = 12.sp,
-                            color = TextGray
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = viewModel::register,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = TextDark,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(18.dp)
-                    ) {
-                        Text(
-                            text = "Sign up",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Text(
-                        text = "Or sign up with",
-                        color = TextGray,
-                        fontSize = 12.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        RegisterSocialIconPlaceholder("f")
-                        RegisterSocialIconPlaceholder("in")
-                        RegisterSocialIconPlaceholder("G")
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Row {
-                        Text(
-                            text = "Have an account? ",
-                            color = TextGray,
-                            fontSize = 14.sp
-                        )
-
-                        Text(
-                            text = "SIGN IN",
-                            color = TextDark,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 14.sp,
-                            modifier = Modifier.clickable { onBackClick() }
-                        )
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.15f)),
+                    .background(Color.White.copy(alpha = 0.75f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Lime)
+                CircularProgressIndicator(color = AuthGreen)
             }
         }
     }
 }
 
-@Composable
-private fun appTextFieldColors(): TextFieldColors {
-    return TextFieldDefaults.colors(
-        focusedContainerColor = SoftWhite,
-        unfocusedContainerColor = SoftWhite,
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        focusedTextColor = TextDark,
-        unfocusedTextColor = TextDark,
-        cursorColor = TextDark
-    )
-}
-
-@Composable
-fun RegisterSocialIconPlaceholder(text: String) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(SoftWhite)
-            .clickable { },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            fontWeight = FontWeight.ExtraBold,
-            color = TextDark
-        )
+private tailrec fun Context.findActivity(): Activity? {
+    return when (this) {
+        is Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
     }
 }

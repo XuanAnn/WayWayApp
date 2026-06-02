@@ -1,6 +1,7 @@
 package com.example.waywayapp.core.network
 
 import com.example.waywayapp.data.remote.api.AuthApi
+import com.example.waywayapp.data.remote.api.AiChatApi
 import com.example.waywayapp.data.remote.api.GeocodingApi
 import com.example.waywayapp.data.remote.api.OsrmApi
 
@@ -25,5 +26,11 @@ object RetrofitProvider {
         RetrofitFactory.create(
             ApiConstants.OSRM_BASE_URL
         ).create(OsrmApi::class.java)
+    }
+
+    val aiChatApi: AiChatApi by lazy {
+        RetrofitFactory.create(
+            ApiConstants.MOMO_BACKEND_BASE_URL
+        ).create(AiChatApi::class.java)
     }
 }

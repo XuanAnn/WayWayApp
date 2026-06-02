@@ -2,21 +2,30 @@ package com.example.waywayapp.data.model
 
 data class Ride(
     val id: String = "",
-
     val userId: String = "",
     val driverId: String = "",
-
-    val status: String = "REQUESTED",
-    // REQUESTED → ACCEPTED → ONGOING → COMPLETED
-
+    val serviceType: String = "bike",
+    val status: String = "searching",
     val pickupLat: Double = 0.0,
     val pickupLng: Double = 0.0,
-
-    val destLat: Double = 0.0,
-    val destLng: Double = 0.0,
-
+    val pickupAddress: String = "",
+    val dropoffLat: Double = 0.0,
+    val dropoffLng: Double = 0.0,
+    val dropoffAddress: String = "",
+    val passengerName: String = "",
+    val passengerPhone: String = "",
+    val driverName: String = "",
+    val driverPhone: String = "",
+    val driverPlate: String = "",
     val price: Double = 0.0,
-
+    val paymentMethod: String = "cash",
+    val paymentStatus: String = "pending",
+    val paidAt: Long? = null,
     val createdAt: Long = 0L,
-    val completedAt: Long? = null
+    val updatedAt: Long = 0L,
+    val acceptedAt: Long? = null,
+    val completedAt: Long? = null,
+    val userRating: Int = 0,
+    val userReview: String = "",
+    val ratedAt: Long? = null
 )
