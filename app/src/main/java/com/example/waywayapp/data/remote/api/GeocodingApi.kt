@@ -13,7 +13,9 @@ interface GeocodingApi {
         @Query("format") format: String = "json",
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("limit") limit: Int = 5,
-        @Query("countrycodes") countryCodes: String = "vn"
+        @Query("countrycodes") countryCodes: String = "vn",
+        @Query("accept-language") acceptLanguage: String = "vi",
+        @Query("dedupe") dedupe: Int = 0
     ): List<GeocodingResponseDto>
 
     @GET("reverse")

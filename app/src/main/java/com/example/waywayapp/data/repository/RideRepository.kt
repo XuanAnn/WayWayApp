@@ -129,6 +129,7 @@ class RideRepository {
         dropoff: LatLng,
         dropoffAddress: String,
         price: Double,
+        serviceType: String = "bike",
         paymentMethod: String = "cash",
         paymentStatus: String = "pending",
         paidAt: Long? = null
@@ -139,7 +140,7 @@ class RideRepository {
         val ride = Ride(
             id = document.id,
             userId = userId,
-            serviceType = "bike",
+            serviceType = serviceType,
             status = "searching",
             pickupLat = pickup.latitude,
             pickupLng = pickup.longitude,

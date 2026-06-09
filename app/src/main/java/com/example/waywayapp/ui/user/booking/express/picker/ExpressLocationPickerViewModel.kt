@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.Normalizer
 import java.util.Locale
 
 class ExpressLocationPickerViewModel : ViewModel() {
@@ -142,7 +143,7 @@ class ExpressLocationPickerViewModel : ViewModel() {
     private suspend fun performAutocomplete(query: String) {
         try {
             val results =
-                geocodingApi.searchAddress(query = query)
+                searchAddressWithFallback(query)
 
             _uiState.update {
                 it.copy(searchResults = results)
@@ -173,6 +174,24 @@ class ExpressLocationPickerViewModel : ViewModel() {
             it.copy(searchResults = emptyList())
         }
     }
+
+    private suspend fun searchAddressWithFallback(query: String): List<GeocodingResponseDto> {
+        val results = geocodingApi.searchAddress(query = query)
+        if (results.isNotEmpty()) return results
+
+        val fallbackQuery = query.withoutVietnameseDiacritics()
+        if (fallbackQuery == query) return results
+
+        return geocodingApi.searchAddress(query = fallbackQuery)
+    }
+
+    private fun String.withoutVietnameseDiacritics(): String {
+        return Normalizer.normalize(this, Normalizer.Form.NFD)
+            .replace("\\p{Mn}+".toRegex(), "")
+            .replace('đ', 'd')
+            .replace('Đ', 'D')
+    }
+
     private fun getAddressFromLatLng(
         latLng: LatLng,
         onResult: (String) -> Unit

@@ -114,7 +114,7 @@ fun LocationPickerScreen(
                             Icon(
                                 imageVector = Icons.Default.Place,
                                 contentDescription = null,
-                                tint = Color(0xFF00B14F)
+                                tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
                             )
 
                             Spacer(modifier = Modifier.width(10.dp))
@@ -162,7 +162,7 @@ fun LocationPickerScreen(
             Icon(
                 imageVector = Icons.Default.GpsFixed,
                 contentDescription = null,
-                tint = Color(0xFF20242A)
+                tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -281,7 +281,7 @@ private fun LocationConfirmPanel(
                 text = address,
                 fontWeight = FontWeight.ExtraBold,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF20242A),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
                 maxLines = 2
             )
 
@@ -289,7 +289,7 @@ private fun LocationConfirmPanel(
 
             Text(
                 text = "Kiểm tra lại vị trí ghim trước khi xác nhận",
-                color = Color.Gray
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -301,7 +301,7 @@ private fun LocationConfirmPanel(
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF00B14F)
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.waywayapp.data.model.AdminDriver
 import com.example.waywayapp.data.model.AdminUser
 import com.example.waywayapp.data.repository.ProfileRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -97,6 +98,35 @@ class ProfileViewModel(
         repository.signOut()
     }
 
+    fun sendPasswordResetEmail() {
+        val email = _uiState.value.user.email.trim()
+        if (email.isBlank()) {
+            _uiState.update { it.copy(error = "Email không khả dụng để đổi mật khẩu") }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, error = null, message = null) }
+            runCatching {
+                FirebaseAuth.getInstance().sendPasswordResetEmail(email).awaitTask()
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        isSaving = false,
+                        message = "Đã gửi email đổi mật khẩu"
+                    )
+                }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        isSaving = false,
+                        error = throwable.localizedMessage ?: "Không gửi được email đổi mật khẩu"
+                    )
+                }
+            }
+        }
+    }
+
     // Xoá message/error sau khi UI đã hiển thị.
     fun clearMessage() {
         _uiState.update { it.copy(message = null, error = null) }
@@ -132,3 +162,16 @@ class ProfileViewModel(
         }
     }
 }
+
+private suspend fun <T> com.google.android.gms.tasks.Task<T>.awaitTask(): T =
+    kotlinx.coroutines.suspendCancellableCoroutine { continuation ->
+        addOnSuccessListener { result ->
+            continuation.resume(result) {}
+        }
+        addOnFailureListener { throwable ->
+            continuation.resumeWith(Result.failure(throwable))
+        }
+        addOnCanceledListener {
+            continuation.cancel()
+        }
+    }

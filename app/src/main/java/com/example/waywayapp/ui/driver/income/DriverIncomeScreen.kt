@@ -57,7 +57,7 @@ fun DriverIncomeScreen(
     onProfileClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val grabGreen = Color(0xFF00B14F)
+    val grabGreen = androidx.compose.material3.MaterialTheme.colorScheme.primary
 
     Scaffold(
         bottomBar = {
@@ -121,7 +121,7 @@ fun DriverIncomeScreen(
                     item {
                         Text(
                             text = error,
-                            color = Color(0xFFD93025),
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -206,7 +206,7 @@ private fun IncomeStatusCard(
                 Icon(
                     imageVector = Icons.Default.BarChart,
                     contentDescription = null,
-                    tint = Color(0xFF00B14F),
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(42.dp)
                 )
             }
@@ -285,7 +285,7 @@ private fun CompletedRideItem(
                     .background(Color(0xFFE8F5EE), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF00B14F))
+                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             }
             Column(
                 modifier = Modifier
@@ -300,14 +300,14 @@ private fun CompletedRideItem(
                 )
                 Text(
                     text = formatDate(ride.completedAt ?: ride.updatedAt),
-                    color = Color(0xFF6B7280),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp
                 )
             }
             Text(
                 text = formatCurrency(ride.price),
                 fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF00B14F)
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
             )
         }
     }

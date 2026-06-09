@@ -23,10 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.R
 import com.example.waywayapp.ui.theme.AppBg
+import com.example.waywayapp.ui.theme.WayWayOnSurface
+import com.example.waywayapp.ui.theme.WayWayOnSurfaceVariant
 
-private val PaymentBg = Color(0xFFF3F8FF)
-private val PaymentTextDark = Color(0xFF10243D)
-private val PaymentTextGray = Color(0xFF7A8BA0)
+private val PaymentTextDark = WayWayOnSurface
+private val PaymentTextGray = WayWayOnSurfaceVariant
 
 @Composable
 fun AddPaymentScreen(

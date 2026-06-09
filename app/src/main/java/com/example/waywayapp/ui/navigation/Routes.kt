@@ -7,10 +7,6 @@ object Routes {
 
     // user
     const val USER_HOME = "user_home"
-    const val FOOD = "food/{foodId}"
-    const val FOOD_CART = "food_cart"
-    const val CHECKOUT_SUCCESS = "checkout_success"
-    const val FOOD_ORDER_TRACKING = "food_order_tracking"
 
     const val EXPRESS_FORM = "express_form"
     const val EXPRESS_PICKUP = "express_pickup"
@@ -23,16 +19,6 @@ object Routes {
     const val BIKE_DROPOFF_MAP = "bike_dropoff_map"
     const val BIKE_CONFIRM = "bike_confirm"
 
-    const val CAR_SEARCH = "car_search"
-    const val CAR_PICKUP_MAP = "car_pickup_map"
-    const val CAR_DROPOFF_MAP = "car_dropoff_map"
-    const val CAR_CONFIRM = "car_confirm"
-    fun createFoodRoute(
-        foodId: Int
-    ): String {
-
-        return "food/$foodId"
-    }
     const val BOOKING = "booking/{type}"
     fun createBookingRoute(type: String): String {
         return "booking/$type"

@@ -1,6 +1,7 @@
 package com.example.waywayapp.ui.driver.home
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -38,6 +39,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun DriverHomeScreen(
     viewModel: DriverViewModel = viewModel(),
@@ -52,7 +54,7 @@ fun DriverHomeScreen(
     val cameraPositionState = rememberCameraPositionState()
     val isOnline = uiState.status != DriverStatus.OFFLINE
     val hasAcceptedRide = uiState.currentRideId != null && uiState.status != DriverStatus.ONLINE
-    val grabGreen = Color(0xFF00B14F)
+    val grabGreen = androidx.compose.material3.MaterialTheme.colorScheme.primary
     var showWallet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     var previousDriverStatus by remember { mutableStateOf<DriverStatus?>(null) }
@@ -201,11 +203,12 @@ fun DriverHomeScreen(
                     Icon(
                         imageVector = Icons.Default.AccountBalanceWallet,
                         contentDescription = "Ví tài xế",
-                        tint = Color(0xFF00B14F),
+                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(25.dp)
                     )
                 }
             }
+
 
             Surface(
                 modifier = Modifier
@@ -214,16 +217,21 @@ fun DriverHomeScreen(
                     .size(52.dp)
                     .clickable { onAiAssistantClick() },
                 shape = CircleShape,
-                color = Color(0xFF00B14F),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 shadowElevation = 6.dp
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.AutoAwesome,
-                        contentDescription = "AI assistant",
-                        tint = Color.White,
-                        modifier = Modifier.size(25.dp)
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFF26C6DA), Color(0xFF00897B))
+                            )
+                        )
+                        .clickable { onAiAssistantClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
                 }
             }
 
@@ -295,7 +303,7 @@ fun DriverHomeScreen(
                             Box(
                                 modifier = Modifier
                                     .size(10.dp)
-                                    .background(if (isOnline) Color.White else Color.Red, CircleShape)
+                                    .background(if (isOnline) Color.White else androidx.compose.material3.MaterialTheme.colorScheme.error, CircleShape)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
@@ -336,32 +344,10 @@ fun DriverHomeScreen(
                                     .padding(horizontal = 16.dp)
                             ) {
                                 Text("Thông tin tạm thời gián đoạn", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                Text("Bạn vẫn có thể tiếp tục nhận cuốc.", color = Color.Gray, fontSize = 14.sp)
+                                Text("Bạn vẫn có thể tiếp tục nhận cuốc.", color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                             }
 
-                            // Sparkle FAB (Bottom Right)
-                            Surface(
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(end = 16.dp, bottom = 12.dp)
-                                    .size(52.dp),
-                                shape = CircleShape,
-                                shadowElevation = 4.dp
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            brush = Brush.linearGradient(
-                                                colors = listOf(Color(0xFF26C6DA), Color(0xFF00897B))
-                                            )
-                                        )
-                                        .clickable { },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
-                                }
-                            }
+
                         }
                     }
                 }
@@ -431,7 +417,7 @@ fun DriverHomeScreen(
                     Text(
                         text = error,
                         modifier = Modifier.padding(12.dp),
-                        color = Color(0xFFD93025),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -572,13 +558,13 @@ fun IncomingRideOverlay(
         elevation = CardDefaults.cardElevation(12.dp)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Text("CHUYẾN XE MỚI", fontWeight = FontWeight.ExtraBold, color = Color(0xFF00B14F), fontSize = 14.sp)
+            Text("CHUYẾN XE MỚI", fontWeight = FontWeight.ExtraBold, color = androidx.compose.material3.MaterialTheme.colorScheme.primary, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier
                     .size(10.dp)
-                    .background(Color(0xFF00B14F), CircleShape))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape))
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(uiState.pickupAddress, fontSize = 14.sp, maxLines = 1)
             }
@@ -586,7 +572,7 @@ fun IncomingRideOverlay(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier
                     .size(10.dp)
-                    .background(Color.Red, CircleShape))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.error, CircleShape))
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(uiState.dropoffAddress, fontSize = 14.sp, maxLines = 1)
             }
@@ -603,7 +589,7 @@ fun IncomingRideOverlay(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 24.sp
                 )
-                Text(text = uiState.passengerName, color = Color.Gray)
+                Text(text = uiState.passengerName, color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -616,14 +602,14 @@ fun IncomingRideOverlay(
                         .height(50.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Từ chối", color = Color.Gray)
+                    Text("Từ chối", color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Button(
                     onClick = onAccept,
                     modifier = Modifier
                         .weight(2f)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B14F)),
+                    colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Chấp nhận", fontWeight = FontWeight.Bold)
@@ -660,7 +646,7 @@ fun ActiveRidePanel(
             Spacer(modifier = Modifier.height(10.dp))
             Text(uiState.pickupAddress, fontWeight = FontWeight.Bold, maxLines = 1)
             Spacer(modifier = Modifier.height(6.dp))
-            Text(uiState.dropoffAddress, color = Color.Gray, maxLines = 1)
+            Text(uiState.dropoffAddress, color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
             if (uiState.navigationTitle.isNotBlank()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Surface(
@@ -708,10 +694,10 @@ fun ActiveRidePanel(
                     Text(uiState.passengerName, fontWeight = FontWeight.Bold)
                     Text(
                         text = uiState.passengerPhone.ifBlank { "Chưa có SĐT" },
-                        color = Color.Gray,
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp
                     )
-                    Text("${uiState.tripPrice.toInt()}đ", color = Color(0xFF00B14F))
+                    Text("${uiState.tripPrice.toInt()}đ", color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                 }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -726,7 +712,7 @@ fun ActiveRidePanel(
                         .size(48.dp)
                         .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
                 ) {
-                    Icon(Icons.Default.Call, contentDescription = null, tint = Color(0xFF00B1A7))
+                    Icon(Icons.Default.Call, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                 }
                 IconButton(
                     onClick = onOpenChat,
@@ -758,7 +744,7 @@ fun ActiveRidePanel(
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B14F)),
+                    colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
@@ -805,7 +791,7 @@ private fun DriverWalletDialog(
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = formatWalletCurrency(uiState.walletBalance),
-                            color = Color(0xFF00A85A),
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                             fontSize = 28.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -831,7 +817,7 @@ private fun DriverWalletDialog(
                 if (recentRides.isEmpty()) {
                     Text(
                         text = "Chưa có cuốc hoàn thành.",
-                        color = Color.Gray,
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp
                     )
                 } else {
@@ -851,7 +837,7 @@ private fun DriverWalletDialog(
                                 Icon(
                                     imageVector = Icons.Default.CheckCircle,
                                     contentDescription = null,
-                                    tint = Color(0xFF00B14F),
+                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -868,13 +854,13 @@ private fun DriverWalletDialog(
                                 )
                                 Text(
                                     text = formatWalletDate(ride.completedAt ?: ride.updatedAt),
-                                    color = Color.Gray,
+                                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp
                                 )
                             }
                             Text(
                                 text = "+${formatWalletCurrency(ride.price)}",
-                                color = Color(0xFF00B14F),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 13.sp
                             )

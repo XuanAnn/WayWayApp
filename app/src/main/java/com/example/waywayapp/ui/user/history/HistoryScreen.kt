@@ -32,6 +32,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,10 +57,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.data.model.Ride
 import com.example.waywayapp.ui.components.WayWayBottomBar
 import com.example.waywayapp.ui.navigation.Routes
-import com.example.waywayapp.ui.theme.AppBg
-import com.example.waywayapp.ui.theme.CardWhite
-import com.example.waywayapp.ui.theme.TextDark
-import com.example.waywayapp.ui.theme.TextGray
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -75,28 +72,24 @@ fun HistoryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedRide by remember { mutableStateOf<Ride?>(null) }
+    val colors = MaterialTheme.colorScheme
 
     Scaffold(
-        containerColor = AppBg,
+        containerColor = colors.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Lich su cuoc",
+                        text = "Lịch sử cuốc",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        color = TextDark
+                        color = colors.onBackground
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background)
             )
         },
-        bottomBar = {
-            WayWayBottomBar(
-                currentRoute = currentRoute,
-                onItemClick = onBottomNavClick
-            )
-        }
+        bottomBar = {}
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -107,13 +100,13 @@ fun HistoryScreen(
                 uiState.isLoading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFF00B1A7)
+                        color = colors.primary
                     )
                 }
 
                 uiState.error != null -> {
                     EmptyHistory(
-                        title = "Khong tai duoc lich su",
+                        title = "Không tải được lịch sử",
                         message = uiState.error.orEmpty(),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -121,8 +114,8 @@ fun HistoryScreen(
 
                 uiState.rides.isEmpty() -> {
                     EmptyHistory(
-                        title = "Chua co cuoc xe",
-                        message = "Cac chuyen da dat se xuat hien tai day.",
+                        title = "Chưa có cuốc xe",
+                        message = "Các chuyến đã đặt sẽ xuất hiện tại đây.",
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -130,7 +123,7 @@ fun HistoryScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
+                        contentPadding = PaddingValues(start = 18.dp, top = 12.dp, end = 18.dp, bottom = 104.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(uiState.rides, key = { it.id }) { ride ->
@@ -144,6 +137,12 @@ fun HistoryScreen(
                     }
                 }
             }
+
+            WayWayBottomBar(
+                currentRoute = currentRoute,
+                onItemClick = onBottomNavClick,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
         }
     }
 
@@ -167,13 +166,14 @@ private fun RideHistoryCard(
     onClick: () -> Unit
 ) {
     val statusInfo = statusInfo(ride.status)
+    val colors = MaterialTheme.colorScheme
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = colors.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
@@ -206,14 +206,14 @@ private fun RideHistoryCard(
                 ) {
                     Text(
                         text = serviceName(ride.serviceType),
-                        color = TextDark,
+                        color = colors.onSurface,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 15.sp,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
                         text = formatCurrency(ride.price),
-                        color = TextDark,
+                        color = colors.onSurface,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 14.sp
                     )
@@ -223,7 +223,7 @@ private fun RideHistoryCard(
 
                 Text(
                     text = formatDate(ride.completedAt ?: ride.updatedAt.takeIf { it != 0L } ?: ride.createdAt),
-                    color = TextGray,
+                    color = colors.onSurfaceVariant,
                     fontSize = 12.sp
                 )
 
@@ -231,12 +231,12 @@ private fun RideHistoryCard(
 
                 AddressLine(
                     icon = Icons.Default.LocationOn,
-                    text = ride.pickupAddress.ifBlank { "Diem don chua cap nhat" }
+                    text = ride.pickupAddress.ifBlank { "Điểm đón chưa cập nhật" }
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 AddressLine(
                     icon = Icons.Default.Route,
-                    text = ride.dropoffAddress.ifBlank { "Diem tra chua cap nhat" }
+                    text = ride.dropoffAddress.ifBlank { "Điểm trả chưa cập nhật" }
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -263,17 +263,19 @@ private fun AddressLine(
     icon: ImageVector,
     text: String
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(verticalAlignment = Alignment.Top) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color(0xFF00B1A7),
+            tint = colors.primary,
             modifier = Modifier.size(16.dp)
         )
         Spacer(modifier = Modifier.size(8.dp))
         Text(
             text = text,
-            color = TextGray,
+            color = colors.onSurfaceVariant,
             fontSize = 13.sp,
             lineHeight = 17.sp
         )
@@ -286,6 +288,8 @@ private fun EmptyHistory(
     message: String,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -294,20 +298,20 @@ private fun EmptyHistory(
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFE0F2F1)),
+                .background(colors.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.DirectionsBike,
                 contentDescription = null,
-                tint = Color(0xFF00B1A7),
+                tint = colors.onPrimaryContainer,
                 modifier = Modifier.size(30.dp)
             )
         }
         Spacer(modifier = Modifier.height(14.dp))
-        Text(title, color = TextDark, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+        Text(title, color = colors.onBackground, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(6.dp))
-        Text(message, color = TextGray, fontSize = 13.sp)
+        Text(message, color = colors.onSurfaceVariant, fontSize = 13.sp)
     }
 }
 
@@ -322,39 +326,39 @@ private fun RideDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Chi tiet cuoc xe")
+            Text("Chi tiết cuốc xe")
         },
         text = {
             Column {
-                DetailRow("Trang thai", statusInfo(ride.status).label)
-                DetailRow("Dich vu", serviceName(ride.serviceType))
-                DetailRow("Tai xe", ride.driverName.ifBlank { "Chua cap nhat" })
-                DetailRow("Bien so", ride.driverPlate.ifBlank { "Chua cap nhat" })
-                DetailRow("SDT tai xe", ride.driverPhone.ifBlank { "Chua cap nhat" })
-                DetailRow("Gia", formatCurrency(ride.price))
-                DetailRow("Thanh toan", "${ride.paymentMethod.ifBlank { "cash" }} - ${ride.paymentStatus.ifBlank { "pending" }}")
-                DetailRow("Thoi gian", formatDate(ride.completedAt ?: ride.updatedAt.takeIf { it != 0L } ?: ride.createdAt))
+                DetailRow("Trạng thái", statusInfo(ride.status).label)
+                DetailRow("Dịch vụ", serviceName(ride.serviceType))
+                DetailRow("Tài xế", ride.driverName.ifBlank { "Chưa cập nhật" })
+                DetailRow("Biển số", ride.driverPlate.ifBlank { "Chưa cập nhật" })
+                DetailRow("SĐT tài xế", ride.driverPhone.ifBlank { "Chưa cập nhật" })
+                DetailRow("Giá", formatCurrency(ride.price))
+                DetailRow("Thanh toán", "${ride.paymentMethod.ifBlank { "cash" }} - ${ride.paymentStatus.ifBlank { "pending" }}")
+                DetailRow("Thời gian", formatDate(ride.completedAt ?: ride.updatedAt.takeIf { it != 0L } ?: ride.createdAt))
                 if (ride.userRating > 0) {
-                    DetailRow("Danh gia", "${ride.userRating}/5")
+                    DetailRow("Đánh giá", "${ride.userRating}/5")
                     if (ride.userReview.isNotBlank()) {
-                        DetailRow("Nhan xet", ride.userReview)
+                        DetailRow("Nhận xét", ride.userReview)
                     }
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-                DetailRow("Diem don", ride.pickupAddress.ifBlank { "Chua cap nhat" })
-                DetailRow("Diem tra", ride.dropoffAddress.ifBlank { "Chua cap nhat" })
+                DetailRow("Điểm đón", ride.pickupAddress.ifBlank { "Chưa cập nhật" })
+                DetailRow("Điểm trả", ride.dropoffAddress.ifBlank { "Chưa cập nhật" })
             }
         },
         dismissButton = {
             if (canRateRide) {
                 TextButton(onClick = onRateRide) {
-                    Text(if (ride.userRating > 0) "Sua danh gia" else "Danh gia tai xe")
+                    Text(if (ride.userRating > 0) "Sửa đánh giá" else "Đánh giá tài xế")
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Dong")
+                Text("Đóng")
             }
         }
     )
@@ -365,9 +369,11 @@ private fun DetailRow(
     label: String,
     value: String
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(label, color = TextGray, fontSize = 12.sp)
-        Text(value, color = TextDark, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Text(label, color = colors.onSurfaceVariant, fontSize = 12.sp)
+        Text(value, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
     }
 }
 
@@ -378,14 +384,16 @@ private data class RideStatusInfo(
     val background: Color
 )
 
+@Composable
 private fun statusInfo(status: String): RideStatusInfo {
+    val colors = MaterialTheme.colorScheme
     return when (status) {
-        "completed" -> RideStatusInfo("Da hoan thanh", Icons.Default.CheckCircle, Color(0xFF008A4B), Color(0xFFE0F7EA))
-        "cancelled" -> RideStatusInfo("Da huy", Icons.Default.Close, Color(0xFFD93025), Color(0xFFFFE6E2))
-        "accepted" -> RideStatusInfo("Tai xe da nhan", Icons.Default.HourglassTop, Color(0xFF0B65C2), Color(0xFFEAF4FF))
-        "arrived" -> RideStatusInfo("Tai xe da den", Icons.Default.Person, Color(0xFF7C3AED), Color(0xFFF1E8FF))
-        "in_progress" -> RideStatusInfo("Dang di chuyen", Icons.Default.DirectionsBike, Color(0xFF00B1A7), Color(0xFFE0F2F1))
-        else -> RideStatusInfo("Dang tim tai xe", Icons.Default.HourglassTop, Color(0xFFB7791F), Color(0xFFFFF4D6))
+        "completed" -> RideStatusInfo("Đã hoàn thành", Icons.Default.CheckCircle, colors.primary, colors.primaryContainer)
+        "cancelled" -> RideStatusInfo("Đã hủy", Icons.Default.Close, colors.error, colors.errorContainer)
+        "accepted" -> RideStatusInfo("Tài xế đã nhận", Icons.Default.HourglassTop, colors.tertiary, colors.tertiaryContainer)
+        "arrived" -> RideStatusInfo("Tài xế đã đến", Icons.Default.Person, colors.secondary, colors.secondaryContainer)
+        "in_progress" -> RideStatusInfo("Đang di chuyển", Icons.Default.DirectionsBike, colors.primary, colors.primaryContainer)
+        else -> RideStatusInfo("Đang tìm tài xế", Icons.Default.HourglassTop, colors.tertiary, colors.tertiaryContainer)
     }
 }
 
@@ -394,12 +402,12 @@ private fun serviceName(serviceType: String): String {
         "bike" -> "Bike"
         "car" -> "Car"
         "express" -> "Express"
-        else -> serviceType.ifBlank { "Cuoc xe" }
+        else -> serviceType.ifBlank { "Cuốc xe" }
     }
 }
 
 private fun formatDate(value: Long): String {
-    if (value <= 0L) return "Chua cap nhat"
+    if (value <= 0L) return "Chưa cập nhật"
     return SimpleDateFormat("HH:mm, dd/MM/yyyy", Locale.getDefault()).format(Date(value))
 }
 

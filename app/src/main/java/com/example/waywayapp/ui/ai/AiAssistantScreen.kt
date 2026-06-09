@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import com.example.waywayapp.data.model.AiChatMessage
 import com.example.waywayapp.data.repository.AiChatRepository
 import com.example.waywayapp.ui.theme.AppBg
+import com.example.waywayapp.ui.theme.BgLight
 import com.example.waywayapp.ui.theme.TextDark
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -72,7 +73,7 @@ fun AiAssistantScreen(
 ) {
     // Role quyết định lời chào, câu hỏi gợi ý và context gửi lên backend.
     val normalizedRole = role.uppercase(Locale.ROOT).ifBlank { "USER" }
-    // Danh sách tin nhắn hiển thị trên màn hình AI.
+
     val messages = remember(normalizedRole) {
         mutableStateListOf(
             AiChatMessage(
@@ -84,7 +85,6 @@ fun AiAssistantScreen(
     }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    // Nội dung người dùng đang nhập trong ô chat.
     var input by rememberSaveable { mutableStateOf("") }
     // Cờ loading để khóa nút gửi khi backend đang xử lý.
     var isSending by remember { mutableStateOf(false) }
@@ -99,7 +99,7 @@ fun AiAssistantScreen(
     }
 
     Scaffold(
-        containerColor = AppBg,
+        containerColor = BgLight,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -114,7 +114,7 @@ fun AiAssistantScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppBg)
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = BgLight)
             )
         },
         bottomBar = {
@@ -202,9 +202,9 @@ fun AiAssistantScreen(
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(16.dp),
                                         strokeWidth = 2.dp,
-                                        color = Color(0xFF00B14F)
+                                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary
                                     )
-                                    Text("Dang suy nghi...", color = Color(0xFF6B7280))
+                                    Text("Đang suy nghĩ...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
@@ -224,7 +224,7 @@ fun AiAssistantScreen(
                     Text(
                         text = it,
                         modifier = Modifier.padding(12.dp),
-                        color = Color(0xFFD93025),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -258,7 +258,7 @@ private fun SuggestedQuestions(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "Cau hoi goi y",
-            color = Color(0xFF6B7280),
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold
         )
@@ -312,7 +312,7 @@ private fun AiMessageBubble(
                         bottomStart = if (message.isUser) 20.dp else 6.dp,
                         bottomEnd = if (message.isUser) 6.dp else 20.dp
                     ),
-                    color = if (message.isUser) Color(0xFF00B14F) else Color.White,
+                    color = if (message.isUser) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.White,
                     shadowElevation = if (message.isUser) 0.dp else 2.dp
                 ) {
                     Text(
@@ -331,7 +331,7 @@ private fun AiMessageBubble(
                     }
                 },
                 modifier = Modifier.padding(top = 4.dp, start = 46.dp, end = 6.dp),
-                color = Color(0xFF9CA3AF),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelSmall
             )
         }
@@ -346,7 +346,7 @@ private fun AiAvatar() {
             .clip(CircleShape)
             .background(
                 Brush.linearGradient(
-                    listOf(Color(0xFF00B14F), Color(0xFF00B1A7))
+                    listOf(androidx.compose.material3.MaterialTheme.colorScheme.primary, androidx.compose.material3.MaterialTheme.colorScheme.primary)
                 )
             ),
         contentAlignment = Alignment.Center
@@ -390,7 +390,7 @@ private fun AiInputBar(
                 modifier = Modifier
                     .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
                     .background(
-                        if (value.isNotBlank() && !isSending) Color(0xFF00B14F) else Color(0xFFD1D5DB),
+                        if (value.isNotBlank() && !isSending) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant,
                         RoundedCornerShape(16.dp)
                     )
             ) {

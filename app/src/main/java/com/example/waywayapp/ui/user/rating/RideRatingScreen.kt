@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -190,13 +191,13 @@ private fun RatingContent(
                         )
                         Text(
                             text = ride.driverPlate.ifBlank { ride.driverPhone.ifBlank { "WayWay Driver" } },
-                            color = Color.Gray,
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 13.sp
                         )
                     }
                     Text(
                         text = NumberFormat.getCurrencyInstance(Locale("vi", "VN")).format(ride.price),
-                        color = Color(0xFF00A85A),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }
@@ -204,7 +205,7 @@ private fun RatingContent(
                 Spacer(modifier = Modifier.height(18.dp))
                 Text("Chuyen di cua ban da hoan thanh", fontWeight = FontWeight.Bold, color = TextDark)
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(ride.dropoffAddress.ifBlank { "Diem den chua cap nhat" }, color = Color.Gray, fontSize = 13.sp)
+                Text(ride.dropoffAddress.ifBlank { "Điểm đến chưa cập nhật" }, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
             }
         }
 
@@ -245,7 +246,7 @@ private fun RatingContent(
         }
 
         error?.let {
-            Text(it, color = Color(0xFFD93025), fontSize = 13.sp)
+            Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.error, fontSize = 13.sp)
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -257,7 +258,7 @@ private fun RatingContent(
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(18.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B14F))
+            colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
         ) {
             if (isSaving) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)

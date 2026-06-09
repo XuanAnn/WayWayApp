@@ -73,14 +73,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.core.di.AppContainer
 import com.example.waywayapp.data.model.AdminDriver
 import com.example.waywayapp.data.model.AdminUser
+import com.example.waywayapp.ui.theme.WayWayBackground
+import com.example.waywayapp.ui.theme.WayWayOnSurface
+import com.example.waywayapp.ui.theme.WayWayOnSurfaceVariant
+import com.example.waywayapp.ui.theme.WayWayPrimary
+import com.example.waywayapp.ui.theme.WayWaySurface
+import com.example.waywayapp.ui.theme.WarningOrange
 
-private val AdminBackground = Color(0xFFF7F6F2)
-private val AdminSurface = Color.White
-private val AdminPrimary = Color(0xFF7C5CFF)
-private val AdminDark = Color(0xFF202124)
-private val AdminGreen = Color(0xFF20B26B)
-private val AdminOrange = Color(0xFFE9A23B)
-private val AdminMuted = Color(0xFF7D817A)
+private val AdminBackground = WayWayBackground
+private val AdminSurface = WayWaySurface
+private val AdminPrimary = WayWayPrimary
+private val AdminDark = WayWayOnSurface
+private val AdminGreen = WayWayPrimary
+private val AdminOrange = WarningOrange
+private val AdminMuted = WayWayOnSurfaceVariant
 
 @Composable
 fun AdminDriverScreen(
@@ -389,7 +395,7 @@ private fun DeleteConfirmDialog(
         text = { Text("Bạn có chắc muốn xoá $label này không? Thao tác này không thể hoàn tác trong app.") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Xoá", color = Color(0xFFD93025))
+                Text("Xoá", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
@@ -594,9 +600,9 @@ private fun EditorActions(
             enabled = !isSaving,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFD93025))
+            Icon(Icons.Default.Delete, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.error)
             Spacer(modifier = Modifier.width(6.dp))
-            Text("Xoá hồ sơ", color = Color(0xFFD93025))
+            Text("Xoá hồ sơ", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
         }
     }
 }

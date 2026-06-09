@@ -184,7 +184,7 @@ private fun LoadingOverlay() {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = Color(0xFF00B1A7)
+            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
         )
     }
 }

@@ -69,7 +69,7 @@ fun PromoBottomSheet(
             Text(
                 text = "Hiện chưa có mã giảm giá nào dành cho bạn.",
                 modifier = Modifier.padding(vertical = 32.dp).align(Alignment.CenterHorizontally),
-                color = Color.Gray
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else {
             LazyColumn(
@@ -131,7 +131,7 @@ fun PromoBottomSheet(
                                     Text(
                                         text = "Áp dụng cho đơn từ ${promo.minPrice}đ",
                                         fontSize = 11.sp,
-                                        color = Color.Gray
+                                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
@@ -140,7 +140,7 @@ fun PromoBottomSheet(
                             if (uiState.error != null){
                                 Text(
                                     text = if (isValid) "Áp dụng" else "Không đủ điều kiện",
-                                    color = if (isValid) Color(0xFF00B1A7) else Color.Gray,
+                                    color = if (isValid) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp
                                 )

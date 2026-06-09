@@ -7,62 +7,103 @@
     <list default="true" id="568a24c8-a430-4595-ad4e-def620b70874" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/database/DatabaseProvider.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/di/AppContainer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/di/AppContainer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/network/ApiConstants.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/network/ApiConstants.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/network/RetrofitProvider.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/network/RetrofitProvider.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/AdminDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/AdminDriver.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/AuthUser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/AuthUser.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/Promo.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/Promo.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/Ride.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/model/Ride.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminDriverRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminDriverRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/DriverLocationRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/DriverLocationRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/FirebaseAuthRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/FirebaseAuthRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/PromoRespository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/PromoRespository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/local/dao/CartDao.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/local/database/WayWayDatabase.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/local/entity/CartEntity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/mapper/CartMapper.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/FoodRepository.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/LocationRepositoryImpl.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/RideRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/RideRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/RouteRepositoryImpl.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModelFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/admin/driver/AdminDriverViewModelFactory.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/login/LoginViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/register/RegisterViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/ai/AiAssistantScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/ai/AiAssistantScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/common/AuthUi.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/auth/common/AuthUi.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/chat/RideChatScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/chat/RideChatScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverHomeScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/home/DriverViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/income/DriverIncomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/driver/income/DriverIncomeScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/AppNavHost.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/AppNavHost.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/Routes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/Routes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/theme/Color.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/theme/Color.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/theme/Theme.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/theme/Theme.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/BookingRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/BookingRoute.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeState.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/BikeViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingConfirmCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingConfirmCard.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingInputOverlay.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/BookingInputOverlay.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/CompletedUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/CompletedUI.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/MainMapContent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/MainMapContent.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/OnTripUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/OnTripUI.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/PromoBottomSheet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/PromoBottomSheet.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/WaitingUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/components/WaitingUI.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/confirm/BikeConfirmScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/confirm/BikeConfirmScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/map/BikeLocationPickerScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/map/BikeLocationPickerScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/search/BikeSearchScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/bike/search/BikeSearchScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarMapper.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarSharedViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/CarViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/components/CarInputOverlay.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/components/CarMapContent.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/confirm/CarConfirmScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/map/CarLocationPickerScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/model/CarLocationType.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/model/CarState.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/car/search/CarSearchScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/express/ExpressFormScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/express/ExpressFormScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/express/ExpressViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/express/ExpressViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/express/picker/LocationPickerScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/express/picker/LocationPickerScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodBookingScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodState.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodStatus.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/FoodViewModelFactory.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/cart/CartScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/cart/FoodCartState.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/cart/FoodCartStore.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/cart/FoodCartViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/FoodCartBottomBar.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/FoodCategories.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/FoodCheckoutSheet.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/FoodHeader.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/FoodRestaurantCard.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/FoodSearchBar.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/PromoFoodBanners.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/components/SectionTitle.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/mock/FoodMockData.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/model/CartItemUiModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/model/FoodBannerUiModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/model/FoodCategoryUiModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/model/FoodItemUiModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/order/FoodOrderState.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/order/FoodOrderStatus.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/order/FoodOrderTrackingScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/order/FoodOrderViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/booking/food/order/FoodOrderViewModelFactory.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/history/HistoryViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/components/WayWayBottomBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/components/WayWayBottomBar.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/mock/HomeMockData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/mock/HomeMockData.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/model/FoodPreviewUiModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/notification/NotificationScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/notification/NotificationScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/payment/AddPaymentScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/payment/AddPaymentScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/payment/MomoLinkScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/payment/MomoLinkScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/profile/ProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/profile/ProfileScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firebase/firestore.rules" beforeDir="false" afterPath="$PROJECT_DIR$/../firebase/firestore.rules" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/rating/RideRatingScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/rating/RideRatingScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/food_banner.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/food_icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/rice.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/your_food_img.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../gradle/libs.versions.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/waywaybackend/momo/MomoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/waywaybackend/momo/MomoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/waywaybackend/momo/MomoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/waywaybackend/momo/MomoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/MavenWrapperDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MavenWrapperDownloader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/waywaybackend/momo/MomoController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/waywaybackend/momo/MomoController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/waywaybackend/momo/MomoService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/waywaybackend/momo/MomoService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/wayway-backend-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/wayway-backend-0.0.1-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/wayway-backend-0.0.1-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/wayway-backend-0.0.1-SNAPSHOT.jar.original" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,6 +213,10 @@
       <workItem from="1780240469319" duration="343000" />
       <workItem from="1780240948173" duration="3870000" />
       <workItem from="1780324951053" duration="3351000" />
+      <workItem from="1780389123344" duration="2117000" />
+      <workItem from="1780585936724" duration="3252000" />
+      <workItem from="1780596432722" duration="1517000" />
+      <workItem from="1780938995094" duration="288000" />
     </task>
     <servers />
   </component>

@@ -3,17 +3,14 @@ package com.example.waywayapp.ui.user.booking
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.example.waywayapp.ui.user.booking.bike.BikeBookingScreen
+import androidx.compose.runtime.LaunchedEffect
+import com.example.waywayapp.ui.user.booking.bike.BikeSharedViewModel
 import com.example.waywayapp.ui.user.booking.bike.search.BikeSearchScreen
-import com.example.waywayapp.ui.user.booking.car.CarScreen
-import com.example.waywayapp.ui.user.booking.car.search.CarSearchScreen
 import com.example.waywayapp.ui.user.booking.express.ExpressFormScreen
-import com.example.waywayapp.ui.user.booking.food.FoodBookingScreen
 @Composable
 fun BookingRoute(
     type: String,
     onBackClick: () -> Unit = {},
-    onCartClick: () -> Unit = {},
     onBikePickupClick: () -> Unit = {},
     onBikeDropoffClick: () -> Unit = {},
     onBikeConfirmClick: () -> Unit = {},
@@ -24,29 +21,19 @@ fun BookingRoute(
     onCarDropoffClick: () -> Unit = {},
     onCarConfirmClick: () -> Unit = {}
 ) {
+    LaunchedEffect(type) {
+        if (type == "bike" || type == "car") {
+            BikeSharedViewModel.viewModel.selectServiceType(type)
+        }
+    }
+
     when (type) {
-        "bike" -> {
+        "bike", "car" -> {
             BikeSearchScreen(
                 onBackClick = onBackClick,
                 onPickupMapClick = onBikePickupClick,
                 onDropoffMapClick = onBikeDropoffClick,
                 onConfirmClick = onBikeConfirmClick
-            )
-        }
-
-        "food" -> {
-            FoodBookingScreen(
-                onBackClick = onBackClick,
-                onCartClick = onCartClick
-            )
-        }
-
-        "car" -> {
-            CarSearchScreen(
-                onBackClick = onBackClick,
-                onPickupMapClick = onCarPickupClick,
-                onDropoffMapClick = onCarDropoffClick,
-                onConfirmClick = onCarConfirmClick
             )
         }
 

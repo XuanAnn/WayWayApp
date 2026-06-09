@@ -70,12 +70,12 @@ fun WaitingUI(onCancel: () -> Unit) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xFF00B1A7).copy(alpha = 0.2f), CircleShape)
+                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape)
                     )
                     Box(
                         modifier = Modifier
                             .size(60.dp)
-                            .background(Color(0xFF00B1A7), CircleShape),
+                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("🏍️", fontSize = 32.sp)
@@ -94,7 +94,7 @@ fun WaitingUI(onCancel: () -> Unit) {
                 Text(
                     text = "Vui lòng đợi trong giây lát...",
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
@@ -104,9 +104,9 @@ fun WaitingUI(onCancel: () -> Unit) {
                     onClick = onCancel,
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color.Red)
+                    border = BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.error)
                 ) {
-                    Text(text = "Hủy tìm xe", color = Color.Red, fontWeight = FontWeight.Medium)
+                    Text(text = "Hủy tìm xe", color = androidx.compose.material3.MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium)
                 }
             }
         }

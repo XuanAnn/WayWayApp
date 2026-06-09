@@ -17,7 +17,7 @@ class AdminRepository {
     // Firestore chứa collection users và drivers.
     private val firestore = FirestoreProvider.db
 
-    // Lắng nghe realtime danh sách users để admin thấy thay đổi ngay.
+    // Lắng nghe realtime danh sách users
     fun observeUsers(): Flow<List<AdminUser>> = callbackFlow {
         val registration = firestore.collection("users")
             .limit(200)

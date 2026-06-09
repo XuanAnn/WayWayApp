@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -51,6 +52,7 @@ fun BikeConfirmScreen(
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
     val snackbarHostState = remember { SnackbarHostState() }
+    val colors = MaterialTheme.colorScheme
 
     LaunchedEffect(
         uiState.pickupLatLng,
@@ -89,6 +91,25 @@ fun BikeConfirmScreen(
 
         when (uiState.status) {
             BookingStatus.IDLE -> {
+                Surface(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(start = 16.dp, top = 12.dp)
+                        .size(48.dp)
+                        .align(Alignment.TopStart),
+                    shape = RoundedCornerShape(16.dp),
+                    color = colors.surface,
+                    shadowElevation = 6.dp,
+                    onClick = onBackClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Quay lại",
+                        tint = colors.onSurface,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+
                 BookingConfirmCard(
                     viewModel = viewModel,
                     onConfirmBooking = viewModel::startBooking,
@@ -147,7 +168,7 @@ fun BikeConfirmScreen(
 
     LaunchedEffect(uiState.status, uiState.rideStatus) {
         val message = when {
-            uiState.status == BookingStatus.FINDING -> "Dang tim tai xe phu hop."
+            uiState.status == BookingStatus.FINDING -> "Đang tìm tài xế phù hợp."
             uiState.rideStatus == "accepted" -> "Tai xe da nhan cuoc va dang den diem don."
             uiState.rideStatus == "arrived" -> "Tai xe da den diem don."
             uiState.rideStatus == "in_progress" -> "Chuyen xe cua ban dang duoc thuc hien."
@@ -188,7 +209,7 @@ private fun RideConfirmBottomSheet(
                 Icon(
                     Icons.Default.TwoWheeler,
                     contentDescription = null,
-                    tint = Color(0xFF00B14F),
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(42.dp)
                 )
 
@@ -204,14 +225,14 @@ private fun RideConfirmBottomSheet(
 
                     Text(
                         text = "$distance • $duration",
-                        color = Color.Gray
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
                 Text(
                     text = "${formatter.format(price)}đ",
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color(0xFF20242A)
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -224,7 +245,7 @@ private fun RideConfirmBottomSheet(
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF00B14F)
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text("Đặt Xe")

@@ -33,7 +33,9 @@ import kotlinx.coroutines.Job
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.Normalizer
 import java.util.*
+import kotlin.math.ceil
 import kotlin.math.floor
 import com.example.waywayapp.data.remote.api.GeocodingApi
 import com.example.waywayapp.data.remote.api.OsrmApi
@@ -111,13 +113,26 @@ class BikeViewModel(
         _uiState.update { it.copy(dropoffAddress = newQuery) }
     }
     // Xoá kết quả gợi ý khi user đã chọn hoặc rời ô tìm kiếm.
+    fun selectServiceType(serviceType: String) {
+        val normalizedType = if (serviceType == "car") "car" else "bike"
+        _uiState.update { state ->
+            val selectedPrice = if (normalizedType == "car") state.carPrice else state.bikePrice
+            val fallbackPrice = selectedPrice.takeIf { it > 0.0 } ?: state.price
+            state.copy(
+                selectedServiceType = normalizedType,
+                price = fallbackPrice,
+                finalPrice = (fallbackPrice - state.discount).coerceAtLeast(0.0)
+            )
+        }
+    }
+
     fun clearSearchResults() {
         _searchResults.value = emptyList()
     }
     // Gọi geocoding API để lấy danh sách địa chỉ gợi ý theo từ khoá.
     private suspend fun performAutocomplete(query: String) {
         try {
-            val results = geocodingApi.searchAddress(query = query)
+            val results = searchAddressWithFallback(query)
             _searchResults.value = results
         } catch (e: Exception) {
             Log.e(TAG, "Autocomplete Error: ${e.message}")
@@ -197,7 +212,7 @@ class BikeViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val results = geocodingApi.searchAddress(query = query)
+                val results = searchAddressWithFallback(query)
 
                 if (results.isNotEmpty()) {
                     val firstResult = results[0]
@@ -222,6 +237,23 @@ class BikeViewModel(
                 _uiState.update { it.copy(isLoading = false, error = "Lỗi kết nối máy chủ tìm kiếm") }
             }
         }
+    }
+
+    private suspend fun searchAddressWithFallback(query: String): List<GeocodingResponseDto> {
+        val results = geocodingApi.searchAddress(query = query)
+        if (results.isNotEmpty()) return results
+
+        val fallbackQuery = query.withoutVietnameseDiacritics()
+        if (fallbackQuery == query) return results
+
+        return geocodingApi.searchAddress(query = fallbackQuery)
+    }
+
+    private fun String.withoutVietnameseDiacritics(): String {
+        return Normalizer.normalize(this, Normalizer.Form.NFD)
+            .replace("\\p{Mn}+".toRegex(), "")
+            .replace('đ', 'd')
+            .replace('Đ', 'D')
     }
 
     // Rút gọn Address của Android thành chuỗi dễ đọc cho UI.
@@ -282,15 +314,20 @@ class BikeViewModel(
                     Log.i(TAG, "Route found: ${route.distance}m, ${route.duration}s")
 
                     _uiState.update { state ->
-                        val basePrice = (floor(route.distance / 1000) * 5000 + 12000)
+                        val distanceKm = route.distance / 1000.0
+                        val bikePrice = calculateBikePrice(distanceKm)
+                        val carPrice = calculateCarPrice(distanceKm)
+                        val selectedPrice = if (state.selectedServiceType == "car") carPrice else bikePrice
                         bookingPolylinePoints = points
                         state.copy(
                             polylinePoints = points,
-                            distance = String.format("%.1f km", route.distance / 1000),
+                            distance = String.format("%.1f km", distanceKm),
                             duration = formatDuration(route.duration),
                             etaToDropoff = formatDuration(route.duration),
-                            price = basePrice,
-                            finalPrice = basePrice,
+                            bikePrice = bikePrice,
+                            carPrice = carPrice,
+                            price = selectedPrice,
+                            finalPrice = selectedPrice,
                             isLoading = false
                         )
                     }
@@ -326,6 +363,7 @@ class BikeViewModel(
                     dropoffAddress = _uiState.value.dropoffAddress,
                     price = _uiState.value.finalPrice.takeIf { price -> price > 0.0 }
                         ?: _uiState.value.price,
+                    serviceType = _uiState.value.selectedServiceType,
                     paymentMethod = paymentMethod,
                     paymentStatus = if (paymentMethod == "momo_uat" || paymentMethod == "momo_gateway") "paid" else "pending",
                     paidAt = if (paymentMethod == "momo_uat" || paymentMethod == "momo_gateway") System.currentTimeMillis() else null
@@ -373,7 +411,7 @@ class BikeViewModel(
                 momoPaymentRepository.createOrder(
                     orderId = orderId,
                     amount = amount,
-                    orderInfo = "WayWay Bike",
+                    orderInfo = "WayWay ${_uiState.value.selectedServiceType.uppercase()}",
                     extraData = "",
                     userId = authRepository.currentUser?.uid
                 )
@@ -421,7 +459,7 @@ class BikeViewModel(
                 momoPaymentRepository.createOrder(
                     orderId = orderId,
                     amount = amount,
-                    orderInfo = "WayWay Bike",
+                    orderInfo = "WayWay ${_uiState.value.selectedServiceType.uppercase()}",
                     extraData = "",
                     userId = authRepository.currentUser?.uid
                 )
@@ -823,5 +861,16 @@ class BikeViewModel(
     private fun formatDuration(durationSeconds: Double): String {
         val minutes = (durationSeconds / 60.0).toInt().coerceAtLeast(1)
         return "$minutes phút"
+    }
+
+    private fun calculateBikePrice(distanceKm: Double): Double {
+        return floor(distanceKm) * 5000 + 12000
+    }
+
+    private fun calculateCarPrice(distanceKm: Double): Double {
+        val firstTwoKmPrice = 36_000.0
+        if (distanceKm <= 2.0) return firstTwoKmPrice
+        val extraKm = ceil(distanceKm - 2.0)
+        return firstTwoKmPrice + extraKm * 8_000.0
     }
 }

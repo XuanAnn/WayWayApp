@@ -59,7 +59,7 @@ fun CompletedUI(
                 Box(
                     modifier = Modifier
                         .size(80.dp)
-                        .background(Color(0xFF00B1A7), CircleShape),
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -84,7 +84,7 @@ fun CompletedUI(
                 Text(
                     text = "Cam on ban da su dung WayWay Bike.\nHay danh gia tai xe de cai thien trai nghiem.",
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
 
@@ -98,13 +98,13 @@ fun CompletedUI(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Tong thanh toan", color = Color.Gray)
+                    Text(text = "Tong thanh toan", color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
                     val formatter = DecimalFormat("#,###")
                     Text(
                         text = "${formatter.format(state.price.toInt())} d",
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
-                        color = Color(0xFF00B1A7)
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -115,7 +115,7 @@ fun CompletedUI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00B1A7)),
+                    colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(text = "Danh gia tai xe", fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -128,7 +128,7 @@ fun CompletedUI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF20242A)),
+                    colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(text = "Ve trang chu", fontSize = 15.sp, fontWeight = FontWeight.Bold)

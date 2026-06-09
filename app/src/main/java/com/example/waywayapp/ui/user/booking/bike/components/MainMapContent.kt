@@ -1,6 +1,7 @@
 package com.example.waywayapp.ui.user.booking.bike.components
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.LinearGradient
@@ -29,6 +30,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun MainMapContent(
     viewModel: BikeViewModel,
@@ -104,7 +106,7 @@ fun MainMapContent(
 
         // Đường kẻ lộ trình
         if (uiState.polylinePoints.isNotEmpty()) {
-            Polyline(points = uiState.polylinePoints, color = Color(0xFF00B1A7), width = 12f)
+            Polyline(points = uiState.polylinePoints, color = androidx.compose.material3.MaterialTheme.colorScheme.primary, width = 12f)
         }
     }
 }

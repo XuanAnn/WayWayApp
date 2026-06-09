@@ -123,12 +123,12 @@ fun MomoLinkScreen(
                                 Text("MoMo UAT Wallet", fontWeight = FontWeight.ExtraBold, color = MomoDark)
                                 Text(
                                     text = if (uiState.isLinked) "Đã liên kết" else "Chưa liên kết",
-                                    color = if (uiState.isLinked) Color(0xFF0BAF63) else MomoMuted,
+                                    color = if (uiState.isLinked) androidx.compose.material3.MaterialTheme.colorScheme.primary else MomoMuted,
                                     fontSize = 13.sp
                                 )
                             }
                             if (uiState.isLinked) {
-                                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF0BAF63))
+                                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                             }
                         }
 
@@ -196,9 +196,9 @@ fun MomoLinkScreen(
                                     .height(48.dp),
                                 shape = RoundedCornerShape(100.dp)
                             ) {
-                                Icon(Icons.Default.LinkOff, contentDescription = null, tint = Color(0xFFD93025))
+                                Icon(Icons.Default.LinkOff, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.error)
                                 Spacer(modifier = Modifier.size(8.dp))
-                                Text("Hủy liên kết", color = Color(0xFFD93025))
+                                Text("Hủy liên kết", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
                             }
                         }
                     }

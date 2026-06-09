@@ -10,13 +10,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.ui.components.WayWayBottomBar
+import com.example.waywayapp.ui.navigation.Routes
 import com.example.waywayapp.ui.theme.*
 
 data class NotificationItem(
@@ -48,15 +49,15 @@ private val notifications = listOf(
         message = "Tài xế đang đến điểm đón của bạn.",
         time = "2 phút trước",
         icon = Icons.Default.DirectionsBike,
-        iconBg = Lime
+        iconBg = WayWayPrimaryContainer
     ),
 
     NotificationItem(
         title = "Khuyến mãi mới",
-        message = "Giảm 30% cho đơn Food hôm nay.",
+        message = "Giảm 30% cho chuyến đi hôm nay.",
         time = "10 phút trước",
         icon = Icons.Default.LocalOffer,
-        iconBg = Color(0xFFFFDDB8)
+        iconBg = WayWaySecondaryContainer
     ),
 
     NotificationItem(
@@ -64,21 +65,24 @@ private val notifications = listOf(
         message = "Bạn đã thanh toán bằng MoMo.",
         time = "1 giờ trước",
         icon = Icons.Default.Payments,
-        iconBg = Color(0xFFFFDCEB)
+        iconBg = WayWayTertiaryContainer
     ),
 
     NotificationItem(
-        title = "Đồ ăn đang được chuẩn bị",
-        message = "Nhà hàng đang chuẩn bị món của bạn.",
+        title = "Giao hàng đang được xử lý",
+        message = "WayWay Express đang cập nhật thông tin đơn hàng.",
         time = "3 giờ trước",
-        icon = Icons.Default.Restaurant,
-        iconBg = Color(0xFFE7E8FF)
+        icon = Icons.Default.LocalOffer,
+        iconBg = WayWaySecondaryContainer
     )
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(
+    currentRoute: String? = Routes.NOTIFICATION,
+    onBottomNavClick: (String) -> Unit = {}
+) {
 
     Scaffold(
         containerColor = AppBg,
@@ -99,33 +103,37 @@ fun NotificationScreen() {
             )
         }
     ) { padding ->
-
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 18.dp),
+                contentPadding = PaddingValues(bottom = 104.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
 
-            item {
-                Spacer(modifier = Modifier.height(4.dp))
+                item {
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                items(notifications) { notification ->
+
+                    NotificationCard(notification)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
             }
 
-            items(notifications) { notification ->
-
-                NotificationCard(notification)
-            }
-
-            item {
-                WayWayBottomBar(
-                    currentRoute = null,
-                    onItemClick = {}
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
+            WayWayBottomBar(
+                currentRoute = currentRoute,
+                onItemClick = onBottomNavClick,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
         }
     }
 }
@@ -164,7 +172,7 @@ fun NotificationCard(
                 Icon(
                     imageVector = notification.icon,
                     contentDescription = null,
-                    tint = TextDark,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(26.dp)
                 )
             }

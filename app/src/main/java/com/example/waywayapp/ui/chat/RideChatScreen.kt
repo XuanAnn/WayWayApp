@@ -129,7 +129,7 @@ fun RideChatScreen(
                 messages == null -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFF00B1A7)
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -139,7 +139,7 @@ fun RideChatScreen(
                         modifier = Modifier
                             .align(Alignment.Center)
                             .padding(24.dp),
-                        color = Color(0xFF6B7280),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -173,7 +173,7 @@ fun RideChatScreen(
                     Text(
                         text = it,
                         modifier = Modifier.padding(12.dp),
-                        color = Color(0xFFD93025),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -217,7 +217,7 @@ private fun ChatInputBar(
                 modifier = Modifier
                     .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
                     .background(
-                        if (enabled) Color(0xFF00B1A7) else Color(0xFFD1D5DB),
+                        if (enabled) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant,
                         RoundedCornerShape(16.dp)
                     )
             ) {
@@ -252,7 +252,7 @@ private fun MessageBubble(
                     bottomStart = if (isMine) 18.dp else 4.dp,
                     bottomEnd = if (isMine) 4.dp else 18.dp
                 ),
-                color = if (isMine) Color(0xFF00B1A7) else Color.White,
+                color = if (isMine) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.White,
                 shadowElevation = if (isMine) 0.dp else 2.dp
             ) {
                 Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
@@ -260,7 +260,7 @@ private fun MessageBubble(
                         Text(
                             text = message.senderName.ifBlank { "Đối tác chuyến xe" },
                             style = MaterialTheme.typography.labelMedium,
-                            color = Color(0xFF6B7280),
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(2.dp))
@@ -274,7 +274,7 @@ private fun MessageBubble(
             Text(
                 text = timeFormatter.format(Date(message.createdAt)),
                 modifier = Modifier.padding(top = 4.dp, start = 6.dp, end = 6.dp),
-                color = Color(0xFF9CA3AF),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelSmall
             )
         }

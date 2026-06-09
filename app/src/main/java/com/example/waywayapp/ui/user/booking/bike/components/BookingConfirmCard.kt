@@ -25,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,16 +62,23 @@ fun BookingConfirmCard(
     val uiState by viewModel.uiState.collectAsState()
     val formatter = remember { DecimalFormat("#,###") }
     val context = LocalContext.current
+    val colors = MaterialTheme.colorScheme
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedPayment by remember { mutableStateOf("Tien mat") }
+    var selectedPayment by remember { mutableStateOf("Tiền mặt") }
     var showMomoDialog by remember { mutableStateOf(false) }
 
     data class PaymentMethod(val name: String, val icon: Int)
+    data class RideOption(
+        val type: String,
+        val title: String,
+        val icon: Int,
+        val price: Double
+    )
 
     val payments = buildList {
-        add(PaymentMethod("Tien mat", R.drawable.dollar))
-        add(PaymentMethod("MoMo UAT", R.drawable.momo_icon))
+        add(PaymentMethod("Tiền mặt", R.drawable.dollar))
+        add(PaymentMethod("MoMo", R.drawable.momo_icon))
         if (BuildConfig.DEBUG) {
             add(PaymentMethod("MoMo Test", R.drawable.momo_icon))
         }
@@ -78,64 +86,99 @@ fun BookingConfirmCard(
 
     val selectedIcon = payments.find { it.name == selectedPayment }?.icon ?: R.drawable.dollar
     val amount = uiState.finalPrice.takeIf { it > 0.0 } ?: uiState.price
+    val rideOptions = listOf(
+        RideOption("bike", "Bike", R.drawable.bike_icon, uiState.bikePrice.takeIf { it > 0.0 } ?: uiState.price),
+        RideOption("car", "Car", R.drawable.car_icon, uiState.carPrice.takeIf { it > 0.0 } ?: uiState.price)
+    ).sortedBy { option ->
+        if (option.type == uiState.selectedServiceType) 0 else 1
+    }
+    val selectedRide = rideOptions.firstOrNull { it.type == uiState.selectedServiceType } ?: rideOptions.first()
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(12.dp),
         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 26.dp, bottomEnd = 26.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 18.dp)
+        colors = CardDefaults.cardColors(containerColor = colors.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color(0xFFF5F7F2)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.bike_icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(50.dp)
-                    )
-                }
 
-                Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
-                    Text(
-                        text = "Bike",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF20242A)
-                    )
-                    Text(
-                        text = "${uiState.distance} - ${uiState.duration}",
-                        fontSize = 12.sp,
-                        color = Color(0xFF8B918A)
-                    )
-                }
 
-                Spacer(modifier = Modifier.weight(1f))
+
 
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "${formatter.format(amount.toInt())}d",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF20242A)
-                    )
+
+                    Row() {
+                        Text(
+                            text = "Bạn đang chọn dịch vụ: ${selectedRide.title}",
+                            fontSize = 16.sp,
+                            color = colors.primary,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
 
                     if (uiState.discount > 0.0) {
                         Text(
-                            text = "${formatter.format(uiState.price.toInt())}d",
+                            text = "${formatter.format(uiState.price.toInt())}đ",
                             fontSize = 13.sp,
-                            color = Color.Gray,
+                            color = colors.onSurfaceVariant,
                             textDecoration = TextDecoration.LineThrough
                         )
+                    }
+
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                rideOptions.forEach { option ->
+                    val selected = option.type == uiState.selectedServiceType
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(58.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(if (selected) colors.primaryContainer else colors.surfaceVariant.copy(alpha = 0.55f))
+                            .clickable { viewModel.selectServiceType(option.type) }
+                            .padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(option.icon),
+                            contentDescription = option.title,
+                            modifier = Modifier.size(38.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column() {
+                        Text(
+                            text = option.title,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = colors.onSurface
+                        )
+
+                            Text(
+                                text = "${uiState.distance} - ${uiState.duration}",
+                                fontSize = 12.sp,
+                                color = colors.onSurfaceVariant
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Text(
+                            text = "${formatter.format(option.price.toInt())}đ",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (selected) colors.primary else colors.onSurface
+                        )
+
                     }
                 }
             }
@@ -143,9 +186,9 @@ fun BookingConfirmCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Diem den",
+                text = "Điểm đến",
                 fontSize = 12.sp,
-                color = Color(0xFF8B918A),
+                color = colors.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
             )
 
@@ -154,7 +197,7 @@ fun BookingConfirmCard(
             Text(
                 text = uiState.dropoffAddress,
                 fontSize = 14.sp,
-                color = Color(0xFF20242A),
+                color = colors.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 18.sp,
                 maxLines = 2
@@ -164,7 +207,7 @@ fun BookingConfirmCard(
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Thanh toan", fontSize = 12.sp, color = Color(0xFF8B918A))
+                    Text("Thanh toán", fontSize = 12.sp, color = colors.onSurfaceVariant)
 
                     Spacer(modifier = Modifier.height(6.dp))
 
@@ -174,14 +217,14 @@ fun BookingConfirmCard(
                                 .fillMaxWidth()
                                 .height(54.dp)
                                 .clip(RoundedCornerShape(18.dp))
-                                .background(Color(0xFFF5F7F2))
+                                .background(colors.surfaceVariant.copy(alpha = 0.55f))
                                 .clickable { expanded = true }
                                 .padding(horizontal = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Image(
                                 painter = painterResource(selectedIcon),
-                                contentDescription = null,
+                                contentDescription = selectedPayment,
                                 modifier = Modifier.size(28.dp)
                             )
 
@@ -191,7 +234,7 @@ fun BookingConfirmCard(
                                 text = selectedPayment,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF20242A),
+                                color = colors.onSurface,
                                 maxLines = 1
                             )
                         }
@@ -207,7 +250,7 @@ fun BookingConfirmCard(
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Image(
                                                 painter = painterResource(payment.icon),
-                                                contentDescription = null,
+                                                contentDescription = payment.name,
                                                 modifier = Modifier.size(26.dp)
                                             )
                                             Spacer(Modifier.width(8.dp))
@@ -225,7 +268,7 @@ fun BookingConfirmCard(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Uu dai", fontSize = 12.sp, color = Color(0xFF8B918A))
+                    Text("Ưu đãi", fontSize = 12.sp, color = colors.onSurfaceVariant)
 
                     Spacer(modifier = Modifier.height(6.dp))
 
@@ -234,7 +277,7 @@ fun BookingConfirmCard(
                             .fillMaxWidth()
                             .height(54.dp)
                             .clip(RoundedCornerShape(18.dp))
-                            .background(Color(0xFFFFF4D8))
+                            .background(colors.secondaryContainer)
                             .clickable {
                                 viewModel.loadPromos()
                                 onSelectPromo()
@@ -244,7 +287,7 @@ fun BookingConfirmCard(
                     ) {
                         Image(
                             painter = painterResource(R.drawable.promo),
-                            contentDescription = null,
+                            contentDescription = "Ưu đãi",
                             modifier = Modifier.size(28.dp)
                         )
 
@@ -254,7 +297,7 @@ fun BookingConfirmCard(
                             text = uiState.promoCode,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFFFF7A00),
+                            color = colors.onSecondaryContainer,
                             maxLines = 1
                         )
                     }
@@ -266,7 +309,7 @@ fun BookingConfirmCard(
             Button(
                 onClick = {
                     when (selectedPayment) {
-                        "MoMo UAT" -> {
+                        "MoMo" -> {
                             viewModel.beginMomoGatewayPayment()
                             showMomoDialog = true
                         }
@@ -278,17 +321,17 @@ fun BookingConfirmCard(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF20242A),
-                    disabledContainerColor = Color(0xFFB6BBB3)
+                    containerColor = colors.primary,
+                    disabledContainerColor = colors.surfaceVariant
                 ),
                 shape = RoundedCornerShape(20.dp),
                 enabled = uiState.dropoffAddress.isNotBlank()
             ) {
                 Text(
-                    text = "Xac nhan dat xe",
+                    text = "Xác nhận đặt xe",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
+                    color = colors.onPrimary
                 )
             }
         }
@@ -297,7 +340,7 @@ fun BookingConfirmCard(
     if (showMomoDialog) {
         MomoGatewayVerifyDialog(
             amount = amount,
-            orderTitle = "WayWay Bike",
+            orderTitle = "WayWay ${selectedRide.title}",
             pickupAddress = uiState.pickupAddress,
             dropoffAddress = uiState.dropoffAddress,
             status = uiState.momoStatus,
@@ -341,6 +384,7 @@ private fun MomoGatewayVerifyDialog(
     onOpenAndDevConfirm: () -> Unit
 ) {
     val formatter = remember { DecimalFormat("#,###") }
+    val colors = MaterialTheme.colorScheme
     val isCreating = status == "CREATING"
     val isWaiting = status == "WAITING"
     val isPaid = status == "PAID"
@@ -355,7 +399,7 @@ private fun MomoGatewayVerifyDialog(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(colors.background)
                 .statusBarsPadding()
                 .padding(horizontal = 22.dp, vertical = 16.dp)
         ) {
@@ -367,14 +411,14 @@ private fun MomoGatewayVerifyDialog(
                     onClick = onDismiss,
                     enabled = !isCreating
                 ) {
-                    Text("Dong", color = Color(0xFFD82D8B), fontWeight = FontWeight.Bold)
+                    Text("Đóng", color = colors.primary, fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
 
                 Image(
                     painter = painterResource(R.drawable.momo_icon),
-                    contentDescription = null,
+                    contentDescription = "MoMo",
                     modifier = Modifier.size(34.dp)
                 )
             }
@@ -382,19 +426,19 @@ private fun MomoGatewayVerifyDialog(
             Spacer(modifier = Modifier.height(28.dp))
 
             Text(
-                text = "Xac nhan thanh toan",
+                text = "Xác nhận thanh toán",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF241B2F)
+                color = colors.onBackground
             )
 
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "MoMo UAT: mo MoMo de thanh toan, quay lai va bam kiem tra trang thai.",
+                text = "MoMo UAT: mở MoMo để thanh toán, quay lại và bấm kiểm tra trạng thái.",
                 fontSize = 13.sp,
                 lineHeight = 18.sp,
-                color = Color(0xFF837889)
+                color = colors.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(26.dp))
@@ -402,7 +446,7 @@ private fun MomoGatewayVerifyDialog(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEFF8)),
+                colors = CardDefaults.cardColors(containerColor = colors.primaryContainer.copy(alpha = 0.55f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -410,23 +454,23 @@ private fun MomoGatewayVerifyDialog(
                         text = orderTitle,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4A324C)
+                        color = colors.onPrimaryContainer
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "${formatter.format(amount.toInt())}d",
+                        text = "${formatter.format(amount.toInt())}đ",
                         fontSize = 34.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFFD82D8B)
+                        color = colors.primary
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    VerifyAddressLine("Diem don", pickupAddress)
+                    VerifyAddressLine("Điểm đón", pickupAddress)
                     Spacer(modifier = Modifier.height(10.dp))
-                    VerifyAddressLine("Diem den", dropoffAddress)
+                    VerifyAddressLine("Điểm đến", dropoffAddress)
                 }
             }
 
@@ -440,24 +484,24 @@ private fun MomoGatewayVerifyDialog(
                     .height(56.dp),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFD82D8B),
-                    disabledContainerColor = Color(0xFFE7B7D2)
+                    containerColor = colors.primary,
+                    disabledContainerColor = colors.surfaceVariant
                 )
             ) {
                 if (isCreating) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(22.dp),
-                        color = Color.White,
+                        color = colors.onPrimary,
                         strokeWidth = 2.dp
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text("Dang tao thanh toan...")
+                    Text("Đang tạo thanh toán...")
                 } else {
                     Text(
-                        text = if (isPaid) "Da thanh toan" else "Mo MoMo UAT",
+                        text = if (isPaid) "Đã thanh toán" else "Mở MoMo UAT",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
+                        color = colors.onPrimary
                     )
                 }
             }
@@ -473,8 +517,8 @@ private fun MomoGatewayVerifyDialog(
                 shape = RoundedCornerShape(18.dp)
             ) {
                 Text(
-                    text = if (isFailed) "Thu kiem tra lai" else "Toi da thanh toan, kiem tra ngay",
-                    color = Color(0xFF4A324C)
+                    text = if (isFailed) "Thử kiểm tra lại" else "Tôi đã thanh toán, kiểm tra ngay",
+                    color = colors.primary
                 )
             }
 
@@ -489,11 +533,11 @@ private fun MomoGatewayVerifyDialog(
                         .height(52.dp),
                     shape = RoundedCornerShape(18.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF241B2F),
-                        disabledContainerColor = Color(0xFFB6BBB3)
+                        containerColor = colors.inverseSurface,
+                        disabledContainerColor = colors.surfaceVariant
                     )
                 ) {
-                    Text("Mo UAT + confirm test", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Mở UAT + confirm test", color = colors.inverseOnSurface, fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -506,7 +550,7 @@ private fun MomoGatewayVerifyDialog(
                         .height(52.dp),
                     shape = RoundedCornerShape(18.dp)
                 ) {
-                    Text("Dev confirm PAID", color = Color(0xFFD82D8B), fontWeight = FontWeight.Bold)
+                    Text("Dev confirm PAID", color = colors.primary, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -514,13 +558,13 @@ private fun MomoGatewayVerifyDialog(
 
             Text(
                 text = message ?: when {
-                    isPaid -> "Thanh toan thanh cong."
-                    isFailed -> "Thanh toan that bai."
-                    isWaiting -> "Dang cho thanh toan..."
+                    isPaid -> "Thanh toán thành công."
+                    isFailed -> "Thanh toán thất bại."
+                    isWaiting -> "Đang chờ thanh toán..."
                     else -> ""
                 },
                 fontSize = 12.sp,
-                color = if (isFailed) Color(0xFFB00020) else Color(0xFF837889),
+                color = if (isFailed) colors.error else colors.onSurfaceVariant,
                 maxLines = 2
             )
         }
@@ -532,17 +576,19 @@ private fun VerifyAddressLine(
     label: String,
     value: String
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column {
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color(0xFF837889),
+            color = colors.onSurfaceVariant,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = value.ifBlank { "Chua co dia chi" },
+            text = value.ifBlank { "Chưa có địa chỉ" },
             fontSize = 14.sp,
-            color = Color(0xFF241B2F),
+            color = colors.onSurface,
             fontWeight = FontWeight.SemiBold,
             lineHeight = 18.sp,
             maxLines = 2

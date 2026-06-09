@@ -13,6 +13,9 @@ data class BikeState(
     val dropoffAddress: String = "",
 
     val price: Double = 0.0,
+    val bikePrice: Double = 0.0,
+    val carPrice: Double = 0.0,
+    val selectedServiceType: String = "bike",
     val distance: String = "",
     val duration: String = "",
 

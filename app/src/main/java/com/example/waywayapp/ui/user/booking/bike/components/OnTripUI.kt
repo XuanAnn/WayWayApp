@@ -69,7 +69,7 @@ fun OnTripUI(
                 Text(
                     text = state.ridePhase.ifBlank { "Tài xế đang đến" },
                     fontSize = 16.sp,
-                    color = Color(0xFF00B1A7),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -96,7 +96,7 @@ fun OnTripUI(
                             Text(text = state.driverName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFB300), modifier = Modifier.size(14.dp))
-                                Text(text = " ${state.driverRating}", fontSize = 12.sp, color = Color.Gray)
+                                Text(text = " ${state.driverRating}", fontSize = 12.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -106,7 +106,7 @@ fun OnTripUI(
                         Text(
                             text = state.driverPhone.ifBlank { "Đang cập nhật SĐT" },
                             fontSize = 12.sp,
-                            color = Color.Gray
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -145,7 +145,7 @@ fun OnTripUI(
                             .height(56.dp)
                             .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
                     ) {
-                        Icon(Icons.Default.Call, contentDescription = null, tint = Color(0xFF00B1A7))
+                        Icon(Icons.Default.Call, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                     }
 
                     IconButton(
@@ -155,7 +155,7 @@ fun OnTripUI(
                             .height(56.dp)
                             .background(Color(0xFFE0F2F1), RoundedCornerShape(12.dp))
                     ) {
-                        Icon(Icons.Default.Chat, contentDescription = null, tint = Color(0xFF00B1A7))
+                        Icon(Icons.Default.Chat, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                     }
 
                     Button(
@@ -204,14 +204,14 @@ private fun RideStatusBar(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(3.dp)
-                        .background(Color(0xFFD1D5DB), RoundedCornerShape(2.dp))
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(2.dp))
                 )
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .fillMaxWidth((activeIndex.toFloat() / (steps.size - 1)).coerceIn(0f, 1f))
                         .height(3.dp)
-                        .background(Color(0xFF00B1A7), RoundedCornerShape(2.dp))
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -221,7 +221,7 @@ private fun RideStatusBar(
                     steps.forEachIndexed { index, _ ->
                         val reached = index <= activeIndex
                         val current = index == activeIndex
-                        val color = if (reached) Color(0xFF00B1A7) else Color(0xFFD1D5DB)
+                        val color = if (reached) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
 
                         Box(
                             modifier = Modifier
@@ -255,7 +255,7 @@ private fun RideStatusBar(
                     ) {
                         Text(
                             text = step.second,
-                            color = if (reached) Color(0xFF0F766E) else Color(0xFF6B7280),
+                            color = if (reached) Color(0xFF0F766E) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 10.sp,
                             fontWeight = if (current) FontWeight.ExtraBold else FontWeight.SemiBold,
                             textAlign = TextAlign.Center,
@@ -282,7 +282,7 @@ private fun EtaChip(
         Text(
             text = title,
             fontSize = 11.sp,
-            color = Color(0xFF6B7280)
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,

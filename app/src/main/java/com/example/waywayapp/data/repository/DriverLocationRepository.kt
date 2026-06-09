@@ -61,6 +61,27 @@ class DriverLocationRepository {
     }
 
     // Cập nhật trạng thái online/available trong drivers để hệ thống match chuyến.
+    fun observeDriverLocations(): Flow<List<DriverLocation>> = callbackFlow {
+        var registration: ListenerRegistration? = null
+        registration = firestore.collection("driver_locations")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val locations = snapshot?.documents.orEmpty()
+                    .mapNotNull { document ->
+                        document.toDriverLocationDto()?.toDomain(document.id)
+                    }
+                trySend(locations)
+            }
+
+        awaitClose {
+            registration?.remove()
+        }
+    }
+
     suspend fun setDriverAvailability(
         driverId: String,
         isOnline: Boolean,

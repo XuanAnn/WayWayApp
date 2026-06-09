@@ -42,18 +42,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.R
+import com.example.waywayapp.ui.theme.WayWayOnSurface
+import com.example.waywayapp.ui.theme.WayWayOnSurfaceVariant
+import com.example.waywayapp.ui.theme.WayWayOutlineVariant
+import com.example.waywayapp.ui.theme.WayWayPrimary
+import com.example.waywayapp.ui.theme.WayWaySurface
 
-val AuthGreen = Color(0xFF12C765)
-val AuthDarkGreen = Color(0xFF0AA354)
-val AuthInk = Color(0xFF1F2523)
-val AuthMuted = Color(0xFF7A827F)
-val AuthLine = Color(0xFFEDEFEF)
-val AuthField = Color(0xFFFAFAFA)
+val AuthGreen = WayWayPrimary
+val AuthDarkGreen = WayWayPrimary
+val AuthInk = WayWayOnSurface
+val AuthMuted = WayWayOnSurfaceVariant
+val AuthLine = WayWayOutlineVariant
+val AuthField = WayWaySurface
 val AuthFont = FontFamily.SansSerif
 
 @Composable
 fun AuthBackButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick, modifier = Modifier.size(34.dp)) {
+    IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",

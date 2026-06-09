@@ -1,7 +1,5 @@
-// Theme.kt
 package com.example.waywayapp.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -10,47 +8,68 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-
-    primary = Lime,
-    onPrimary = TextDark,
-
-    secondary = DarkCard,
-    onSecondary = CardWhite,
-
-    tertiary = WarningOrange,
-
-    background = AppBg,
-    onBackground = TextDark,
-
-    surface = CardWhite,
-    onSurface = TextDark,
-
-    error = ErrorRed,
-    onError = CardWhite
+    primary = WayWayPrimary,
+    onPrimary = WayWayOnPrimary,
+    primaryContainer = WayWayPrimaryContainer,
+    onPrimaryContainer = WayWayOnPrimaryContainer,
+    inversePrimary = WayWayInversePrimary,
+    secondary = WayWaySecondary,
+    onSecondary = WayWayOnSecondary,
+    secondaryContainer = WayWaySecondaryContainer,
+    onSecondaryContainer = WayWayOnSecondaryContainer,
+    tertiary = WayWayTertiary,
+    onTertiary = WayWayOnTertiary,
+    tertiaryContainer = WayWayTertiaryContainer,
+    onTertiaryContainer = WayWayOnTertiaryContainer,
+    background = WayWayBackground,
+    onBackground = WayWayOnBackground,
+    surface = WayWaySurface,
+    onSurface = WayWayOnSurface,
+    surfaceVariant = WayWaySurfaceVariant,
+    onSurfaceVariant = WayWayOnSurfaceVariant,
+    inverseSurface = WayWayInverseSurface,
+    inverseOnSurface = WayWayInverseOnSurface,
+    outline = WayWayOutline,
+    outlineVariant = WayWayOutlineVariant,
+    scrim = WayWayScrim,
+    error = WayWayError,
+    onError = WayWayOnError,
+    errorContainer = WayWayErrorContainer,
+    onErrorContainer = WayWayOnErrorContainer
 )
 
 private val DarkColorScheme = darkColorScheme(
-
-    primary = Lime,
-    onPrimary = TextDark,
-
-    secondary = CardWhite,
-    onSecondary = TextDark,
-
-    tertiary = WarningOrange,
-
-    background = DarkCard,
-    onBackground = CardWhite,
-
-    surface = Color(0xFF2B3036),
-    onSurface = CardWhite,
-
-    error = ErrorRed,
-    onError = CardWhite
+    primary = WayWayDarkPrimary,
+    onPrimary = WayWayDarkOnPrimary,
+    primaryContainer = WayWayDarkPrimaryContainer,
+    onPrimaryContainer = WayWayDarkOnPrimaryContainer,
+    inversePrimary = WayWayDarkInversePrimary,
+    secondary = WayWayDarkSecondary,
+    onSecondary = WayWayDarkOnSecondary,
+    secondaryContainer = WayWayDarkSecondaryContainer,
+    onSecondaryContainer = WayWayDarkOnSecondaryContainer,
+    tertiary = WayWayDarkTertiary,
+    onTertiary = WayWayDarkOnTertiary,
+    tertiaryContainer = WayWayDarkTertiaryContainer,
+    onTertiaryContainer = WayWayDarkOnTertiaryContainer,
+    background = WayWayDarkBackground,
+    onBackground = WayWayDarkOnBackground,
+    surface = WayWayDarkSurface,
+    onSurface = WayWayDarkOnSurface,
+    surfaceVariant = WayWayDarkSurfaceVariant,
+    onSurfaceVariant = WayWayDarkOnSurfaceVariant,
+    inverseSurface = WayWayDarkInverseSurface,
+    inverseOnSurface = WayWayDarkInverseOnSurface,
+    outline = WayWayDarkOutline,
+    outlineVariant = WayWayDarkOutlineVariant,
+    scrim = WayWayScrim,
+    error = WayWayDarkError,
+    onError = WayWayDarkOnError,
+    errorContainer = WayWayDarkErrorContainer,
+    onErrorContainer = WayWayDarkOnErrorContainer
 )
 
 @Composable
@@ -59,21 +78,13 @@ fun WayWayAppTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-
     val colorScheme = when {
-
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-
             val context = LocalContext.current
-
-            if (darkTheme)
-                dynamicDarkColorScheme(context)
-            else
-                dynamicLightColorScheme(context)
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
         darkTheme -> DarkColorScheme
-
         else -> LightColorScheme
     }
 

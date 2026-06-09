@@ -9,12 +9,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.waywayapp.ui.navigation.AppNavHost
 import com.example.waywayapp.ui.user.booking.bike.BikeSharedViewModel
-import com.example.waywayapp.ui.theme.AppBg
 import com.example.waywayapp.ui.theme.WayWayAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +26,11 @@ class MainActivity : ComponentActivity() {
             WayWayAppTheme {
 
                 val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize().background(AppBg)) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) { innerPadding ->
                     AppNavHost(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding)
