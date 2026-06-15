@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.waywayapp.core.network.RetrofitProvider
 import com.example.waywayapp.data.remote.dto.geocoding.GeocodingResponseDto
+import com.example.waywayapp.data.repository.ProfileRepository
 import com.example.waywayapp.ui.user.home.mock.mockBanners
 import com.example.waywayapp.ui.user.home.mock.mockServices
 import kotlinx.coroutines.Job
@@ -20,10 +21,12 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState: StateFlow<HomeState> = _uiState.asStateFlow()
     private val geocodingApi = RetrofitProvider.geocodingApi
+    private val profileRepository = ProfileRepository()
     private var searchJob: Job? = null
 
     init {
         loadHomeData()
+        refreshMomoStatus()
     }
 
     private fun loadHomeData() {
@@ -66,6 +69,22 @@ class HomeViewModel : ViewModel() {
         searchJob?.cancel()
         _uiState.update {
             it.copy(searchSuggestions = emptyList())
+        }
+    }
+
+    fun refreshMomoStatus() {
+        viewModelScope.launch {
+            runCatching {
+                profileRepository.loadUserProfile()
+            }.onSuccess { user ->
+                _uiState.update {
+                    it.copy(
+                        momoLinked = user.momoLinked,
+                        momoPhone = user.momoPhone,
+                        momoDisplayName = user.name.ifBlank { user.email.ifBlank { user.phone } }
+                    )
+                }
+            }
         }
     }
 

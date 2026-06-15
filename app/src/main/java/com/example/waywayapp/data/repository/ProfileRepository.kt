@@ -1,5 +1,6 @@
 package com.example.waywayapp.data.repository
 
+import android.net.Uri
 import com.example.waywayapp.core.firebase.FirestoreProvider
 import com.example.waywayapp.data.model.AdminDriver
 import com.example.waywayapp.data.model.AdminUser
@@ -78,12 +79,16 @@ class ProfileRepository {
             createdAt = if (profile.createdAt == 0L) now else profile.createdAt
         )
 
-        if (savedProfile.name.isNotBlank()) {
-            user.updateProfile(
-                UserProfileChangeRequest.Builder()
-                    .setDisplayName(savedProfile.name)
-                    .build()
-            ).await()
+        if (savedProfile.name.isNotBlank() || savedProfile.avatarUrl.isNotBlank()) {
+            val profileRequest = UserProfileChangeRequest.Builder()
+                .setDisplayName(savedProfile.name.ifBlank { user.displayName })
+                .apply {
+                    if (savedProfile.avatarUrl.isNotBlank()) {
+                        setPhotoUri(Uri.parse(savedProfile.avatarUrl))
+                    }
+                }
+                .build()
+            user.updateProfile(profileRequest).await()
         }
 
         firestore.collection("users")

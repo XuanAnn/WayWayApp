@@ -58,6 +58,7 @@ class ProfileViewModel(
     // Cập nhật tên trong form và đồng bộ sang driver profile nếu là tài xế.
     fun onNameChange(value: String) = updateUser { copy(name = value) }
     fun onPhoneChange(value: String) = updateUser { copy(phone = value) }
+    fun onAvatarUrlChange(value: String) = updateUser { copy(avatarUrl = value) }
     fun onVehicleTypeChange(value: String) = updateDriver { copy(vehicleType = value) }
     fun onPlateNumberChange(value: String) = updateDriver { copy(plateNumber = value.uppercase()) }
 

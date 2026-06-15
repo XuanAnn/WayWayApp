@@ -9,6 +9,9 @@ data class HomeState(
     val searchSuggestions: List<GeocodingResponseDto> = emptyList(),
     val services: List<ServiceUiModel> = emptyList(),
     val banners: List<BannerUiModel> = emptyList(),
+    val momoLinked: Boolean = false,
+    val momoPhone: String = "",
+    val momoDisplayName: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

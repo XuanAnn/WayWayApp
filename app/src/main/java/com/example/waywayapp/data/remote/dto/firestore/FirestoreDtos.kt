@@ -157,6 +157,7 @@ data class DriverLocationDto(
     val activeRideId: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
+    val vehicleType: String? = null,
     val heading: Double? = null,
     val speed: Double? = null,
     val updatedAt: Long? = null
@@ -167,6 +168,7 @@ data class DriverLocationDto(
             activeRideId = activeRideId,
             latitude = latitude ?: 0.0,
             longitude = longitude ?: 0.0,
+            vehicleType = vehicleType.orEmpty().ifBlank { "bike" },
             heading = heading?.toFloat() ?: 0f,
             speed = speed?.toFloat() ?: 0f,
             updatedAt = updatedAt ?: 0L
@@ -272,6 +274,7 @@ fun DriverLocation.toDto(): DriverLocationDto {
         activeRideId = activeRideId,
         latitude = latitude,
         longitude = longitude,
+        vehicleType = vehicleType,
         heading = heading.toDouble(),
         speed = speed.toDouble(),
         updatedAt = updatedAt

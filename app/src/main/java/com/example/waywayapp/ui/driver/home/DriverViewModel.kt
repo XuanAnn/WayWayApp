@@ -175,6 +175,7 @@ class DriverViewModel(
                                 locationRepository.publishDriverLocation(
                                     driverId = id,
                                     activeRideId = _uiState.value.currentRideId,
+                                    vehicleType = driverProfile?.vehicleType?.ifBlank { "bike" } ?: "bike",
                                     location = location
                                 )
                             }

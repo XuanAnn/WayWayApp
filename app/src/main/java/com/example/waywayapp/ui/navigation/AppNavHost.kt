@@ -1,5 +1,13 @@
 package com.example.waywayapp.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +37,7 @@ import com.example.waywayapp.ui.user.home.HomeScreen
 import com.example.waywayapp.ui.user.notification.NotificationScreen
 import com.example.waywayapp.ui.user.payment.AddPaymentScreen
 import com.example.waywayapp.ui.user.payment.MomoLinkScreen
+import com.example.waywayapp.ui.user.profile.ProfileEditScreen
 import com.example.waywayapp.ui.user.profile.ProfileScreen
 import com.example.waywayapp.ui.user.rating.RideRatingScreen
 import com.example.waywayapp.ui.user.booking.bike.BikeSharedViewModel
@@ -75,7 +84,11 @@ fun AppNavHost(
     NavHost(
         navController = navController,
         startDestination = startDestination.orEmpty(),
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = { wayWayEnterTransition() },
+        exitTransition = { wayWayExitTransition() },
+        popEnterTransition = { wayWayPopEnterTransition() },
+        popExitTransition = { wayWayPopExitTransition() }
     ) {
         /*----------------------------------------------------
         AUTH
@@ -121,7 +134,7 @@ fun AppNavHost(
                     }
                 },
                 onProfileClick = {
-                    navController.navigate(Routes.PROFILE)
+                    navController.navigate(Routes.DRIVER_PROFILE)
                 },
                 onOpenChat = { rideId ->
                     navController.navigate(Routes.createRideChatRoute(rideId))
@@ -146,7 +159,42 @@ fun AppNavHost(
                     }
                 },
                 onProfileClick = {
-                    navController.navigate(Routes.PROFILE)
+                    navController.navigate(Routes.DRIVER_PROFILE)
+                }
+            )
+        }
+
+        composable(Routes.DRIVER_PROFILE) {
+            ProfileScreen(
+                currentRoute = Routes.DRIVER_PROFILE,
+                showBottomNav = false,
+                onBackClick = {
+                    navController.navigate(Routes.DRIVER_HOME) {
+                        popUpTo(Routes.DRIVER_HOME) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onSignOut = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onPaymentClick = {
+                    navController.navigate("add_payment") {
+                        launchSingleTop = true
+                    }
+                },
+                onNotificationClick = {
+                    navController.navigate(Routes.NOTIFICATION) {
+                        launchSingleTop = true
+                    }
+                },
+                onEditProfileClick = {
+                    navController.navigate(Routes.PROFILE_EDIT) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -393,6 +441,19 @@ fun AppNavHost(
                     navController.navigate(Routes.NOTIFICATION) {
                         launchSingleTop = true
                     }
+                },
+                onEditProfileClick = {
+                    navController.navigate(Routes.PROFILE_EDIT) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(Routes.PROFILE_EDIT) {
+            ProfileEditScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -441,6 +502,42 @@ fun AppNavHost(
             )
         }
     }
+}
+
+private fun AnimatedContentTransitionScope<*>.wayWayEnterTransition(): EnterTransition {
+    return fadeIn(animationSpec = tween(180)) +
+        scaleIn(initialScale = 0.985f, animationSpec = tween(240)) +
+        slideIntoContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+            animationSpec = tween(260)
+        )
+}
+
+private fun AnimatedContentTransitionScope<*>.wayWayExitTransition(): ExitTransition {
+    return fadeOut(animationSpec = tween(130)) +
+        scaleOut(targetScale = 0.99f, animationSpec = tween(180)) +
+        slideOutOfContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+            animationSpec = tween(220)
+        )
+}
+
+private fun AnimatedContentTransitionScope<*>.wayWayPopEnterTransition(): EnterTransition {
+    return fadeIn(animationSpec = tween(180)) +
+        scaleIn(initialScale = 0.985f, animationSpec = tween(240)) +
+        slideIntoContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+            animationSpec = tween(260)
+        )
+}
+
+private fun AnimatedContentTransitionScope<*>.wayWayPopExitTransition(): ExitTransition {
+    return fadeOut(animationSpec = tween(130)) +
+        scaleOut(targetScale = 0.99f, animationSpec = tween(180)) +
+        slideOutOfContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+            animationSpec = tween(220)
+        )
 }
 
 private fun routeForRole(role: String): String {

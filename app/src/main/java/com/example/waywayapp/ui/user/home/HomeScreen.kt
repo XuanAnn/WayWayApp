@@ -146,6 +146,10 @@ fun HomeScreen(
     val userPhotoUrl = currentUser?.photoUrl?.toString()
     var homeScrollEnabled by remember { mutableStateOf(true) }
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshMomoStatus()
+    }
+
     Scaffold(
         containerColor = BgLight,
         bottomBar = {}
@@ -191,7 +195,14 @@ fun HomeScreen(
                         }
                     )
                 }
-                item { WalletCard(onWalletClick = onWalletClick) }
+                item {
+                    WalletCard(
+                        isLinked = uiState.momoLinked,
+                        displayName = uiState.momoDisplayName.ifBlank { userName },
+                        phone = uiState.momoPhone,
+                        onWalletClick = onWalletClick
+                    )
+                }
             }
 
             WayWayBottomBar(
@@ -492,7 +503,21 @@ private fun ServiceItem(
 // WalletCard — thêm subtitle, bớt đơn điệu
 // ─────────────────────────────────────────
 @Composable
-private fun WalletCard(onWalletClick: () -> Unit = {}) {
+private fun WalletCard(
+    isLinked: Boolean,
+    displayName: String,
+    phone: String,
+    onWalletClick: () -> Unit = {}
+) {
+    if (isLinked) {
+        LinkedMomoWalletCard(
+            displayName = displayName,
+            phone = phone,
+            onWalletClick = onWalletClick
+        )
+        return
+    }
+
     Card(
         modifier = Modifier
             .padding(horizontal = 18.dp, vertical = 4.dp)  // ✦ 18.dp nhất quán
@@ -545,6 +570,77 @@ private fun WalletCard(onWalletClick: () -> Unit = {}) {
 // ─────────────────────────────────────────
 // SectionTitle — font bớt nặng
 // ─────────────────────────────────────────
+private fun String.toMaskedPhone(): String {
+    val compact = trim().replace(" ", "")
+    if (compact.length <= 4) return compact
+    return "${compact.take(3)}***${compact.takeLast(3)}"
+}
+
+@Composable
+private fun LinkedMomoWalletCard(
+    displayName: String,
+    phone: String,
+    onWalletClick: () -> Unit = {}
+) {
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 18.dp, vertical = 4.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = onWalletClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFAA0011)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(id = R.drawable.momo_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "MoMo đã liên kết",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextDark
+                )
+                Text(
+                    text = buildString {
+                        append(displayName.ifBlank { "Tài khoản WayWay" })
+                        val maskedPhone = phone.toMaskedPhone()
+                        if (maskedPhone.isNotBlank()) append(" · ").append(maskedPhone)
+                    },
+                    fontSize = 10.sp,
+                    color = TextGray
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Quản lý", fontSize = 11.sp, color = TextGray, fontWeight = FontWeight.SemiBold)
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = TextGray,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun SectionTitle(
     title: String,
@@ -626,9 +722,21 @@ private fun HomeMapPreview(
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
     var driverLocations by remember { mutableStateOf<List<DriverLocation>>(emptyList()) }
     var userMarkerIcon by remember { mutableStateOf<BitmapDescriptor?>(null) }
-    var driverMarkerIcon by remember { mutableStateOf<BitmapDescriptor?>(null) }
+    var bikeMarkerIcon by remember { mutableStateOf<BitmapDescriptor?>(null) }
+    var carMarkerIcon by remember { mutableStateOf<BitmapDescriptor?>(null) }
     val scope = rememberCoroutineScope()
     var releaseScrollJob by remember { mutableStateOf<Job?>(null) }
+    val userPulseTransition = rememberInfiniteTransition(label = "user-location-pulse")
+    val userPulseProgress by userPulseTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "user-location-pulse-progress"
+    )
+    val userPulseStep = (userPulseProgress * 14f).roundToInt() / 14f
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(16.0542, 108.2140), 15f)
     }
@@ -670,19 +778,29 @@ private fun HomeMapPreview(
         }
     }
 
-    LaunchedEffect(userPhotoUrl, colors.primary, colors.onPrimary) {
+    LaunchedEffect(userPhotoUrl, colors.primary, colors.onPrimary, userPulseStep) {
         userMarkerIcon = withContext(Dispatchers.IO) {
             createUserMarkerIcon(
                 photoUrl = userPhotoUrl,
                 backgroundColor = colors.primary.toArgb(),
-                foregroundColor = colors.onPrimary.toArgb()
+                foregroundColor = colors.onPrimary.toArgb(),
+                pulseProgress = userPulseStep
             )
         }
     }
 
     LaunchedEffect(colors.primary, colors.onPrimary) {
-        driverMarkerIcon = withContext(Dispatchers.IO) {
-            createDriverMarkerIcon(
+        val markerColors = colors.primary.toArgb() to colors.onPrimary.toArgb()
+        bikeMarkerIcon = withContext(Dispatchers.IO) {
+            createDriverVehicleMarkerIcon(
+                vehicleType = "bike",
+                backgroundColor = markerColors.first,
+                foregroundColor = markerColors.second
+            )
+        }
+        carMarkerIcon = withContext(Dispatchers.IO) {
+            createDriverVehicleMarkerIcon(
+                vehicleType = "car",
                 backgroundColor = colors.primary.toArgb(),
                 foregroundColor = colors.onPrimary.toArgb()
             )
@@ -803,11 +921,12 @@ private fun HomeMapPreview(
                         )
                     }
                     nearbyDrivers.forEach { driver ->
+                        val isCar = driver.vehicleType.equals("car", ignoreCase = true)
                         Marker(
                             state = MarkerState(position = LatLng(driver.latitude, driver.longitude)),
-                            title = "Tài xế WayWay",
+                            title = if (isCar) "Tài xế ô tô WayWay" else "Tài xế xe máy WayWay",
                             snippet = driver.distanceLabelFrom(currentLocation),
-                            icon = driverMarkerIcon,
+                            icon = if (isCar) carMarkerIcon else bikeMarkerIcon,
                             rotation = driver.heading,
                             flat = true
                         )
@@ -1039,27 +1158,56 @@ private fun estimatePickupMinutes(distanceKm: Float): Int {
 private fun createUserMarkerIcon(
     photoUrl: String?,
     backgroundColor: Int,
-    foregroundColor: Int
+    foregroundColor: Int,
+    pulseProgress: Float = 0f
 ): BitmapDescriptor {
-    val size = 112
+    val size = 160
+    val center = size / 2f
+    val avatarDiameter = 86
+    val avatarOffset = (size - avatarDiameter) / 2f
+    val avatarRadius = avatarDiameter / 2f
     val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    paint.color = android.graphics.Color.WHITE
-    canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+    repeat(3) { index ->
+        val phase = (pulseProgress + index / 3f) % 1f
+        val radius = 48f + phase * 30f
+        val alpha = ((1f - phase) * 80f).roundToInt().coerceIn(0, 80)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 4f
+        paint.color = android.graphics.Color.argb(
+            alpha,
+            android.graphics.Color.red(backgroundColor),
+            android.graphics.Color.green(backgroundColor),
+            android.graphics.Color.blue(backgroundColor)
+        )
+        canvas.drawCircle(center, center, radius, paint)
+    }
 
-    val avatarBitmap = loadCircularAvatar(photoUrl, size - 14)
+    paint.style = Paint.Style.FILL
+    paint.color = android.graphics.Color.WHITE
+    canvas.drawCircle(center, center, avatarRadius + 7f, paint)
+
+    val avatarBitmap = loadCircularAvatar(photoUrl, avatarDiameter)
     if (avatarBitmap != null) {
-        canvas.drawBitmap(avatarBitmap, 7f, 7f, null)
+        canvas.drawBitmap(avatarBitmap, avatarOffset, avatarOffset, null)
     } else {
         paint.color = backgroundColor
-        canvas.drawCircle(size / 2f, size / 2f, (size - 14) / 2f, paint)
+        canvas.drawCircle(center, center, avatarRadius, paint)
 
         paint.color = foregroundColor
-        canvas.drawCircle(size / 2f, 42f, 15f, paint)
+        canvas.drawCircle(center, center - 14f, 13f, paint)
         val body = Path().apply {
-            addRoundRect(30f, 60f, 82f, 92f, 22f, 22f, Path.Direction.CW)
+            addRoundRect(
+                center - 25f,
+                center + 10f,
+                center + 25f,
+                center + 38f,
+                22f,
+                22f,
+                Path.Direction.CW
+            )
         }
         canvas.drawPath(body, paint)
     }
@@ -1067,12 +1215,13 @@ private fun createUserMarkerIcon(
     paint.style = Paint.Style.STROKE
     paint.strokeWidth = 5f
     paint.color = backgroundColor
-    canvas.drawCircle(size / 2f, size / 2f, size / 2f - 3f, paint)
+    canvas.drawCircle(center, center, avatarRadius + 5f, paint)
 
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
-private fun createDriverMarkerIcon(
+private fun createDriverVehicleMarkerIcon(
+    vehicleType: String,
     backgroundColor: Int,
     foregroundColor: Int
 ): BitmapDescriptor {
@@ -1088,15 +1237,36 @@ private fun createDriverMarkerIcon(
     paint.color = backgroundColor
     canvas.drawCircle(center, center, 32f, paint)
 
+    val isCar = vehicleType.equals("car", ignoreCase = true)
     paint.color = foregroundColor
-    val heading = Path().apply {
-        moveTo(center, 18f)
-        lineTo(center + 16f, 56f)
-        lineTo(center, 48f)
-        lineTo(center - 16f, 56f)
-        close()
+    if (isCar) {
+        val carBody = Path().apply {
+            addRoundRect(22f, 34f, 66f, 58f, 10f, 10f, Path.Direction.CW)
+            addRoundRect(30f, 24f, 58f, 42f, 8f, 8f, Path.Direction.CW)
+        }
+        canvas.drawPath(carBody, paint)
+
+        paint.color = backgroundColor
+        canvas.drawRoundRect(34f, 28f, 45f, 40f, 4f, 4f, paint)
+        canvas.drawRoundRect(47f, 28f, 56f, 40f, 4f, 4f, paint)
+
+        paint.color = foregroundColor
+        canvas.drawCircle(31f, 60f, 5f, paint)
+        canvas.drawCircle(57f, 60f, 5f, paint)
+    } else {
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 5f
+        paint.strokeCap = Paint.Cap.ROUND
+        canvas.drawCircle(29f, 58f, 8f, paint)
+        canvas.drawCircle(59f, 58f, 8f, paint)
+        canvas.drawLine(29f, 58f, 42f, 42f, paint)
+        canvas.drawLine(42f, 42f, 51f, 58f, paint)
+        canvas.drawLine(51f, 58f, 59f, 58f, paint)
+        canvas.drawLine(42f, 42f, 54f, 42f, paint)
+        canvas.drawLine(54f, 42f, 62f, 36f, paint)
+        canvas.drawLine(42f, 42f, 38f, 34f, paint)
+        paint.style = Paint.Style.FILL
     }
-    canvas.drawPath(heading, paint)
 
     paint.style = Paint.Style.STROKE
     paint.strokeWidth = 4f

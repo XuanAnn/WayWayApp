@@ -52,6 +52,13 @@ import com.example.waywayapp.BuildConfig
 import com.example.waywayapp.ui.user.booking.bike.BikeViewModel
 import java.text.DecimalFormat
 
+private data class RideOption(
+    val type: String,
+    val title: String,
+    val icon: Int,
+    val price: Double
+)
+
 @Composable
 fun BookingConfirmCard(
     viewModel: BikeViewModel,
@@ -65,17 +72,11 @@ fun BookingConfirmCard(
     val colors = MaterialTheme.colorScheme
 
     var expanded by remember { mutableStateOf(false) }
+    var rideExpanded by remember { mutableStateOf(false) }
     var selectedPayment by remember { mutableStateOf("Tiền mặt") }
     var showMomoDialog by remember { mutableStateOf(false) }
 
     data class PaymentMethod(val name: String, val icon: Int)
-    data class RideOption(
-        val type: String,
-        val title: String,
-        val icon: Int,
-        val price: Double
-    )
-
     val payments = buildList {
         add(PaymentMethod("Tiền mặt", R.drawable.dollar))
         add(PaymentMethod("MoMo", R.drawable.momo_icon))
@@ -134,7 +135,19 @@ fun BookingConfirmCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            RideServiceDropdown(
+                selectedRide = selectedRide,
+                rideOptions = rideOptions,
+                expanded = rideExpanded,
+                onExpandedChange = { rideExpanded = it },
+                distance = uiState.distance,
+                duration = uiState.duration,
+                formatter = formatter,
+                selectedServiceType = uiState.selectedServiceType,
+                onSelect = viewModel::selectServiceType
+            )
+
+            if (false) Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 rideOptions.forEach { option ->
                     val selected = option.type == uiState.selectedServiceType
                     Row(
@@ -365,6 +378,113 @@ fun BookingConfirmCard(
                 viewModel.devConfirmMomoGatewayPayment()
             }
         )
+    }
+}
+
+@Composable
+private fun RideServiceDropdown(
+    selectedRide: RideOption,
+    rideOptions: List<RideOption>,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    distance: String,
+    duration: String,
+    formatter: DecimalFormat,
+    selectedServiceType: String,
+    onSelect: (String) -> Unit
+) {
+    val colors = MaterialTheme.colorScheme
+
+    Box {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(62.dp)
+                .clip(RoundedCornerShape(18.dp))
+                .background(colors.primaryContainer.copy(alpha = 0.72f))
+                .clickable { onExpandedChange(true) }
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(selectedRide.icon),
+                contentDescription = selectedRide.title,
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = selectedRide.title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = colors.onPrimaryContainer
+                )
+                Text(
+                    text = "$distance - $duration",
+                    fontSize = 12.sp,
+                    color = colors.onPrimaryContainer.copy(alpha = 0.72f)
+                )
+            }
+
+            Text(
+                text = "${formatter.format(selectedRide.price.toInt())}đ",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = colors.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("⌄", fontSize = 18.sp, color = colors.onPrimaryContainer)
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(0.92f)
+        ) {
+            rideOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(option.icon),
+                                contentDescription = option.title,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = option.title,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.onSurface
+                                )
+                                Text(
+                                    text = "$distance - $duration",
+                                    fontSize = 12.sp,
+                                    color = colors.onSurfaceVariant
+                                )
+                            }
+                            Text(
+                                text = "${formatter.format(option.price.toInt())}đ",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (option.type == selectedServiceType) colors.primary else colors.onSurface
+                            )
+                        }
+                    },
+                    onClick = {
+                        onSelect(option.type)
+                        onExpandedChange(false)
+                    }
+                )
+            }
+        }
     }
 }
 

@@ -36,6 +36,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +49,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.R
 import com.example.waywayapp.ui.theme.AppBg
@@ -63,12 +67,39 @@ fun MomoLinkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(uiState.message, uiState.error) {
         val message = uiState.message ?: uiState.error
         if (!message.isNullOrBlank()) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             viewModel.clearMessage()
+        }
+    }
+
+    LaunchedEffect(uiState.launchUrl) {
+        val url = uiState.launchUrl ?: return@LaunchedEffect
+        runCatching {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        }.onFailure { error ->
+            if (error is ActivityNotFoundException) {
+                Toast.makeText(context, "Thiet bi chua cai MoMo UAT/app MoMo.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, error.localizedMessage ?: "Khong mo duoc MoMo.", Toast.LENGTH_SHORT).show()
+            }
+        }
+        viewModel.clearLaunchUrl()
+    }
+
+    DisposableEffect(lifecycleOwner, uiState.pendingOrderId) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && uiState.pendingOrderId != null) {
+                viewModel.verifyPendingLink()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -185,6 +216,19 @@ fun MomoLinkScreen(
                             shape = RoundedCornerShape(100.dp)
                         ) {
                             Text("Mở ứng dụng MoMo")
+                        }
+
+                        if (uiState.pendingOrderId != null && !uiState.isLinked) {
+                            OutlinedButton(
+                                onClick = viewModel::verifyPendingLink,
+                                enabled = !uiState.isLoading,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                                shape = RoundedCornerShape(100.dp)
+                            ) {
+                                Text("Kiem tra xac thuc MoMo")
+                            }
                         }
 
                         if (uiState.isLinked) {

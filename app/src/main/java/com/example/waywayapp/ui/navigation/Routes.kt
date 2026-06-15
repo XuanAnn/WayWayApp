@@ -41,6 +41,7 @@ object Routes {
     // driver
     const val DRIVER_HOME = "driver_home"
     const val DRIVER_INCOME = "driver_income"
+    const val DRIVER_PROFILE = "driver_profile"
     const val INCOMING = "incoming_ride"
     const val TRIP = "trip"
 
@@ -48,6 +49,7 @@ object Routes {
     const val NOTIFICATION = "notification"
     const val RECENTLY_SERVICE = "recent_service"
     const val PROFILE = "profile"
+    const val PROFILE_EDIT = "profile_edit"
 
     // admin
     const val ADMIN_DRIVERS = "admin_drivers"

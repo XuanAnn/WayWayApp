@@ -1,7 +1,9 @@
 package com.example.waywayapp.ui.user.profile
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -109,7 +111,10 @@ fun ProfileScreen(
     currentRoute: String? = Routes.PROFILE,
     onBottomNavClick: (String) -> Unit = {},
     onPaymentClick: () -> Unit = {},
-    onNotificationClick: () -> Unit = {}
+    onNotificationClick: () -> Unit = {},
+    onEditProfileClick: () -> Unit = {},
+    onBackClick: () -> Unit = { onBottomNavClick(Routes.USER_HOME) },
+    showBottomNav: Boolean = true
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -148,8 +153,8 @@ fun ProfileScreen(
                         tripCount = 42,        // TODO: từ uiState
                         rating = 4.9f,
                         memberMonths = 6,
-                        onBackClick = { onBottomNavClick(Routes.USER_HOME) },
-                        onSettingsClick = { viewModel.loadProfile() }
+                        onBackClick = onBackClick,
+                        onSettingsClick = onEditProfileClick
                     )
                 }
                 item {
@@ -164,11 +169,13 @@ fun ProfileScreen(
                 }
             }
 
-            WayWayBottomBar(
-                currentRoute = currentRoute,
-                onItemClick = onBottomNavClick,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
+            if (showBottomNav) {
+                WayWayBottomBar(
+                    currentRoute = currentRoute,
+                    onItemClick = onBottomNavClick,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
         }
     }
 }
@@ -188,10 +195,11 @@ private fun ProfileHero(
     onSettingsClick: () -> Unit
 ) {
     var avatarBitmap by remember(avatarUrl) { mutableStateOf<Bitmap?>(null) }
+    val context = LocalContext.current
 
     LaunchedEffect(avatarUrl) {
         avatarBitmap = withContext(Dispatchers.IO) {
-            loadAvatarBitmap(avatarUrl)
+            loadAvatarBitmap(context, avatarUrl)
         }
     }
 
@@ -539,12 +547,18 @@ private fun String.initials(): String {
         .ifBlank { "U" }
 }
 
-private fun loadAvatarBitmap(url: String): Bitmap? {
-    if (url.isBlank()) return null
+private fun loadAvatarBitmap(context: Context, value: String): Bitmap? {
+    if (value.isBlank()) return null
 
     return runCatching {
-        URL(url).openStream().use { stream ->
-            BitmapFactory.decodeStream(stream)
+        if (value.startsWith("content://")) {
+            context.contentResolver.openInputStream(Uri.parse(value))?.use { stream ->
+                BitmapFactory.decodeStream(stream)
+            }
+        } else {
+            URL(value).openStream().use { stream ->
+                BitmapFactory.decodeStream(stream)
+            }
         }
     }.getOrNull()
 }
