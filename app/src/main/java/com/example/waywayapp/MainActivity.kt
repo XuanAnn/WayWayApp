@@ -13,9 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.waywayapp.ui.navigation.AppNavHost
-import com.example.waywayapp.ui.user.booking.bike.BikeSharedViewModel
-import com.example.waywayapp.ui.theme.WayWayAppTheme
+import com.example.waywayapp.presentation.navigation.AppNavHost
+import com.example.waywayapp.presentation.user.booking.bike.BikeSharedViewModel
+import com.example.waywayapp.presentation.theme.WayWayAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

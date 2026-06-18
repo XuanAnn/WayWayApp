@@ -1,7 +1,7 @@
 package com.example.waywayapp.data.repository
 
 import com.example.waywayapp.core.firebase.FirestoreProvider
-import com.example.waywayapp.data.model.RideMessage
+import com.example.waywayapp.domain.model.RideMessage
 import com.example.waywayapp.data.remote.dto.firestore.toDto
 import com.example.waywayapp.data.remote.dto.firestore.toRideMessageDto
 import com.google.firebase.Firebase

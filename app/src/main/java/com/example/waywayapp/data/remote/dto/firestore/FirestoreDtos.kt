@@ -1,10 +1,10 @@
 package com.example.waywayapp.data.remote.dto.firestore
 
-import com.example.waywayapp.data.model.AdminDriver
-import com.example.waywayapp.data.model.AdminUser
-import com.example.waywayapp.data.model.DriverLocation
-import com.example.waywayapp.data.model.Ride
-import com.example.waywayapp.data.model.RideMessage
+import com.example.waywayapp.domain.model.AdminDriver
+import com.example.waywayapp.domain.model.AdminUser
+import com.example.waywayapp.domain.model.DriverLocation
+import com.example.waywayapp.domain.model.Ride
+import com.example.waywayapp.domain.model.RideMessage
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.PropertyName
 
@@ -114,6 +114,11 @@ data class AdminDriverDto(
         )
     }
 }
+data class DriverDto(
+    val full_name: String = "",
+    val vehicle_type: String = "",
+)
+
 
 data class AdminUserDto(
     val id: String? = null,

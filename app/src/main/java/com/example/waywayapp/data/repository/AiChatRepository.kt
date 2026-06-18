@@ -1,7 +1,7 @@
 package com.example.waywayapp.data.repository
 
 import com.example.waywayapp.core.network.RetrofitProvider
-import com.example.waywayapp.data.model.Promo
+import com.example.waywayapp.domain.model.Promo
 import com.example.waywayapp.data.remote.dto.ai.AiAssistantContextDto
 import com.example.waywayapp.data.remote.dto.ai.AiChatRequestDto
 import com.example.waywayapp.data.remote.dto.ai.AiFareDto

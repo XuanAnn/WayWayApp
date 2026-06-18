@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="568a24c8-a430-4595-ad4e-def620b70874" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/DriverLocationRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/DriverLocationRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/AppNavHost.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/AppNavHost.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/Routes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/navigation/Routes.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/home/HomeViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/payment/MomoLinkScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/payment/MomoLinkScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/profile/ProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/ui/user/profile/ProfileScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="568a24c8-a430-4595-ad4e-def620b70874" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,6 +118,7 @@
       <workItem from="1780596432722" duration="1517000" />
       <workItem from="1780938995094" duration="288000" />
       <workItem from="1781003081370" duration="2525000" />
+      <workItem from="1781545465486" duration="270000" />
     </task>
     <servers />
   </component>

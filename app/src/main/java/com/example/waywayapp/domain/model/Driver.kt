@@ -1,8 +1,10 @@
 package com.example.waywayapp.domain.model
 
-import com.example.waywayapp.data.remote.dto.DriverDto
-
 data class Driver(
-    val fullName: String,
-    val vehicleType: String,
+    val id: String = "",
+    val name: String = "",
+    val age: Int = 0,
+    val phone: String? = null,
+    val email: String? = null,
+    val avatarUrl: String? = null,
 )

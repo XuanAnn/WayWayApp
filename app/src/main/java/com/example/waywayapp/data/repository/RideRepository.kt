@@ -1,8 +1,8 @@
-package com.example.waywayapp.data.repository
+﻿package com.example.waywayapp.data.repository
 
 import com.example.waywayapp.core.firebase.FirestoreProvider
-import com.example.waywayapp.data.model.AdminDriver
-import com.example.waywayapp.data.model.Ride
+import com.example.waywayapp.domain.model.AdminDriver
+import com.example.waywayapp.domain.model.Ride
 import com.example.waywayapp.data.remote.dto.firestore.toAdminDriverDto
 import com.example.waywayapp.data.remote.dto.firestore.toDto
 import com.example.waywayapp.data.remote.dto.firestore.toRideDto
@@ -15,12 +15,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-// Repository xử lý dữ liệu chuyến xe trên Firestore.
 class RideRepository {
-    // Firestore dùng chung để đọc/ghi rides, drivers và messages.
     private val firestore = FirestoreProvider.db
 
-    // Theo dõi realtime các cuốc đang searching để driver nhìn thấy cuốc mới.
     fun observeOpenRides(
         serviceType: String = "bike",
         rejectedRideIds: Set<String> = emptySet()
@@ -52,7 +49,6 @@ class RideRepository {
     fun observeRide(
         rideId: String
     ): Flow<Ride?> = callbackFlow {
-        // Lắng nghe một document ride để user/driver cập nhật trạng thái tức thời.
         val registration = firestore.collection("rides")
             .document(rideId)
             .addSnapshotListener { snapshot, error ->
@@ -72,7 +68,6 @@ class RideRepository {
     fun observeCompletedRides(
         driverId: String
     ): Flow<List<Ride>> = callbackFlow {
-        // Lấy các cuốc đã hoàn thành để tính thu nhập và ví tài xế.
         val registration = firestore.collection("rides")
             .whereEqualTo("driverId", driverId)
             .limit(100)
@@ -99,7 +94,6 @@ class RideRepository {
     fun observeUserRides(
         userId: String
     ): Flow<List<Ride>> = callbackFlow {
-        // Lấy lịch sử chuyến đi của user để hiển thị ở màn History.
         val registration = firestore.collection("rides")
             .whereEqualTo("userId", userId)
             .limit(100)
@@ -122,6 +116,28 @@ class RideRepository {
         }
     }
 
+    fun observeAllRides(): Flow<List<Ride>> = callbackFlow {
+        val registration = firestore.collection("rides")
+            .limit(300)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val rides = snapshot?.documents
+                    ?.mapNotNull { document -> document.toRideDto()?.toDomain(document.id) }
+                    ?.sortedByDescending { ride -> ride.updatedAt.takeIf { it != 0L } ?: ride.createdAt }
+                    .orEmpty()
+
+                trySend(rides)
+            }
+
+        awaitClose {
+            registration.remove()
+        }
+    }
+
     suspend fun createBikeRide(
         userId: String,
         pickup: LatLng,
@@ -134,7 +150,6 @@ class RideRepository {
         paymentStatus: String = "pending",
         paidAt: Long? = null
     ): Ride {
-        // Tạo document ride mới sau khi user xác nhận đặt xe.
         val now = System.currentTimeMillis()
         val document = firestore.collection("rides").document()
         val ride = Ride(
@@ -164,7 +179,7 @@ class RideRepository {
     suspend fun getDriver(
         driverId: String
     ): AdminDriver? {
-        // Đọc thông tin driver để gắn vào cuốc khi tài xế nhận chuyến.
+        // Äá»c thÃ´ng tin driver Ä‘á»ƒ gáº¯n vÃ o cuá»‘c khi tÃ i xáº¿ nháº­n chuyáº¿n.
         val document = firestore.collection("drivers")
             .document(driverId)
             .get()
@@ -179,7 +194,7 @@ class RideRepository {
         rideId: String,
         driver: AdminDriver
     ) {
-        // Transaction đảm bảo chỉ một tài xế nhận được cuốc đang searching.
+        // Transaction Ä‘áº£m báº£o chá»‰ má»™t tÃ i xáº¿ nháº­n Ä‘Æ°á»£c cuá»‘c Ä‘ang searching.
         val rideRef = firestore.collection("rides").document(rideId)
         val driverRef = firestore.collection("drivers").document(driver.id)
         val now = System.currentTimeMillis()
@@ -221,12 +236,51 @@ class RideRepository {
         }.await()
     }
 
+    suspend fun updateRideAdminFields(
+        rideId: String,
+        driverId: String,
+        status: String,
+        paymentStatus: String,
+        paymentMethod: String
+    ) {
+        val now = System.currentTimeMillis()
+        val data = mutableMapOf<String, Any?>(
+            "status" to status,
+            "paymentStatus" to paymentStatus,
+            "paymentMethod" to paymentMethod,
+            "updatedAt" to now
+        )
+
+        if (status == "completed") {
+            data["completedAt"] = now
+        }
+
+        firestore.collection("rides")
+            .document(rideId)
+            .set(data, SetOptions.merge())
+            .await()
+
+        if ((status == "completed" || status == "cancelled") && driverId.isNotBlank()) {
+            firestore.collection("drivers")
+                .document(driverId)
+                .set(
+                    mapOf(
+                        "available" to true,
+                        "isAvailable" to true,
+                        "activeRideId" to FieldValue.delete(),
+                        "updatedAt" to now
+                    ),
+                    SetOptions.merge()
+                )
+                .await()
+        }
+    }
     suspend fun updateRideStatus(
         rideId: String,
         driverId: String,
         status: String
     ) {
-        // Cập nhật trạng thái ride theo luồng accepted/arrived/in_progress/completed.
+        // Cáº­p nháº­t tráº¡ng thÃ¡i ride theo luá»“ng accepted/arrived/in_progress/completed.
         val now = System.currentTimeMillis()
         val data = mutableMapOf<String, Any?>(
             "status" to status,
@@ -242,8 +296,8 @@ class RideRepository {
             .set(data, SetOptions.merge())
             .await()
 
-        if (status == "completed" || status == "cancelled") {
-            // Khi kết thúc/hủy chuyến thì mở lại tài xế để nhận cuốc mới.
+        if ((status == "completed" || status == "cancelled") && driverId.isNotBlank()) {
+            // Khi káº¿t thÃºc/há»§y chuyáº¿n thÃ¬ má»Ÿ láº¡i tÃ i xáº¿ Ä‘á»ƒ nháº­n cuá»‘c má»›i.
             firestore.collection("drivers")
                 .document(driverId)
                 .set(
@@ -262,7 +316,7 @@ class RideRepository {
     suspend fun cancelRide(
         rideId: String
     ) {
-        // User hoặc hệ thống hủy cuốc bằng cách đổi status sang cancelled.
+        // User hoáº·c há»‡ thá»‘ng há»§y cuá»‘c báº±ng cÃ¡ch Ä‘á»•i status sang cancelled.
         firestore.collection("rides")
             .document(rideId)
             .set(
@@ -280,7 +334,7 @@ class RideRepository {
         rating: Int,
         review: String
     ) {
-        // Lưu đánh giá của user vào ride sau khi chuyến completed.
+        // LÆ°u Ä‘Ã¡nh giÃ¡ cá»§a user vÃ o ride sau khi chuyáº¿n completed.
         val normalizedRating = rating.coerceIn(1, 5)
         val now = System.currentTimeMillis()
         val rideRef = firestore.collection("rides").document(rideId)
@@ -296,7 +350,7 @@ class RideRepository {
         ).await()
 
         runCatching {
-            // Cập nhật điểm trung bình driver nếu rules cho phép, lỗi thì không làm fail đánh giá.
+            // Cáº­p nháº­t Ä‘iá»ƒm trung bÃ¬nh driver náº¿u rules cho phÃ©p, lá»—i thÃ¬ khÃ´ng lÃ m fail Ä‘Ã¡nh giÃ¡.
             val ride = rideRef.get().await().toRideDto()?.toDomain(rideId) ?: return
             val driverId = ride.driverId.takeIf { it.isNotBlank() } ?: return
 
@@ -326,3 +380,4 @@ class RideRepository {
     }
 
 }
+

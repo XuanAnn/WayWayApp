@@ -1,7 +1,7 @@
 package com.example.waywayapp.data.repository
 
 import com.example.waywayapp.core.firebase.FirestoreProvider
-import com.example.waywayapp.data.model.Promo
+import com.example.waywayapp.domain.model.Promo
 import kotlinx.coroutines.tasks.await
 
 // Repository quản lý mã khuyến mãi dùng cho đặt xe và AI assistant.
@@ -9,36 +9,9 @@ class PromoRepository {
     // Firestore dùng để đọc collection promos do admin cấu hình.
     private val firestore = FirestoreProvider.db
 
-    // Danh sách mã mẫu để app vẫn có dữ liệu khi Firestore chưa cấu hình.
-    fun getAvailablePromos(): List<Promo> {
-        return listOf(
-            Promo(
-                code = "WAYTIETKIEM",
-                title = "Giam 10%",
-                percent = 10,
-                minPrice = 20000,
-                serviceTypes = listOf("bike", "car")
-            ),
-            Promo(
-                code = "SALE20",
-                title = "Giam 20%",
-                percent = 20,
-                maxDiscount = 15000,
-                serviceTypes = listOf("bike")
-            ),
-            Promo(
-                code = "GIAM10K",
-                title = "Giam 10.000d",
-                amount = 10000,
-                serviceTypes = listOf("bike", "car")
-            )
-        )
-    }
-
     suspend fun getActivePromos(
         serviceType: String = "bike"
     ): List<Promo> {
-        // Đọc mã khuyến mãi thật từ Firestore collection promos.
         return runCatching {
             firestore.collection("promos")
                 .get()
@@ -68,9 +41,14 @@ class PromoRepository {
                 }
                 .filter { it.code.isNotBlank() && it.isActiveFor(serviceType) }
         }.getOrElse {
-            // Nếu Firestore lỗi hoặc chưa có quyền, dùng mã mẫu để demo không bị rỗng.
-            getAvailablePromos().filter { promo -> promo.isActiveFor(serviceType) }
+            emptyList()
         }
+    }
+
+    suspend fun getAvailablePromos(
+        serviceType: String = "bike"
+    ): List<Promo> {
+        return getActivePromos(serviceType)
     }
 
     // Tính số tiền được giảm dựa trên giá cuốc và loại mã percent/fixed.

@@ -1,8 +1,8 @@
 package com.example.waywayapp.data.repository
 
 import com.example.waywayapp.core.firebase.FirestoreProvider
-import com.example.waywayapp.data.model.AdminDriver
-import com.example.waywayapp.data.model.AdminUser
+import com.example.waywayapp.domain.model.AdminDriver
+import com.example.waywayapp.domain.model.AdminUser
 import com.example.waywayapp.data.remote.dto.firestore.toAdminDriverDto
 import com.example.waywayapp.data.remote.dto.firestore.toAdminUserDto
 import com.example.waywayapp.data.remote.dto.firestore.toDto
