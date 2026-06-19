@@ -49,7 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.waywayapp.domain.model.Ride
-import com.example.waywayapp.data.repository.RideRepository
+import com.example.waywayapp.data.repository.RideRepositoryImpl
 import com.example.waywayapp.presentation.theme.AppBg
 import com.example.waywayapp.presentation.theme.TextDark
 import kotlinx.coroutines.launch
@@ -63,7 +63,7 @@ fun RideRatingScreen(
     rideId: String,
     onBackClick: () -> Unit,
     onDone: () -> Unit,
-    repository: RideRepository = RideRepository()
+    repository: RideRepositoryImpl = RideRepositoryImpl()
 ) {
     // Theo dõi ride realtime để lấy thông tin tài xế và giá chuyến.
     val ride by repository.observeRide(rideId).collectAsState(initial = null)

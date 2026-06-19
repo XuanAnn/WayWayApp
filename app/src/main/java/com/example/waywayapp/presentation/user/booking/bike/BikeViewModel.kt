@@ -13,7 +13,7 @@ import com.example.waywayapp.data.repository.DriverLocationRepository
 import com.example.waywayapp.data.repository.FirebaseAuthRepository
 import com.example.waywayapp.data.repository.MomoPaymentRepository
 import com.example.waywayapp.data.repository.PromoRepository
-import com.example.waywayapp.data.repository.RideRepository
+import com.example.waywayapp.data.repository.RideRepositoryImpl
 import com.example.waywayapp.presentation.user.booking.bike.model.BookingStatus
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -36,6 +36,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import com.example.waywayapp.data.remote.dto.geocoding.GeocodingResponseDto
 import com.example.waywayapp.core.network.RetrofitProvider
+import com.example.waywayapp.data.repository.ProfileRepository
 import com.example.waywayapp.presentation.user.booking.bike.model.BikeLocationType
 
 // ViewModel điều phối luồng đặt xe máy: vị trí, tuyến đường, khuyến mãi, thanh toán và theo dõi tài xế.
@@ -53,7 +54,7 @@ class BikeViewModel(
     // Repository đọc mã giảm giá từ Firestore và tính số tiền được giảm.
     private val promoRepository = PromoRepository()
     // Repository thao tác collection rides để tạo, theo dõi và huỷ chuyến.
-    private val rideRepository = RideRepository()
+    private val rideRepositoryImpl = RideRepositoryImpl()
     // Repository đọc realtime vị trí tài xế từ collection driver_locations.
     private val driverLocationRepository = DriverLocationRepository()
     // Repository lấy user hiện tại từ Firebase Authentication.
@@ -89,7 +90,7 @@ class BikeViewModel(
     // Kết quả autocomplete trả về từ geocoding API.
     private val _searchResults = MutableStateFlow<List<GeocodingResponseDto>>(emptyList())
     val searchResults: StateFlow<List<GeocodingResponseDto>> = _searchResults.asStateFlow()
-
+    val profileRepository: ProfileRepository = ProfileRepository()
     init {
         viewModelScope.launch {
             _searchQuery
@@ -101,6 +102,7 @@ class BikeViewModel(
                 }
         }
         loadPromos()
+        getUserProfile()
     }
 
     // Cập nhật ô tìm kiếm điểm đến và đồng bộ vào state của form đặt xe.
@@ -198,7 +200,11 @@ class BikeViewModel(
             }
         }
     }
-
+     fun isProgress(status: BookingStatus): Boolean {
+        if (status == BookingStatus.FINDING|| status == BookingStatus.IDLE)
+            return false
+        return true
+    }
     // Tìm một địa điểm theo text và đặt kết quả đầu tiên làm điểm đến.
     fun searchLocation(query: String) {
         if (query.isBlank()) return
@@ -333,13 +339,28 @@ class BikeViewModel(
             }
         }
     }
-
+    private fun getUserProfile(){
+        viewModelScope.launch {
+            val user = profileRepository.loadUserProfile()
+            Log.d(TAG, "Profile loaded: Name=${user.name}, Phone=${user.phone}") // THÊM DÒNG NÀY
+            _uiState.update {
+                it.copy(
+                    passengerName = user.name,
+                    passengerPhone = user.phone
+                )
+            }
+        }
+    }
     // Tạo document chuyến xe trên Firestore sau khi user xác nhận đặt xe.
     fun startBooking(paymentMethod: String = "cash") {
         Log.i(TAG, "Booking process started")
         viewModelScope.launch {
             val pickup = _uiState.value.pickupLatLng
             val dropoff = _uiState.value.dropoffLatLng
+
+            val profile = profileRepository.loadUserProfile()
+            val userName = profile.name.ifBlank{ "Khách hàng"}
+            val userPhone = profile.phone.ifBlank{ "Chưa có SĐT"}
             if (pickup == null || dropoff == null) {
                 _uiState.update { it.copy(error = "Vui lòng chọn đủ điểm đón và điểm đến") }
                 return@launch
@@ -347,8 +368,10 @@ class BikeViewModel(
 
             _uiState.update { it.copy(status = BookingStatus.FINDING, isLoading = true, error = null) }
             runCatching {
-                rideRepository.createBikeRide(
+                rideRepositoryImpl.createBikeRide(
                     userId = authRepository.currentUser?.uid.orEmpty(),
+                    userName = userName,
+                    userPhone = userPhone,
                     pickup = pickup,
                     pickupAddress = _uiState.value.pickupAddress,
                     dropoff = dropoff,
@@ -543,7 +566,7 @@ class BikeViewModel(
     private fun observeRide(rideId: String) {
         rideJob?.cancel()
         rideJob = viewModelScope.launch {
-            rideRepository.observeRide(rideId).collect { ride ->
+            rideRepositoryImpl.observeRide(rideId).collect { ride ->
                 if (ride == null) return@collect
                 when (ride.status) {
                     "searching" -> _uiState.update { it.copy(status = BookingStatus.FINDING) }
@@ -793,7 +816,7 @@ class BikeViewModel(
         lastTrackingRouteAt = 0L
         if (rideId != null) {
             viewModelScope.launch {
-                runCatching { rideRepository.cancelRide(rideId) }
+                runCatching { rideRepositoryImpl.cancelRide(rideId) }
             }
         }
         _uiState.update {

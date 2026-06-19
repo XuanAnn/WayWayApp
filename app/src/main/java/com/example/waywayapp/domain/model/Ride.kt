@@ -3,6 +3,8 @@ package com.example.waywayapp.domain.model
 data class Ride(
     val id: String = "",
     val userId: String = "",
+    val userName: String = "",
+    val userPhone: String = "",
     val driverId: String = "",
     val serviceType: String = "bike",
     val status: String = "searching",

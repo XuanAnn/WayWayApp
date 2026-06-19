@@ -17,9 +17,7 @@ fun BookingRoute(
     onExpressPickupClick: () -> Unit,
     onExpressDropoffClick: () -> Unit,
     onExpressConfirmClick: () -> Unit,
-    onCarPickupClick: () -> Unit = {},
-    onCarDropoffClick: () -> Unit = {},
-    onCarConfirmClick: () -> Unit = {}
+
 ) {
     LaunchedEffect(type) {
         if (type == "bike" || type == "car") {

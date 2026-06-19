@@ -1,16 +1,17 @@
 package com.example.waywayapp.presentation.user.booking.express.model
 
+import com.example.waywayapp.domain.model.Driver
 import com.google.android.gms.maps.model.LatLng
 
 data class ExpressState(
     val pickupAddress: String = "Chọn điểm lấy hàng",
     val pickupLat: Double = 0.0,
     val pickupLng: Double = 0.0,
-
+    val driverLatLng: Double = 0.0,
     val dropoffAddress: String = "Giao đến đâu?",
     val dropoffLat: Double = 0.0,
     val dropoffLng: Double = 0.0,
-
+    val currentDriver: Driver? = null,
     val packageDetail: String = "",
     val codEnabled: Boolean = false,
     val handDelivery: Boolean = false,
@@ -22,7 +23,15 @@ data class ExpressState(
 
     val basePrice: Double = 0.0,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val status: ExpressStatus = ExpressStatus.INPUT,
+    val currentRideId: String = "",
+    val driverId: String = "",
+    val driverName: String = "",
+    val driverPhone: String = "",
+    val driverPlate: String = "",
+    val driverAvatarUrl: String = "",
+    val rideStatus: String = ""
 ) {
     val extraFee: Double
         get() {

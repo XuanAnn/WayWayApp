@@ -4,7 +4,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="568a24c8-a430-4595-ad4e-def620b70874" name="Changes" comment="" />
+    <list default="true" id="568a24c8-a430-4595-ad4e-def620b70874" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/di/AppContainer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/core/di/AppContainer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminDriverRepository.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminPromoRepository.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/AdminRepositoryImpl.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/RideRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/data/repository/RideRepositoryImpl.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/domain/model/Ride.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/domain/model/Ride.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/domain/repository/AdminRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/domain/repository/AdminRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/admin/driver/AdminDriverScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/admin/driver/AdminDriverScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/admin/driver/AdminDriverViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/admin/driver/AdminDriverViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/admin/driver/AdminDriverViewModelFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/admin/driver/AdminDriverViewModelFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/components/WayWayBottomBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/components/WayWayBottomBar.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/home/DriverHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/home/DriverHomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/home/DriverState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/home/DriverState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/home/DriverViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/home/DriverViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/income/DriverIncomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/driver/income/DriverIncomeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/navigation/AppNavHost.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/navigation/AppNavHost.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/BikeBookingScreen.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/BikeState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/BikeState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/BikeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/BikeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/components/BookingConfirmCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/components/BookingConfirmCard.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/components/OnTripUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/components/OnTripUI.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/confirm/BikeConfirmScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/booking/bike/confirm/BikeConfirmScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/history/HistoryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/history/HistoryViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/home/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/home/HomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/home/HomeState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/home/HomeState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/home/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/home/HomeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/notification/NotificationViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/notification/NotificationViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/rating/RideRatingScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/com/example/waywayapp/presentation/user/rating/RideRatingScreen.kt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -119,6 +150,7 @@
       <workItem from="1780938995094" duration="288000" />
       <workItem from="1781003081370" duration="2525000" />
       <workItem from="1781545465486" duration="270000" />
+      <workItem from="1781799183490" duration="21000" />
     </task>
     <servers />
   </component>

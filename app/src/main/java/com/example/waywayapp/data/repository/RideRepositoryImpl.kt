@@ -6,6 +6,7 @@ import com.example.waywayapp.domain.model.Ride
 import com.example.waywayapp.data.remote.dto.firestore.toAdminDriverDto
 import com.example.waywayapp.data.remote.dto.firestore.toDto
 import com.example.waywayapp.data.remote.dto.firestore.toRideDto
+import com.example.waywayapp.domain.repository.RideRepository
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -14,10 +15,38 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-
-class RideRepository {
+import com.google.firebase.firestore.AggregateField
+import com.google.firebase.firestore.AggregateSource
+class RideRepositoryImpl: RideRepository {
     private val firestore = FirestoreProvider.db
-
+//
+//    fun observeOpenRides(
+//        serviceType: String = "bike",
+//        rejectedRideIds: Set<String> = emptySet()
+//    ): Flow<List<Ride>> = callbackFlow {
+//        val registration = firestore.collection("rides")
+//            .whereEqualTo("status", "searching")
+//            .limit(20)
+//            .addSnapshotListener { snapshot, error ->
+//                if (error != null) {
+//                    close(error)
+//                    return@addSnapshotListener
+//                }
+//
+//                val rides = snapshot?.documents
+//                    ?.mapNotNull { document -> document.toRideDto()?.toDomain(document.id) }
+//                    ?.filter { ride -> ride.serviceType == serviceType }
+//                    ?.filterNot { ride -> ride.id in rejectedRideIds }
+//                    ?.sortedBy { ride -> ride.createdAt }
+//                    .orEmpty()
+//
+//                trySend(rides)
+//            }
+//
+//        awaitClose {
+//            registration.remove()
+//        }
+//    }
     fun observeOpenRides(
         serviceType: String = "bike",
         rejectedRideIds: Set<String> = emptySet()
@@ -33,7 +62,7 @@ class RideRepository {
 
                 val rides = snapshot?.documents
                     ?.mapNotNull { document -> document.toRideDto()?.toDomain(document.id) }
-                    ?.filter { ride -> ride.serviceType == serviceType }
+                    ?.filter { ride -> ride.isCompatibleWithDriver(serviceType) }
                     ?.filterNot { ride -> ride.id in rejectedRideIds }
                     ?.sortedBy { ride -> ride.createdAt }
                     .orEmpty()
@@ -43,6 +72,17 @@ class RideRepository {
 
         awaitClose {
             registration.remove()
+        }
+    }
+
+    private fun Ride.isCompatibleWithDriver(driverVehicleType: String): Boolean {
+        val driverType = driverVehicleType.lowercase()
+        val requestedType = serviceType.lowercase()
+        return when (driverType) {
+            "bike" -> requestedType == "bike" || requestedType == "express"
+            "express" -> requestedType == "express"
+            "car" -> requestedType == "car"
+            else -> requestedType == driverType
         }
     }
 
@@ -140,6 +180,8 @@ class RideRepository {
 
     suspend fun createBikeRide(
         userId: String,
+        userName: String,
+        userPhone: String,
         pickup: LatLng,
         pickupAddress: String,
         dropoff: LatLng,
@@ -151,10 +193,14 @@ class RideRepository {
         paidAt: Long? = null
     ): Ride {
         val now = System.currentTimeMillis()
+        val safeName = userName.ifBlank { "Khách hàng" }
+        val safePhone = userPhone.ifBlank { "Không có SĐT" }
         val document = firestore.collection("rides").document()
         val ride = Ride(
             id = document.id,
             userId = userId,
+            passengerName = safeName,
+            passengerPhone = safePhone,
             serviceType = serviceType,
             status = "searching",
             pickupLat = pickup.latitude,
@@ -179,7 +225,7 @@ class RideRepository {
     suspend fun getDriver(
         driverId: String
     ): AdminDriver? {
-        // Äá»c thÃ´ng tin driver Ä‘á»ƒ gáº¯n vÃ o cuá»‘c khi tÃ i xáº¿ nháº­n chuyáº¿n.
+
         val document = firestore.collection("drivers")
             .document(driverId)
             .get()
@@ -314,19 +360,36 @@ class RideRepository {
     }
 
     suspend fun cancelRide(
-        rideId: String
+        rideId: String,
+        driverId: String? = null
     ) {
-        // User hoáº·c há»‡ thá»‘ng há»§y cuá»‘c báº±ng cÃ¡ch Ä‘á»•i status sang cancelled.
+        val now = System.currentTimeMillis()
+
         firestore.collection("rides")
             .document(rideId)
             .set(
                 mapOf(
                     "status" to "cancelled",
-                    "updatedAt" to System.currentTimeMillis()
+                    "updatedAt" to now
                 ),
                 SetOptions.merge()
             )
             .await()
+
+        if (!driverId.isNullOrBlank()) {
+            firestore.collection("drivers")
+                .document(driverId)
+                .set(
+                    mapOf(
+                        "available" to true,
+                        "isAvailable" to true,
+                        "activeRideId" to FieldValue.delete(),
+                        "updatedAt" to now
+                    ),
+                    SetOptions.merge()
+                )
+                .await()
+        }
     }
 
     suspend fun submitRideRating(
@@ -334,7 +397,6 @@ class RideRepository {
         rating: Int,
         review: String
     ) {
-        // LÆ°u Ä‘Ã¡nh giÃ¡ cá»§a user vÃ o ride sau khi chuyáº¿n completed.
         val normalizedRating = rating.coerceIn(1, 5)
         val now = System.currentTimeMillis()
         val rideRef = firestore.collection("rides").document(rideId)
@@ -350,34 +412,35 @@ class RideRepository {
         ).await()
 
         runCatching {
-            // Cáº­p nháº­t Ä‘iá»ƒm trung bÃ¬nh driver náº¿u rules cho phÃ©p, lá»—i thÃ¬ khÃ´ng lÃ m fail Ä‘Ã¡nh giÃ¡.
             val ride = rideRef.get().await().toRideDto()?.toDomain(rideId) ?: return
             val driverId = ride.driverId.takeIf { it.isNotBlank() } ?: return
 
-            val ratedRides = firestore.collection("rides")
+            // Khai báo truy vấn chỉ lấy các chuyến có đánh giá
+            val query = firestore.collection("rides")
                 .whereEqualTo("driverId", driverId)
-                .get()
-                .await()
-                .documents
-                .mapNotNull { it.toRideDto()?.toDomain(it.id) }
-                .filter { it.userRating > 0 }
+                .whereGreaterThan("userRating", 0)
 
-            if (ratedRides.isNotEmpty()) {
-                val average = ratedRides.map { it.userRating }.average()
-                firestore.collection("drivers")
-                    .document(driverId)
-                    .set(
-                        mapOf(
-                            "rating" to average,
-                            "ratingCount" to ratedRides.size,
-                            "updatedAt" to now
-                        ),
-                        SetOptions.merge()
-                    )
-                    .await()
-            }
+            // Yêu cầu máy chủ Firebase tính toán
+            val aggregateQuery = query.aggregate(
+                AggregateField.average("userRating"),
+                AggregateField.count()
+            ).get(AggregateSource.SERVER).await()
+
+            val average = aggregateQuery.get(AggregateField.average("userRating")) ?: 0.0
+            val count = aggregateQuery.count
+
+            firestore.collection("drivers")
+                .document(driverId)
+                .set(
+                    mapOf(
+                        "rating" to average,
+                        "ratingCount" to count,
+                        "updatedAt" to now
+                    ),
+                    SetOptions.merge()
+                )
+                .await()
         }
     }
 
 }
-

@@ -6,6 +6,7 @@ import com.example.waywayapp.domain.model.AdminUser
 import com.example.waywayapp.data.remote.dto.firestore.toAdminDriverDto
 import com.example.waywayapp.data.remote.dto.firestore.toAdminUserDto
 import com.example.waywayapp.data.remote.dto.firestore.toDto
+import com.example.waywayapp.domain.repository.AdminRepository
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -13,12 +14,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 // Repository cho màn admin quản lý người dùng và tài xế trên Firestore.
-class AdminRepository {
+class AdminRepositoryImpl: AdminRepository {
     // Firestore chứa collection users và drivers.
     private val firestore = FirestoreProvider.db
 
     // Lắng nghe realtime danh sách users
-    fun observeUsers(): Flow<List<AdminUser>> = callbackFlow {
+    override fun observeUsers(): Flow<List<AdminUser>> = callbackFlow {
         val registration = firestore.collection("users")
             .limit(200)
             .addSnapshotListener { snapshot, error ->
@@ -40,7 +41,7 @@ class AdminRepository {
     }
 
     // Lắng nghe realtime danh sách drivers để admin quản lý tài xế.
-    fun observeDrivers(): Flow<List<AdminDriver>> = callbackFlow {
+    override fun observeDrivers(): Flow<List<AdminDriver>> = callbackFlow {
         val registration = firestore.collection("drivers")
             .limit(200)
             .addSnapshotListener { snapshot, error ->
@@ -62,7 +63,7 @@ class AdminRepository {
     }
 
     // Lưu user vào users, nếu role DRIVER thì tạo/cập nhật thêm hồ sơ driver.
-    suspend fun saveUser(user: AdminUser) {
+    override suspend fun saveUser(user: AdminUser) {
         val now = System.currentTimeMillis()
         val document = if (user.id.isBlank()) {
             firestore.collection("users").document()
@@ -85,7 +86,7 @@ class AdminRepository {
     }
 
     // Xoá hồ sơ user khỏi collection users.
-    suspend fun deleteUser(userId: String) {
+    override suspend fun deleteUser(userId: String) {
         if (userId.isBlank()) return
         firestore.collection("users")
             .document(userId)
@@ -94,7 +95,7 @@ class AdminRepository {
     }
 
     // Lưu hồ sơ tài xế vào drivers và đồng bộ role DRIVER sang users.
-    suspend fun saveDriver(driver: AdminDriver) {
+    override suspend fun saveDriver(driver: AdminDriver) {
         val now = System.currentTimeMillis()
         val document = if (driver.id.isBlank()) {
             firestore.collection("drivers").document()
@@ -113,7 +114,7 @@ class AdminRepository {
     }
 
     // Xoá hồ sơ tài xế khỏi collection drivers.
-    suspend fun deleteDriver(driverId: String) {
+    override suspend fun deleteDriver(driverId: String) {
         if (driverId.isBlank()) return
         firestore.collection("drivers")
             .document(driverId)
@@ -122,7 +123,7 @@ class AdminRepository {
     }
 
     // Tạo hoặc cập nhật driver từ user khi admin đổi role sang DRIVER.
-    private suspend fun upsertDriverFromUser(
+    override suspend fun upsertDriverFromUser(
         user: AdminUser,
         now: Long
     ) {
@@ -149,12 +150,15 @@ class AdminRepository {
         driver: AdminDriver,
         now: Long
     ) {
+
         val userDocumentId = driver.userId.ifBlank { driver.id }
         if (userDocumentId.isBlank()) return
 
+        firestore.runTransaction { transaction ->
+
         val userDocument = firestore.collection("users").document(userDocumentId)
-        val existing = userDocument.get().await()
-        if (!existing.exists()) return
+        val snapshot = transaction.get(userDocument)
+        if (!snapshot.exists()) return@runTransaction
 
         val data = mapOf(
             "name" to driver.name,
@@ -165,6 +169,7 @@ class AdminRepository {
             "updatedAt" to now
         )
 
-        userDocument.set(data, SetOptions.merge()).await()
+        transaction.update(userDocument,data)
+        }.await()
     }
 }

@@ -37,7 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.presentation.user.booking.bike.BikeState
+import com.example.waywayapp.presentation.user.booking.bike.BikeViewModel
 
 @Composable
 fun OnTripUI(
@@ -45,7 +47,8 @@ fun OnTripUI(
     cardHeight: Dp,
     onBack: () -> Unit,
     onCallClick: () -> Unit = {},
-    onChatClick: () -> Unit = {}
+    onChatClick: () -> Unit = {},
+
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -162,7 +165,8 @@ fun OnTripUI(
                         onClick = onBack,
                         modifier = Modifier.weight(2f).height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373)),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = state.canCancelRide
                     ) {
                         Text("Tôi chưa sẵn sàng đi!", textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }

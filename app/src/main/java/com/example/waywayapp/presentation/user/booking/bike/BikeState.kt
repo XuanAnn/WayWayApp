@@ -5,6 +5,8 @@ import com.example.waywayapp.domain.model.Promo
 import com.google.android.gms.maps.model.LatLng
 
 data class BikeState(
+    val passengerName: String = "",
+    val passengerPhone: String = "",
     val currentLatLng: LatLng? = null,
     val pickupLatLng: LatLng? = null,
     val dropoffLatLng: LatLng? = null,
@@ -46,8 +48,8 @@ data class BikeState(
     val momoStatus: String = "IDLE",
     val momoMessage: String? = null
 ) {
-    val canConfirmRide: Boolean
-        get() = pickupLatLng != null &&
-                dropoffLatLng != null &&
-                price > 0.0
+    val canCancelRide: Boolean
+        get() = status == BookingStatus.IDLE ||
+                status == BookingStatus.FINDING ||
+                (status == BookingStatus.ON_TRIP && rideStatus == "accepted")
 }

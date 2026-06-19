@@ -3,7 +3,7 @@ package com.example.waywayapp.presentation.driver.income
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.waywayapp.data.repository.FirebaseAuthRepository
-import com.example.waywayapp.data.repository.RideRepository
+import com.example.waywayapp.data.repository.RideRepositoryImpl
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 // ViewModel màn thu nhập tài xế, tính ví từ các chuyến completed.
 class DriverIncomeViewModel(
-    private val rideRepository: RideRepository = RideRepository(),
+    private val rideRepositoryImpl: RideRepositoryImpl = RideRepositoryImpl(),
     private val authRepository: FirebaseAuthRepository = FirebaseAuthRepository()
 ) : ViewModel() {
     // State chứa danh sách chuyến hoàn thành và tổng thu nhập.
@@ -49,7 +49,7 @@ class DriverIncomeViewModel(
 
         _uiState.update { it.copy(isLoading = true, error = null) }
         incomeJob = viewModelScope.launch {
-            rideRepository.observeCompletedRides(driverId)
+            rideRepositoryImpl.observeCompletedRides(driverId)
                 .collect { rides ->
                     _uiState.update {
                         it.copy(

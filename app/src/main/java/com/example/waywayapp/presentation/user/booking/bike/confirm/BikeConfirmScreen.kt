@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +36,11 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.rememberCameraPositionState
 import java.text.DecimalFormat
-
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.LocalOffer
+import com.example.waywayapp.domain.model.Promo
 @Composable
 fun BikeConfirmScreen(
     onBackHomeClick: () -> Unit = {},
@@ -52,7 +58,8 @@ fun BikeConfirmScreen(
     val screenHeight = configuration.screenHeightDp
     val snackbarHostState = remember { SnackbarHostState() }
     val colors = MaterialTheme.colorScheme
-
+    var showPromoSheet by remember { mutableStateOf(false) }
+    val availablePromos by viewModel.availablePromos.collectAsState()
     LaunchedEffect(
         uiState.pickupLatLng,
         uiState.dropoffLatLng
@@ -114,6 +121,7 @@ fun BikeConfirmScreen(
                     onConfirmBooking = viewModel::startBooking,
                     onSelectPromo = {
                         viewModel.loadPromos()
+                        showPromoSheet = true
                     },
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
@@ -176,83 +184,113 @@ fun BikeConfirmScreen(
         }
         message?.let { snackbarHostState.showSnackbar(it) }
     }
-}
-
-@Composable
-private fun RideConfirmBottomSheet(
-    price: Double,
-    distance: String,
-    duration: String,
-    onBookClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val formatter = DecimalFormat("#,###")
-
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(
-            topStart = 30.dp,
-            topEnd = 30.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
+    @OptIn(ExperimentalMaterial3Api::class)
+    if (showPromoSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showPromoSheet = false },
+            containerColor = MaterialTheme.colorScheme.surface,
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Default.TwoWheeler,
-                    contentDescription = null,
-                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(42.dp)
-                )
-
-                Spacer(modifier = Modifier.width(14.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "Bike Phổ Thông",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Text(
-                        text = "$distance • $duration",
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            PromoSelectionSheetContent(
+                promos = availablePromos,
+                onPromoSelect = { promo ->
+                    viewModel.applyPromo(promo)
+                    showPromoSheet = false
+                },
+                onClearPromo = {
+                    viewModel.clearPromo()
+                    showPromoSheet = false
                 }
-
-                Text(
-                    text = "${formatter.format(price)}đ",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Button(
-                onClick = onBookClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text("Đặt Xe")
-            }
+            )
         }
     }
 }
 
+
+@Composable
+private fun PromoSelectionSheetContent(
+    promos: List<Promo>,
+    onPromoSelect: (Promo) -> Unit,
+    onClearPromo: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp)
+    ) {
+        Text(
+            text = "Khuyến mãi dành cho bạn",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Nút xoá khuyến mãi đang áp dụng
+        OutlinedButton(
+            onClick = onClearPromo,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            Text("Không dùng mã khuyến mãi")
+        }
+
+        if (promos.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Hiện không có mã giảm giá nào khả dụng",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(promos) { promo ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onPromoSelect(promo) },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.LocalOffer,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    text = promo.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Mã: ${promo.code}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 private fun openDialer(
     context: Context,
     phone: String

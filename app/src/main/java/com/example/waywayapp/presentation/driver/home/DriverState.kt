@@ -1,6 +1,7 @@
 package com.example.waywayapp.presentation.driver.home
 
 import com.example.waywayapp.domain.model.Ride
+import com.example.waywayapp.domain.model.User
 import com.google.android.gms.maps.model.LatLng
 
 enum class DriverStatus {
@@ -40,4 +41,8 @@ data class DriverState(
     val routeDistance: String = "",
     val routeDuration: String = "",
     val isRouting: Boolean = false
-)
+){
+    val canNavigate: Boolean
+            get() = status == DriverStatus.ON_THE_WAY_TO_PICKUP || status == DriverStatus.ON_TRIP
+
+}

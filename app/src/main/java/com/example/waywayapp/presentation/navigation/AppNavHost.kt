@@ -31,6 +31,7 @@ import com.example.waywayapp.presentation.driver.income.DriverIncomeScreen
 import com.example.waywayapp.presentation.auth.login.LoginScreen
 import com.example.waywayapp.presentation.auth.register.RegisterScreen
 import com.example.waywayapp.presentation.user.booking.BookingRoute
+import com.example.waywayapp.presentation.user.booking.express.ExpressConfirmScreen
 import com.example.waywayapp.presentation.user.booking.express.model.ExpressLocationType
 import com.example.waywayapp.presentation.user.booking.express.picker.LocationPickerScreen
 import com.example.waywayapp.presentation.user.home.HomeScreen
@@ -242,7 +243,13 @@ fun AppNavHost(
                     navController.navigate("momo_payment") {
                         launchSingleTop = true
                     }
+                },
+                onProfileClick = {
+                    navController.navigate("profile"){
+                        launchSingleTop = true
+                    }
                 }
+
             )
         }
         composable(
@@ -479,6 +486,23 @@ fun AppNavHost(
                 onConfirmClick = {
                     navController.popBackStack()
                 }
+            )
+        }
+        composable(Routes.EXPRESS_CONFIRM) {
+            ExpressConfirmScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onDone = {
+                    navController.navigate(Routes.USER_HOME) {
+                        popUpTo(Routes.USER_HOME) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+
+
             )
         }
         composable("add_payment") {

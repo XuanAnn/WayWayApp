@@ -79,11 +79,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.waywayapp.R
 import com.example.waywayapp.domain.model.DriverLocation
 import com.example.waywayapp.data.remote.dto.geocoding.GeocodingResponseDto
 import com.example.waywayapp.data.repository.DriverLocationRepository
 import com.example.waywayapp.domain.model.Service
+import com.example.waywayapp.presentation.components.ProfileAvatar
 import com.example.waywayapp.presentation.components.WayWayBottomBar
 import com.example.waywayapp.presentation.navigation.Routes
 import com.example.waywayapp.presentation.theme.BgLight
@@ -132,14 +134,14 @@ fun HomeScreen(
     onNotificationClick: () -> Unit = {},
     onPromoClick: () -> Unit = {},
     onAiAssistantClick: () -> Unit = {},
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    onProfileClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val currentUser = remember { FirebaseAuth.getInstance().currentUser }
-    val userName = currentUser?.displayName?.takeIf { it.isNotBlank() } ?: "Minh Tú"
-    val userPhotoUrl = currentUser?.photoUrl?.toString()
+    val userName = currentUser?.displayName?.takeIf { it.isNotBlank() } ?: "Người dùng"
     var homeScrollEnabled by remember { mutableStateOf(true) }
-
+    val userPhotoUrl = currentUser?.photoUrl?.toString()
     LaunchedEffect(Unit) {
         viewModel.refreshMomoStatus()
     }
@@ -151,16 +153,16 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 104.dp),
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
                 userScrollEnabled = homeScrollEnabled
             ) {
                 item {
                     HomeHeader(
                         userName = userName,
+                        userAvatarUrl = uiState.currentUser?.avatarUrl,
                         searchText = uiState.searchText,
                         searchSuggestions = uiState.searchSuggestions,
                         onSearchChange = viewModel::onSearchChange,
@@ -170,6 +172,7 @@ fun HomeScreen(
                             viewModel.clearSearchSuggestions()
                             onSearchSuggestionClick(suggestion.display_name)
                         },
+                        onProfileClick = onProfileClick,
                         onNotificationClick = onNotificationClick
                     )
                 }
@@ -189,14 +192,7 @@ fun HomeScreen(
                         }
                     )
                 }
-                item {
-                    WalletCard(
-                        isLinked = uiState.momoLinked,
-                        displayName = uiState.momoDisplayName.ifBlank { userName },
-                        phone = uiState.momoPhone,
-                        onWalletClick = onWalletClick
-                    )
-                }
+
             }
 
             WayWayBottomBar(
@@ -212,7 +208,7 @@ fun HomeScreen(
                     .size(52.dp)
                     .clickable { onAiAssistantClick() },
                 shape = CircleShape,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.primary,
                 shadowElevation = 6.dp
             ) {
                 Box(
@@ -241,11 +237,13 @@ fun HomeScreen(
 private fun HomeHeader(
     userName: String,
     searchText: String,
+    userAvatarUrl: String? = null,
     searchSuggestions: List<GeocodingResponseDto>,
     onSearchChange: (String) -> Unit,
     onSearchClick: () -> Unit,
     onSearchSuggestionClick: (GeocodingResponseDto) -> Unit,
-    onNotificationClick: () -> Unit
+    onNotificationClick: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -279,17 +277,22 @@ private fun HomeHeader(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(CircleShape)
-                    // ✦ avatar tối để tương phản với BgLight
-                    .background(Color(0xFF111111))
-                    .clickable { onNotificationClick() },
+                    .background(Color(0xFF111111)) // Màu nền fallback nếu chưa có ảnh
+                    .clickable { onProfileClick() },
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = userName.initials(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
+
+                // Trong HomeScreen.kt -> HomeHeader
+                Box(
+                    modifier = Modifier.size(42.dp).clip(CircleShape).clickable { onProfileClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    ProfileAvatar(
+                        avatarUrl = userAvatarUrl, // URL từ FirebaseAuth hoặc Firestore
+                        userName = userName,
+                        size = 42.dp
+                    )
+                }
             }
         }
 
@@ -427,9 +430,7 @@ private fun SearchBox(
     }
 }
 
-// ─────────────────────────────────────────
-// ServiceGrid — dùng weight thay vì width cố định
-// ─────────────────────────────────────────
+
 @Composable
 private fun ServiceGrid(
     services: List<ServiceUI>,
@@ -445,7 +446,7 @@ private fun ServiceGrid(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = CardWhite),
+            colors = CardDefaults.cardColors(containerColor =GreenSurface ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Row(
@@ -713,10 +714,12 @@ private fun SearchSuggestionItem(
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-private fun HomeMapPreview(
+fun HomeMapPreview(
     userPhotoUrl: String?,
-    onMapTouchChanged: (Boolean) -> Unit
+    onMapTouchChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
@@ -997,6 +1000,7 @@ private fun HomeMapPreview(
 }
 
 // ✦ Live indicator
+
 @Composable
 private fun LivePill() {
     val infiniteTransition = rememberInfiniteTransition(label = "live")
@@ -1029,38 +1033,6 @@ private fun LivePill() {
                 fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF0F6E56)
-            )
-        }
-    }
-}
-
-// ✦ Stats footer
-@Composable
-private fun MapStatsRow(nearbyCount: Int, etaMinutes: Int?, nearestKm: Float?) {
-    val etaText = etaMinutes?.let { "~$it ph" } ?: "--"
-    val nearestText = nearestKm?.let { "%.1f km".format(it) } ?: "--"
-
-    Row(modifier = Modifier.fillMaxWidth()) {
-        listOf(
-            nearbyCount.toString()      to "Xe gần đây",
-            "~$etaMinutes ph"           to "Thời gian đón",
-            "$nearestKm km"             to "Xe gần nhất"
-        ).forEachIndexed { i, (value, label) ->
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(value, fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface)
-                Text(label, fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            if (i < 2) VerticalDivider(
-                modifier = Modifier.height(36.dp).align(Alignment.CenterVertically),
-                thickness = 0.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.example.waywayapp.presentation.user.booking.express.picker
+﻿package com.example.waywayapp.presentation.user.booking.express.picker
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -95,7 +95,7 @@ class ExpressLocationPickerViewModel : ViewModel() {
                     currentLatLng = fallback,
                     selectedLatLng = fallback,
                     isLoading = false,
-                    errorMessage = "Không lấy được vị trí hiện tại"
+                    errorMessage = "KhÃ´ng láº¥y Ä‘Æ°á»£c vá»‹ trÃ­ hiá»‡n táº¡i"
                 )
             }
 
@@ -107,7 +107,7 @@ class ExpressLocationPickerViewModel : ViewModel() {
         _uiState.update {
             it.copy(
                 selectedLatLng = latLng,
-                selectedAddress = "Đang lấy địa chỉ..."
+                selectedAddress = "Äang láº¥y Ä‘á»‹a chá»‰..."
             )
         }
 
@@ -188,8 +188,8 @@ class ExpressLocationPickerViewModel : ViewModel() {
     private fun String.withoutVietnameseDiacritics(): String {
         return Normalizer.normalize(this, Normalizer.Form.NFD)
             .replace("\\p{Mn}+".toRegex(), "")
-            .replace('đ', 'd')
-            .replace('Đ', 'D')
+            .replace('\u0111', 'd')
+            .replace('\u0110', 'D')
     }
 
     private fun getAddressFromLatLng(
@@ -211,7 +211,7 @@ class ExpressLocationPickerViewModel : ViewModel() {
                     onResult(
                         address?.let {
                             formatAddress(it)
-                        } ?: "Vị trí không xác định"
+                        } ?: "Vá»‹ trÃ­ khÃ´ng xÃ¡c Ä‘á»‹nh"
                     )
                 }
             } else {
@@ -229,17 +229,17 @@ class ExpressLocationPickerViewModel : ViewModel() {
                 onResult(
                     address?.let {
                         formatAddress(it)
-                    } ?: "Vị trí không xác định"
+                    } ?: "Vá»‹ trÃ­ khÃ´ng xÃ¡c Ä‘á»‹nh"
                 )
             }
         } catch (e: Exception) {
-            onResult("Vị trí không xác định")
+            onResult("Vá»‹ trÃ­ khÃ´ng xÃ¡c Ä‘á»‹nh")
         }
     }
 
     private fun formatAddress(addr: Address): String {
         return addr.getAddressLine(0)
             ?: addr.featureName
-            ?: "Vị trí không xác định"
+            ?: "Vá»‹ trÃ­ khÃ´ng xÃ¡c Ä‘á»‹nh"
     }
 }

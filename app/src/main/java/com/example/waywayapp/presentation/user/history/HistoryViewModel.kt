@@ -2,7 +2,7 @@ package com.example.waywayapp.presentation.user.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.waywayapp.data.repository.RideRepository
+import com.example.waywayapp.data.repository.RideRepositoryImpl
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 // ViewModel hiển thị lịch sử cuốc xe của user hiện tại.
 class HistoryViewModel(
-    private val rideRepository: RideRepository = RideRepository()
+    private val rideRepositoryImpl: RideRepositoryImpl = RideRepositoryImpl()
 ) : ViewModel() {
     // State chứa danh sách ride, loading và lỗi của màn lịch sử.
     private val _uiState = MutableStateFlow(HistoryState())
@@ -35,7 +35,7 @@ class HistoryViewModel(
         }
 
         viewModelScope.launch {
-            rideRepository.observeUserRides(userId)
+            rideRepositoryImpl.observeUserRides(userId)
                 .catch { throwable ->
                     _uiState.value = HistoryState(
                         isLoading = false,

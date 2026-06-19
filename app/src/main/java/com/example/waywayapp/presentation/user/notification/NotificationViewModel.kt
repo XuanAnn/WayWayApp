@@ -2,7 +2,7 @@ package com.example.waywayapp.presentation.user.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.waywayapp.data.repository.RideRepository
+import com.example.waywayapp.data.repository.RideRepositoryImpl
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class NotificationViewModel(
-    private val rideRepository: RideRepository = RideRepository()
+    private val rideRepositoryImpl: RideRepositoryImpl = RideRepositoryImpl()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotificationState())
@@ -33,7 +33,7 @@ class NotificationViewModel(
         }
 
         viewModelScope.launch {
-            rideRepository.observeUserRides(userId)
+            rideRepositoryImpl.observeUserRides(userId)
                 .catch { throwable ->
                     _uiState.value = NotificationState(
                         isLoading = false,

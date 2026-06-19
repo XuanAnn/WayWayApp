@@ -7,7 +7,9 @@ import com.example.waywayapp.core.network.RetrofitProvider
 import com.example.waywayapp.data.remote.dto.geocoding.GeocodingResponseDto
 import com.example.waywayapp.data.repository.HomeRepositoryImpl
 import com.example.waywayapp.data.repository.ProfileRepository
+import com.example.waywayapp.domain.model.AdminUser
 import com.example.waywayapp.domain.model.Service
+import com.example.waywayapp.domain.model.User
 import com.example.waywayapp.presentation.user.home.model.ServiceUI
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -83,6 +85,7 @@ class HomeViewModel : ViewModel() {
             }.onSuccess { user ->
                 _uiState.update {
                     it.copy(
+                        currentUser = user.toUser(),
                         momoLinked = user.momoLinked,
                         momoPhone = user.momoPhone,
                         momoDisplayName = user.name.ifBlank { user.email.ifBlank { user.phone } }
@@ -91,7 +94,17 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
-
+    // Trong file model hoặc nơi tiện lợi
+    fun AdminUser.toUser(): User {
+        return User(
+            id = this.id,
+            name = this.name,
+            email = this.email,
+            phone = this.phone,
+            avatarUrl = this.avatarUrl // Lưu ý map đúng tên field
+            // ... các trường khác
+        )
+    }
     private suspend fun searchAddressWithFallback(query: String): List<GeocodingResponseDto> {
         val results = geocodingApi.searchAddress(query = query)
         if (results.isNotEmpty()) return results

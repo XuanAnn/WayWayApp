@@ -105,10 +105,6 @@ fun BookingConfirmCard(
         Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
 
-
-
-
-
                 Column(horizontalAlignment = Alignment.End) {
 
                     Row() {
@@ -117,15 +113,6 @@ fun BookingConfirmCard(
                             fontSize = 16.sp,
                             color = colors.primary,
                             fontWeight = FontWeight.ExtraBold
-                        )
-                    }
-
-                    if (uiState.discount > 0.0) {
-                        Text(
-                            text = "${formatter.format(uiState.price.toInt())}đ",
-                            fontSize = 13.sp,
-                            color = colors.onSurfaceVariant,
-                            textDecoration = TextDecoration.LineThrough
                         )
                     }
 
@@ -143,57 +130,9 @@ fun BookingConfirmCard(
                 duration = uiState.duration,
                 formatter = formatter,
                 selectedServiceType = uiState.selectedServiceType,
+                discountAmount = uiState.discount,
                 onSelect = viewModel::selectServiceType
             )
-
-            if (false) Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                rideOptions.forEach { option ->
-                    val selected = option.type == uiState.selectedServiceType
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(58.dp)
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(if (selected) colors.primaryContainer else colors.surfaceVariant.copy(alpha = 0.55f))
-                            .clickable { viewModel.selectServiceType(option.type) }
-                            .padding(horizontal = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(option.icon),
-                            contentDescription = option.title,
-                            modifier = Modifier.size(38.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Column() {
-                        Text(
-                            text = option.title,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = colors.onSurface
-                        )
-
-                            Text(
-                                text = "${uiState.distance} - ${uiState.duration}",
-                                fontSize = 12.sp,
-                                color = colors.onSurfaceVariant
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Text(
-                            text = "${formatter.format(option.price.toInt())}đ",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = if (selected) colors.primary else colors.onSurface
-                        )
-
-                    }
-                }
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -284,13 +223,13 @@ fun BookingConfirmCard(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(54.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(colors.secondaryContainer)
-                                .clickable {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(colors.secondaryContainer)
+                            .clickable {
                                 viewModel.loadPromos(uiState.selectedServiceType)
                                 onSelectPromo()
                             }
@@ -400,6 +339,7 @@ private fun RideServiceDropdown(
     duration: String,
     formatter: DecimalFormat,
     selectedServiceType: String,
+    discountAmount: Double,
     onSelect: (String) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -437,12 +377,22 @@ private fun RideServiceDropdown(
                 )
             }
 
-            Text(
-                text = "${formatter.format(selectedRide.price.toInt())}đ",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = colors.primary
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                if (discountAmount > 0.0) {
+                    Text(
+                        text = "${formatter.format(selectedRide.price.toInt())}đ",
+                        fontSize = 12.sp,
+                        color = colors.onPrimaryContainer.copy(alpha = 0.6f),
+                        textDecoration = TextDecoration.LineThrough
+                    )
+                }
+                Text(
+                    text = "${formatter.format((selectedRide.price - discountAmount).coerceAtLeast(0.0).toInt())}đ",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = colors.primary
+                )
+            }
             Spacer(modifier = Modifier.width(8.dp))
             Text("⌄", fontSize = 18.sp, color = colors.onPrimaryContainer)
         }
@@ -454,6 +404,8 @@ private fun RideServiceDropdown(
             modifier = Modifier.fillMaxWidth(0.92f)
         ) {
             rideOptions.forEach { option ->
+                val isSelected = option.type == selectedServiceType
+                val finalOptionPrice = if (isSelected) (option.price - discountAmount).coerceAtLeast(0.0) else option.price
                 DropdownMenuItem(
                     text = {
                         Row(
@@ -479,12 +431,23 @@ private fun RideServiceDropdown(
                                     color = colors.onSurfaceVariant
                                 )
                             }
-                            Text(
-                                text = "${formatter.format(option.price.toInt())}đ",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = if (option.type == selectedServiceType) colors.primary else colors.onSurface
-                            )
+
+                            Column(horizontalAlignment = Alignment.End) {
+                                if (isSelected && discountAmount > 0.0) {
+                                    Text(
+                                        text = "${formatter.format(option.price.toInt())}đ",
+                                        fontSize = 11.sp,
+                                        color = colors.onSurfaceVariant,
+                                        textDecoration = TextDecoration.LineThrough
+                                    )
+                                }
+                                Text(
+                                    text = "${formatter.format(finalOptionPrice.toInt())}đ",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (isSelected) colors.primary else colors.onSurface
+                                )
+                            }
                         }
                     },
                     onClick = {

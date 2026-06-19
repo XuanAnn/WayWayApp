@@ -3,12 +3,13 @@ package com.example.waywayapp.data.repository
 import com.example.waywayapp.core.firebase.FirestoreProvider
 import com.example.waywayapp.domain.model.AdminPromo
 import com.example.waywayapp.domain.model.Promo
+import com.example.waywayapp.domain.repository.AdminPromoRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class AdminPromoRepository {
+class AdminPromoRepositoryImpl: AdminPromoRepository {
     private val firestore = FirestoreProvider.db
 
     fun observePromos(): Flow<List<AdminPromo>> = callbackFlow {

@@ -1,9 +1,10 @@
 package com.example.waywayapp.core.di
 
-import com.example.waywayapp.data.repository.AdminRepository
-import com.example.waywayapp.data.repository.AdminDriverRepository
+import com.example.waywayapp.data.repository.AdminPromoRepositoryImpl
+import com.example.waywayapp.data.repository.AdminRepositoryImpl
 import com.example.waywayapp.data.repository.DriverLocationRepository
 import com.example.waywayapp.data.repository.FirebaseAuthRepository
+import com.example.waywayapp.data.repository.RideRepositoryImpl
 
 object AppContainer {
 
@@ -11,10 +12,14 @@ object AppContainer {
             FirebaseAuthRepository? = null
     private var driverLocationRepository:
             DriverLocationRepository? = null
-    private var adminDriverRepository:
-            AdminDriverRepository? = null
-    private var adminRepository:
-            AdminRepository? = null
+
+    private var adminRepositoryImpl:
+            AdminRepositoryImpl? = null
+
+    private var rideRepositoryImpl:
+            RideRepositoryImpl? = null
+    private var adminPromoRepositoryImpl:
+            AdminPromoRepositoryImpl? = null
 
     fun provideAuthRepository(): FirebaseAuthRepository {
         return authRepository
@@ -34,20 +39,28 @@ object AppContainer {
             }
     }
 
-    fun provideAdminDriverRepository(): AdminDriverRepository {
-        return adminDriverRepository
+
+    fun provideAdminRepository(): AdminRepositoryImpl {
+        return adminRepositoryImpl
             ?: synchronized(this) {
-                val repo = AdminDriverRepository()
-                adminDriverRepository = repo
+                val repo = AdminRepositoryImpl()
+                adminRepositoryImpl = repo
                 repo
             }
     }
-
-    fun provideAdminRepository(): AdminRepository {
-        return adminRepository
+    fun provideRideRepository(): RideRepositoryImpl {
+        return rideRepositoryImpl
             ?: synchronized(this) {
-                val repo = AdminRepository()
-                adminRepository = repo
+                val repo = RideRepositoryImpl()
+                rideRepositoryImpl = repo
+                repo
+            }
+    }
+    fun provideAdminPromoRepository(): AdminPromoRepositoryImpl {
+        return adminPromoRepositoryImpl
+            ?: synchronized(this) {
+                val repo = AdminPromoRepositoryImpl()
+                adminPromoRepositoryImpl = repo
                 repo
             }
     }

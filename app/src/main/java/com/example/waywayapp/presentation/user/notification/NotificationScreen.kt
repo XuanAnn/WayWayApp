@@ -1,6 +1,5 @@
 package com.example.waywayapp.presentation.user.notification
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -62,25 +62,43 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.outlined.DoneAll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.waywayapp.presentation.components.WayWayBottomBar
+private val WayWayDarkGreen = Color(0xFF006C4C)
+private val WayWayLightGreen = Color(0xFF1DB954)
+private val AppBgColor = Color(0xFFF5F7FA)
+private val CardBgColor = Color(0xFFFFFFFF)
+private val TextPrimary = Color(0xFF1D1B20)
+private val TextSecondary = Color(0xFF757575)
+
 private enum class NotificationFilter(val label: String) {
-    ALL("Tất cả"),
-    RIDE("Cuốc xe"),
-    PAYMENT("Thanh toán"),
-    EXPRESS("Giao hàng")
+    ALL("Tất cả"), RIDE("Cuốc xe"), PAYMENT("Thanh toán"), EXPRESS("Giao hàng")
 }
 
 private data class WayWayNotification(
-    val id: String,
-    val title: String,
-    val message: String,
-    val time: Long,
-    val filter: NotificationFilter,
-    @DrawableRes val iconRes: Int,
-    val accent: Color,
-    val isUnreadByDefault: Boolean
+    val id: String, val title: String, val message: String, val time: Long,
+    val filter: NotificationFilter, @DrawableRes val iconRes: Int, val accent: Color, val isUnreadByDefault: Boolean
 )
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(
     currentRoute: String? = Routes.NOTIFICATION,
@@ -88,118 +106,64 @@ fun NotificationScreen(
     viewModel: NotificationViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = MaterialTheme.colorScheme
     var selectedFilter by remember { mutableStateOf(NotificationFilter.ALL) }
     var readIds by remember { mutableStateOf<Set<String>>(emptySet()) }
 
     val notifications = remember(uiState.rides) {
-        uiState.rides.flatMap { it.toNotifications() }
-            .sortedByDescending { it.time }
+        uiState.rides.flatMap { it.toNotifications() }.sortedByDescending { it.time }
     }
     val filteredNotifications = remember(notifications, selectedFilter) {
-        if (selectedFilter == NotificationFilter.ALL) {
-            notifications
-        } else {
-            notifications.filter { it.filter == selectedFilter }
-        }
+        if (selectedFilter == NotificationFilter.ALL) notifications else notifications.filter { it.filter == selectedFilter }
     }
     val unreadCount = notifications.count { it.isUnreadByDefault && it.id !in readIds }
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = AppBgColor,
         topBar = {
             TopAppBar(
                 title = {
                     Column {
-                        Text(
-                            text = "Thông báo",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.onBackground
-                        )
+                        Text("Thông báo", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
                         Text(
                             text = if (unreadCount > 0) "$unreadCount thông báo mới" else "Bạn đã xem hết thông báo",
-                            fontSize = 12.sp,
-                            color = colors.onSurfaceVariant
+                            fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium
                         )
                     }
                 },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
                 actions = {
                     IconButton(onClick = { readIds = notifications.map { it.id }.toSet() }) {
-                        Icon(
-                            imageVector = Icons.Outlined.DoneAll,
-                            contentDescription = "Đánh dấu đã đọc",
-                            tint = colors.onSurfaceVariant
-                        )
+                        Icon(Icons.Outlined.DoneAll, contentDescription = "Đã đọc", tint = TextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppBgColor)
             )
         }
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Box(modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding())) {
             when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = colors.primary
-                    )
-                }
-
-                uiState.error != null -> {
-                    EmptyNotification(
-                        title = "Không tải được thông báo",
-                        message = uiState.error.orEmpty(),
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-                notifications.isEmpty() -> {
-                    EmptyNotification(
-                        title = "Chưa có thông báo",
-                        message = "Các cập nhật về cuốc xe, giao hàng và thanh toán sẽ xuất hiện tại đây.",
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
+                uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = WayWayDarkGreen)
+                uiState.error != null -> EmptyNotification("Lỗi", uiState.error.orEmpty(), Modifier.align(Alignment.Center))
+                notifications.isEmpty() -> EmptyNotification("Chưa có thông báo", "Các cập nhật sẽ xuất hiện tại đây.", Modifier.align(Alignment.Center))
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 104.dp)
                     ) {
-                        item {
-                            NotificationFilters(
-                                selected = selectedFilter,
-                                onSelected = { selectedFilter = it }
-                            )
-                        }
+                        item { NotificationFilters(selectedFilter) { selectedFilter = it } }
 
                         if (filteredNotifications.isEmpty()) {
-                            item {
-                                EmptyNotification(
-                                    title = "Không có mục phù hợp",
-                                    message = "Thử chọn nhóm thông báo khác.",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 56.dp)
-                                )
-                            }
+                            item { EmptyNotification("Trống", "Thử chọn nhóm thông báo khác.", Modifier.padding(top = 56.dp)) }
                         } else {
                             val grouped = filteredNotifications.groupBy { it.sectionLabel() }
                             grouped.forEach { (section, items) ->
-                                item(key = "section_$section") {
-                                    SectionLabel(section)
-                                }
+                                item(key = "section_$section") { SectionLabel(section) }
                                 items(items, key = { it.id }) { item ->
                                     NotificationCard(
                                         item = item,
                                         isRead = item.id in readIds || !item.isUnreadByDefault,
                                         onClick = { readIds = readIds + item.id },
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp)
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                                     )
                                 }
                             }
@@ -207,38 +171,30 @@ fun NotificationScreen(
                     }
                 }
             }
-
-            WayWayBottomBar(
-                currentRoute = currentRoute,
-                onItemClick = onBottomNavClick,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
+            WayWayBottomBar(currentRoute = currentRoute, onItemClick = onBottomNavClick, modifier = Modifier.align(Alignment.BottomCenter))
         }
     }
 }
 
 @Composable
-private fun NotificationFilters(
-    selected: NotificationFilter,
-    onSelected: (NotificationFilter) -> Unit
-) {
-    val colors = MaterialTheme.colorScheme
+private fun NotificationFilters(selected: NotificationFilter, onSelected: (NotificationFilter) -> Unit) {
     Row(
-        modifier = Modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 18.dp, vertical = 12.dp),
+        modifier = Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         NotificationFilter.entries.forEach { filter ->
             FilterChip(
                 selected = selected == filter,
                 onClick = { onSelected(filter) },
-                label = { Text(filter.label, fontSize = 12.sp) },
-                shape = RoundedCornerShape(18.dp),
+                label = { Text(filter.label, fontSize = 13.sp, fontWeight = FontWeight.Bold) },
+                shape = RoundedCornerShape(20.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colors.primaryContainer,
-                    selectedLabelColor = colors.onPrimaryContainer
-                )
+                    selectedContainerColor = WayWayDarkGreen,
+                    selectedLabelColor = Color.White,
+                    containerColor = CardBgColor,
+                    labelColor = TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected == filter, borderColor = Color.Transparent)
             )
         }
     }
@@ -248,77 +204,37 @@ private fun NotificationFilters(
 private fun SectionLabel(text: String) {
     Text(
         text = text.uppercase(Locale("vi", "VN")),
-        modifier = Modifier.padding(start = 20.dp, top = 14.dp, bottom = 4.dp),
-        fontSize = 11.sp,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = 0.6.sp,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp),
+        fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.5.sp, color = TextSecondary
     )
 }
 
 @Composable
-private fun NotificationCard(
-    item: WayWayNotification,
-    isRead: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = MaterialTheme.colorScheme
-    val container = if (isRead) colors.surface else colors.primaryContainer.copy(alpha = 0.28f)
+private fun NotificationCard(item: WayWayNotification, isRead: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val container = if (isRead) CardBgColor else Color(0xFFE8F5EE) // Nền xanh nhạt nếu chưa đọc
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(18.dp),
+        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = container),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(if (isRead) 1.dp else 4.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            LocalIconBubble(iconRes = item.iconRes, accent = item.accent)
-            Spacer(Modifier.width(12.dp))
+        Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Top) {
+            LocalIconBubble(item.iconRes, item.accent)
+            Spacer(Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = item.title,
-                        modifier = Modifier.weight(1f),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.onSurface
-                    )
-                    Text(
-                        text = item.relativeTime(),
-                        fontSize = 11.sp,
-                        color = colors.onSurfaceVariant
-                    )
+                    Text(item.title, modifier = Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+                    Text(item.relativeTime(), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = TextSecondary)
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(
-                    text = item.message,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp,
-                    color = colors.onSurfaceVariant
-                )
-                Spacer(Modifier.height(9.dp))
+                Text(item.message, fontSize = 13.sp, lineHeight = 20.sp, color = TextSecondary)
+                Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${item.filter.label} · WayWay",
-                        fontSize = 11.sp,
-                        color = colors.onSurfaceVariant.copy(alpha = 0.75f)
-                    )
+                    Text("${item.filter.label} · WayWay", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                     if (!isRead) {
                         Spacer(Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(7.dp)
-                                .clip(CircleShape)
-                                .background(colors.primary)
-                        )
+                        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(WayWayLightGreen))
                     }
                 }
             }
@@ -329,51 +245,27 @@ private fun NotificationCard(
 @Composable
 private fun LocalIconBubble(@DrawableRes iconRes: Int, accent: Color) {
     Box(
-        modifier = Modifier
-            .size(46.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(accent.copy(alpha = 0.14f)),
+        modifier = Modifier.size(48.dp).clip(CircleShape).background(accent.copy(alpha = 0.12f)),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(30.dp)
-        )
+        Image(painterResource(iconRes), null, contentScale = ContentScale.Fit, modifier = Modifier.size(24.dp))
     }
 }
 
 @Composable
-private fun EmptyNotification(
-    title: String,
-    message: String,
-    modifier: Modifier = Modifier
-) {
-    val colors = MaterialTheme.colorScheme
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Surface(
-            modifier = Modifier.size(66.dp),
-            shape = CircleShape,
-            color = colors.primaryContainer
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(R.drawable.express_icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp)
-                )
-            }
+private fun EmptyNotification(title: String, message: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(modifier = Modifier.size(80.dp).background(CardBgColor, CircleShape), contentAlignment = Alignment.Center) {
+            Image(painterResource(R.drawable.express_icon), null, modifier = Modifier.size(40.dp))
         }
-        Spacer(Modifier.height(14.dp))
-        Text(title, color = colors.onBackground, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-        Spacer(Modifier.height(6.dp))
-        Text(message, color = colors.onSurfaceVariant, fontSize = 13.sp)
+        Spacer(Modifier.height(16.dp))
+        Text(title, color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+        Spacer(Modifier.height(8.dp))
+        Text(message, color = TextSecondary, fontSize = 14.sp, textAlign = TextAlign.Center)
     }
 }
+
+
 
 private fun Ride.toNotifications(): List<WayWayNotification> {
     val statusTime = completedAt ?: updatedAt.takeIf { it != 0L } ?: createdAt

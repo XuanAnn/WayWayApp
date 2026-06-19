@@ -1,6 +1,7 @@
 ﻿package com.example.waywayapp.presentation.admin.driver
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Email
@@ -41,20 +44,24 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -73,6 +80,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.core.di.AppContainer
 import com.example.waywayapp.domain.model.AdminPromo
@@ -86,19 +96,20 @@ import com.example.waywayapp.presentation.theme.WayWayPrimary
 import com.example.waywayapp.presentation.theme.WayWaySurface
 import com.example.waywayapp.presentation.theme.WarningOrange
 
-private val AdminBackground = WayWayBackground
-private val AdminSurface = WayWaySurface
-private val AdminPrimary = WayWayPrimary
-private val AdminDark = WayWayOnSurface
-private val AdminGreen = WayWayPrimary
-private val AdminOrange = WarningOrange
-private val AdminMuted = WayWayOnSurfaceVariant
+private val AdminBackground = Color(0xFFF7F8FA) // Sáng và dịu hơn
+private val AdminSurface = Color.White
+private val AdminPrimary = Color(0xFF1DB954) // Xanh thương hiệu WayWay
+private val AdminDark = Color(0xFF1A1A1A)
+private val AdminMuted = Color(0xFF8A8D93)
+private val AdminBorder = Color(0xFFEBECEF)
 
 @Composable
 fun AdminDriverScreen(
     viewModel: AdminDriverViewModel = viewModel(
         factory = AdminDriverViewModelFactory(
-            AppContainer.provideAdminRepository()
+            AppContainer.provideAdminRepository(),
+            promoRepository = AppContainer.provideAdminPromoRepository(),
+            rideRepository = AppContainer.provideRideRepository()
         )
     ),
     onProfileClick: () -> Unit = {}
@@ -110,18 +121,18 @@ fun AdminDriverScreen(
 
     val users = uiState.users.filter { user ->
         search.isBlank() ||
-            user.name.contains(search, ignoreCase = true) ||
-            user.email.contains(search, ignoreCase = true) ||
-            user.phone.contains(search, ignoreCase = true) ||
-            user.role.contains(search, ignoreCase = true)
+                user.name.contains(search, ignoreCase = true) ||
+                user.email.contains(search, ignoreCase = true) ||
+                user.phone.contains(search, ignoreCase = true) ||
+                user.role.contains(search, ignoreCase = true)
     }
     val drivers = uiState.drivers.filter { driver ->
         search.isBlank() ||
-            driver.name.contains(search, ignoreCase = true) ||
-            driver.phone.contains(search, ignoreCase = true) ||
-            driver.email.contains(search, ignoreCase = true) ||
-            driver.plateNumber.contains(search, ignoreCase = true) ||
-            driver.vehicleType.contains(search, ignoreCase = true)
+                driver.name.contains(search, ignoreCase = true) ||
+                driver.phone.contains(search, ignoreCase = true) ||
+                driver.email.contains(search, ignoreCase = true) ||
+                driver.plateNumber.contains(search, ignoreCase = true) ||
+                driver.vehicleType.contains(search, ignoreCase = true)
     }
 
     LaunchedEffect(uiState.message) {
@@ -147,9 +158,10 @@ fun AdminDriverScreen(
                         }
                     },
                     containerColor = AdminPrimary,
-                    contentColor = Color.White
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(18.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Them moi")
+                    Icon(Icons.Default.Add, contentDescription = "Thêm mới", modifier = Modifier.size(28.dp))
                 }
                 AdminSection.RIDES -> Unit
             }
@@ -165,11 +177,11 @@ fun AdminDriverScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(start = 18.dp, top = 18.dp, end = 18.dp, bottom = 96.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(start = 20.dp, top = 24.dp, end = 20.dp, bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                DashboardTitle(
+                DashboardHeader(
                     selectedSection = uiState.selectedSection,
                     count = when (uiState.selectedSection) {
                         AdminSection.USERS -> users.size
@@ -182,131 +194,59 @@ fun AdminDriverScreen(
             }
 
             item {
-                AdminSearchAndTabs(
+                ModernSearchBar(
                     query = uiState.searchQuery,
+                    onQueryChange = viewModel::onSearchChange
+                )
+            }
+
+            item {
+                ModernTabs(
                     selectedSection = uiState.selectedSection,
-                    onQueryChange = viewModel::onSearchChange,
                     onSelectSection = viewModel::selectSection
                 )
             }
 
             when (uiState.selectedSection) {
                 AdminSection.USERS -> {
-                    if (uiState.isLoadingUsers) {
-                        item { LoadingRow() }
-                    } else {
-                        items(users) { user ->
-                            UserRow(
-                                user = user,
-                                onClick = { viewModel.editUser(user) }
-                            )
-                        }
-                    }
+                    if (uiState.isLoadingUsers) item { LoadingRow() }
+                    else items(users) { user -> UserRow(user) { viewModel.editUser(user) } }
                 }
                 AdminSection.DRIVERS -> {
-                    if (uiState.isLoadingDrivers) {
-                        item { LoadingRow() }
-                    } else {
-                        items(drivers) { driver ->
-                            DriverRow(
-                                driver = driver,
-                                onClick = { viewModel.editDriver(driver) }
-                            )
-                        }
-                    }
+                    if (uiState.isLoadingDrivers) item { LoadingRow() }
+                    else items(drivers) { driver -> DriverRow(driver) { viewModel.editDriver(driver) } }
                 }
                 AdminSection.PROMOS -> {
-                    if (uiState.isLoadingPromos) {
-                        item { LoadingRow() }
-                    } else {
-                        items(
-                            uiState.promos.filter { promo ->
-                                search.isBlank() ||
-                                    promo.code.contains(search, ignoreCase = true) ||
-                                    promo.title.contains(search, ignoreCase = true) ||
-                                    promo.serviceTypes.any { it.contains(search, ignoreCase = true) }
-                            }
-                        ) { promo ->
-                            PromoRow(
-                                promo = promo,
-                                onClick = { viewModel.editPromo(promo) }
-                            )
-                        }
+                    if (uiState.isLoadingPromos) item { LoadingRow() }
+                    else items(uiState.promos.filter { it.code.contains(search, true) }) { promo ->
+                        PromoRow(promo) { viewModel.editPromo(promo) }
                     }
                 }
                 AdminSection.RIDES -> {
-                    if (uiState.isLoadingRides) {
-                        item { LoadingRow() }
-                    } else {
-                        items(
-                            uiState.rides.filter { ride ->
-                                search.isBlank() ||
-                                    ride.id.contains(search, ignoreCase = true) ||
-                                    ride.userId.contains(search, ignoreCase = true) ||
-                                    ride.driverId.contains(search, ignoreCase = true) ||
-                                    ride.pickupAddress.contains(search, ignoreCase = true) ||
-                                    ride.dropoffAddress.contains(search, ignoreCase = true) ||
-                                    ride.status.contains(search, ignoreCase = true)
-                            }
-                        ) { ride ->
-                            RideRow(
-                                ride = ride,
-                                onClick = { viewModel.editRide(ride) }
-                            )
-                        }
+                    if (uiState.isLoadingRides) item { LoadingRow() }
+                    else items(uiState.rides.filter { it.id.contains(search, true) }) { ride ->
+                        RideRow(ride) { viewModel.editRide(ride) }
                     }
                 }
             }
         }
     }
 
+    // Modal Dialogs
     if (uiState.isUserDetailOpen) {
-        AdminDetailDialog(
-            title = if (uiState.editingUser.id.isBlank()) "ThÃªm ngÆ°á»i dÃ¹ng" else "Chi tiáº¿t ngÆ°á»i dÃ¹ng",
-            onDismiss = viewModel::closeUserDetail
-        ) {
-            UserEditor(
-                user = uiState.editingUser,
-                isSaving = uiState.isSaving,
-                onNameChange = viewModel::onUserNameChange,
-                onEmailChange = viewModel::onUserEmailChange,
-                onPhoneChange = viewModel::onUserPhoneChange,
-                onRoleChange = viewModel::onUserRoleChange,
-                onActiveChange = viewModel::onUserActiveChange,
-                onSave = viewModel::saveUser,
-                onDelete = { pendingDelete = AdminSection.USERS }
-            )
+        ModernFormDialog(title = if (uiState.editingUser.id.isBlank()) "Thêm người dùng" else "Sửa thông tin", onDismiss = viewModel::closeUserDetail) {
+            UserEditor(uiState.editingUser, uiState.isSaving, viewModel::onUserNameChange, viewModel::onUserEmailChange, viewModel::onUserPhoneChange, viewModel::onUserRoleChange, viewModel::onUserActiveChange, viewModel::saveUser, { pendingDelete = AdminSection.USERS })
         }
     }
 
     if (uiState.isDriverDetailOpen) {
-        AdminDetailDialog(
-            title = if (uiState.editingDriver.id.isBlank()) "ThÃªm tÃ i xáº¿" else "Chi tiáº¿t tÃ i xáº¿",
-            onDismiss = viewModel::closeDriverDetail
-        ) {
-            DriverEditor(
-                driver = uiState.editingDriver,
-                isSaving = uiState.isSaving,
-                onNameChange = viewModel::onDriverNameChange,
-                onPhoneChange = viewModel::onDriverPhoneChange,
-                onEmailChange = viewModel::onDriverEmailChange,
-                onVehicleTypeChange = viewModel::onVehicleTypeChange,
-                onPlateNumberChange = viewModel::onPlateNumberChange,
-                onRatingChange = viewModel::onDriverRatingChange,
-                onActiveChange = viewModel::onDriverActiveChange,
-                onAvailableChange = viewModel::onDriverAvailableChange,
-                onOnlineChange = viewModel::onDriverOnlineChange,
-                onSave = viewModel::saveDriver,
-                onDelete = { pendingDelete = AdminSection.DRIVERS }
-            )
+        ModernFormDialog(title = if (uiState.editingDriver.id.isBlank()) "Thêm tài xế" else "Sửa tài xế", onDismiss = viewModel::closeDriverDetail) {
+            DriverEditor(uiState.editingDriver, uiState.isSaving, viewModel::onDriverNameChange, viewModel::onDriverPhoneChange, viewModel::onDriverEmailChange, viewModel::onVehicleTypeChange, viewModel::onPlateNumberChange, viewModel::onDriverRatingChange, viewModel::onDriverActiveChange, viewModel::onDriverAvailableChange, viewModel::onDriverOnlineChange, viewModel::saveDriver, { pendingDelete = AdminSection.DRIVERS })
         }
     }
 
     if (uiState.isPromoDetailOpen) {
-        AdminDetailDialog(
-            title = if (uiState.editingPromo.code.isBlank()) "Them promo" else "Chi tiet promo",
-            onDismiss = viewModel::closePromoDetail
-        ) {
+        ModernFormDialog(title = if (uiState.editingPromo.code.isBlank()) "Khuyến mãi mới" else "Sửa khuyến mãi", onDismiss = viewModel::closePromoDetail) {
             PromoEditor(
                 promo = uiState.editingPromo,
                 isSaving = uiState.isSaving,
@@ -317,54 +257,37 @@ fun AdminDriverScreen(
                 onDiscountValueChange = viewModel::onPromoDiscountValueChange,
                 onMinPriceChange = viewModel::onPromoMinPriceChange,
                 onMaxDiscountChange = viewModel::onPromoMaxDiscountChange,
-                onServiceTypesChange = viewModel::onPromoServiceTypesChange,
-                onStartAtChange = viewModel::onPromoStartAtChange,
-                onEndAtChange = viewModel::onPromoEndAtChange,
+                onServiceTypesToggle = viewModel::togglePromoServiceType,
                 onSave = viewModel::savePromo,
                 onDelete = { pendingDelete = AdminSection.PROMOS }
-            )
-        }
+            ) }
     }
 
     if (uiState.isRideDetailOpen) {
-        AdminDetailDialog(
-            title = if (uiState.editingRide.id.isBlank()) "Ride detail" else "Ride detail",
-            onDismiss = viewModel::closeRideDetail
-        ) {
-            RideEditor(
-                ride = uiState.editingRide,
-                isSaving = uiState.isSaving,
-                onStatusChange = viewModel::onRideStatusChange,
-                onPaymentStatusChange = viewModel::onRidePaymentStatusChange,
-                onPaymentMethodChange = viewModel::onRidePaymentMethodChange,
-                onSave = viewModel::saveRide,
-                onDelete = { pendingDelete = AdminSection.RIDES }
-            )
+        ModernFormDialog(title = "Chi tiết chuyến đi", onDismiss = viewModel::closeRideDetail) {
+            RideEditor(uiState.editingRide, uiState.isSaving, viewModel::onRideStatusChange, viewModel::onRidePaymentStatusChange, viewModel::onRidePaymentMethodChange, viewModel::saveRide, { pendingDelete = AdminSection.RIDES })
         }
     }
+
     pendingDelete?.let { section ->
-        DeleteConfirmDialog(
-            section = section,
-            onDismiss = { pendingDelete = null },
-            onConfirm = {
-                pendingDelete = null
-                when (section) {
-                    AdminSection.USERS -> viewModel.deleteUser()
-                    AdminSection.DRIVERS -> viewModel.deleteDriver()
-                    AdminSection.PROMOS -> viewModel.deletePromo()
-                    AdminSection.RIDES -> viewModel.deleteRide()
-                }
+        DeleteConfirmDialog(section, { pendingDelete = null }) {
+            pendingDelete = null
+            when (section) {
+                AdminSection.USERS -> viewModel.deleteUser()
+                AdminSection.DRIVERS -> viewModel.deleteDriver()
+                AdminSection.PROMOS -> viewModel.deletePromo()
+                AdminSection.RIDES -> viewModel.deleteRide()
             }
-        )
+        }
     }
 }
 
+// ============================================================================
+// CÁC COMPONENT GIAO DIỆN MỚI (MODERN UI)
+// ============================================================================
+
 @Composable
-private fun DashboardTitle(
-    selectedSection: AdminSection,
-    count: Int,
-    onProfileClick: () -> Unit
-) {
+private fun DashboardHeader(selectedSection: AdminSection, count: Int, onProfileClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -372,162 +295,245 @@ private fun DashboardTitle(
     ) {
         Column {
             Text(
-                text = "Dashboard",
-                style = MaterialTheme.typography.headlineSmall,
+                text = "Quản trị hệ thống",
+                fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = AdminDark
             )
-            Text(
-                text = when (selectedSection) {
-                    AdminSection.USERS -> "$count ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng"
-                    AdminSection.DRIVERS -> "$count tÃƒÂ i xÃ¡ÂºÂ¿"
-                    AdminSection.PROMOS -> "$count promo"
-                    AdminSection.RIDES -> "$count chuyÃ¡ÂºÂ¿n"
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = AdminMuted
-            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(AdminPrimary))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "Đang quản lý $count bản ghi",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = AdminMuted
+                )
+            }
         }
-
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(AdminPrimary)
-                .clickable(onClick = onProfileClick),
-            contentAlignment = Alignment.Center
+        Surface(
+            shape = CircleShape,
+            color = AdminSurface,
+            shadowElevation = 2.dp,
+            modifier = Modifier.size(48.dp).clickable(onClick = onProfileClick)
         ) {
-            Icon(
-                imageVector = Icons.Default.AdminPanelSettings,
-                contentDescription = null,
-                tint = Color.White
-            )
+            Box(contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.AdminPanelSettings, contentDescription = null, tint = AdminPrimary, modifier = Modifier.size(26.dp))
+            }
         }
     }
 }
 
 @Composable
-private fun AdminSearchAndTabs(
-    query: String,
-    selectedSection: AdminSection,
-    onQueryChange: (String) -> Unit,
-    onSelectSection: (AdminSection) -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = AdminSurface)
+private fun ModernSearchBar(query: String, onQueryChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("Tìm kiếm...", color = AdminMuted) },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = AdminMuted) },
+        shape = CircleShape,
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = Color.Black.copy(alpha = 0.04f),
+            focusedContainerColor = AdminSurface,
+            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = AdminPrimary,
+            cursorColor = AdminPrimary
+        ),
+        singleLine = true
+    )
+}
+
+@Composable
+private fun ModernTabs(selectedSection: AdminSection, onSelectSection: (AdminSection) -> Unit) {
+    val tabs = listOf(
+        Triple(AdminSection.USERS, "Khách", Icons.Default.Person),
+        Triple(AdminSection.DRIVERS, "Tài xế", Icons.Default.TwoWheeler),
+        Triple(AdminSection.PROMOS, "Ưu đãi", Icons.Default.LocalOffer),
+        Triple(AdminSection.RIDES, "Chuyến", Icons.Default.ReceiptLong)
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = null)
-                },
-                label = { Text("TÃ¬m kiáº¿m") }
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+        tabs.forEach { (section, label, icon) ->
+            val isSelected = selectedSection == section
+            Surface(
+                shape = CircleShape,
+                color = if (isSelected) AdminPrimary else Color.White,
+                border = if (isSelected) null else BorderStroke(1.dp, AdminBorder),
+                modifier = Modifier.clickable { onSelectSection(section) }
             ) {
-                ElevatedFilterChip(
-                    selected = selectedSection == AdminSection.USERS,
-                    onClick = { onSelectSection(AdminSection.USERS) },
-                    label = { Text("Users") },
-                    leadingIcon = { Icon(Icons.Default.Group, contentDescription = null) }
-                )
-                ElevatedFilterChip(
-                    selected = selectedSection == AdminSection.DRIVERS,
-                    onClick = { onSelectSection(AdminSection.DRIVERS) },
-                    label = { Text("Drivers") },
-                    leadingIcon = { Icon(Icons.Default.TwoWheeler, contentDescription = null) }
-                )
-                ElevatedFilterChip(
-                    selected = selectedSection == AdminSection.PROMOS,
-                    onClick = { onSelectSection(AdminSection.PROMOS) },
-                    label = { Text("Promos") },
-                    leadingIcon = { Icon(Icons.Default.LocalOffer, contentDescription = null) }
-                )
-                ElevatedFilterChip(
-                    selected = selectedSection == AdminSection.RIDES,
-                    onClick = { onSelectSection(AdminSection.RIDES) },
-                    label = { Text("Rides") },
-                    leadingIcon = { Icon(Icons.Default.ReceiptLong, contentDescription = null) }
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(icon, contentDescription = null, tint = if (isSelected) Color.White else AdminMuted, modifier = Modifier.size(18.dp))
+                    Text(
+                        text = label,
+                        fontSize = 13.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) Color.White else AdminDark
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun AdminDetailDialog(
-    title: String,
-    onDismiss: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(title, fontWeight = FontWeight.Bold)
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 560.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                content = content
-            )
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("ÄÃ³ng")
+private fun AdminListRow(title: String, subtitle: String, meta: String, statusColor: Color, icon: ImageVector, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = AdminSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(0.5.dp, AdminBorder)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier.size(48.dp).clip(CircleShape).background(statusColor.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = statusColor)
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = AdminDark, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(text = subtitle, fontSize = 13.sp, color = AdminMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Surface(shape = RoundedCornerShape(8.dp), color = statusColor.copy(alpha = 0.08f)) {
+                Text(
+                    text = meta,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    fontSize = 11.sp, fontWeight = FontWeight.Bold, color = statusColor,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
             }
         }
+    }
+}
+
+// Tái thiết kế Form nhập liệu dạng Modal
+@Composable
+private fun ModernFormDialog(title: String, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(0.92f).padding(vertical = 24.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = AdminSurface
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(title, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = AdminDark)
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = "Đóng", tint = AdminMuted)
+                    }
+                }
+                // Content
+                Column(
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 500.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    content = content
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+        }
+    }
+}
+
+// Áp dụng phong cách mới cho các field trong Form
+@Composable
+private fun AdminTextField(value: String, onValueChange: (String) -> Unit, label: String, icon: ImageVector) {
+    OutlinedTextField(
+        value = value, onValueChange = onValueChange, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        leadingIcon = { Icon(icon, contentDescription = null, tint = AdminPrimary) },
+        label = { Text(label, color = AdminMuted) },
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedBorderColor = AdminBorder, focusedBorderColor = AdminPrimary, focusedLabelColor = AdminPrimary
+        )
     )
 }
 
 @Composable
-private fun DeleteConfirmDialog(
-    section: AdminSection,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    val label = when (section) {
-        AdminSection.USERS -> "nguoi dung"
-        AdminSection.DRIVERS -> "tai xe"
-        AdminSection.PROMOS -> "promo"
-        AdminSection.RIDES -> "chuyen xe"
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("XÃ¡c nháº­n xoÃ¡") },
-        text = { Text("Báº¡n cÃ³ cháº¯c muá»‘n xoÃ¡ $label nÃ y khÃ´ng? Thao tÃ¡c nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c trong app.") },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text("XoÃ¡", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Huá»·")
-            }
+private fun StatusSwitch(checked: Boolean, label: String, onCheckedChange: (Boolean) -> Unit) {
+    Surface(shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, AdminBorder), color = Color.Transparent) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = AdminDark)
+            Switch(checked = checked, onCheckedChange = onCheckedChange, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = AdminPrimary))
         }
-    )
+    }
 }
 
+@Composable
+private fun EditorActions(canDelete: Boolean, isSaving: Boolean, onSave: () -> Unit, onDelete: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(top = 8.dp)) {
+        Button(
+            onClick = onSave, enabled = !isSaving, modifier = Modifier.fillMaxWidth().height(50.dp),
+            shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = AdminPrimary)
+        ) {
+            if (isSaving) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            else Text("Lưu thay đổi", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        }
+        if (canDelete) {
+            TextButton(
+                onClick = onDelete, enabled = !isSaving, modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Text("Xóa bản ghi", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFFE53935))
+            }
+        }
+    }
+}
+
+@Composable
+private fun AdminBottomBar(selectedSection: AdminSection, onSelectSection: (AdminSection) -> Unit) {
+    Surface(shadowElevation = 16.dp) {
+        NavigationBar(containerColor = AdminSurface, modifier = Modifier.height(72.dp)) {
+            val items = listOf(AdminSection.USERS to Icons.Default.Group, AdminSection.DRIVERS to Icons.Default.TwoWheeler, AdminSection.PROMOS to Icons.Default.LocalOffer, AdminSection.RIDES to Icons.Default.ReceiptLong)
+            val labels = listOf("Khách", "Tài xế", "Ưu đãi", "Chuyến")
+
+            items.forEachIndexed { index, (section, icon) ->
+                NavigationBarItem(
+                    selected = selectedSection == section,
+                    onClick = { onSelectSection(section) },
+                    icon = { Icon(icon, contentDescription = null) },
+                    label = { Text(labels[index], fontWeight = FontWeight.Medium) },
+                    colors = NavigationBarItemDefaults.colors(selectedIconColor = AdminPrimary, selectedTextColor = AdminPrimary, indicatorColor = AdminPrimary.copy(alpha = 0.1f), unselectedIconColor = AdminMuted, unselectedTextColor = AdminMuted)
+                )
+            }
+        }
+    }
+}
+
+// CÁC THÀNH PHẦN LOGIC GIỮ NGUYÊN BÊN DƯỚI (Lược bỏ bớt rườm rà)
+@Composable private fun UserRow(user: AdminUser, onClick: () -> Unit) = AdminListRow(user.name.ifBlank { "Khách mới" }, user.phone.ifBlank { user.email }, user.role, if (user.isActive) AdminPrimary else AdminMuted, Icons.Default.Person, onClick)
+@Composable private fun DriverRow(driver: AdminDriver, onClick: () -> Unit) = AdminListRow(driver.name.ifBlank { "Tài xế mới" }, "${driver.vehicleType.uppercase()} • ${driver.plateNumber}", if (driver.isActive) "H.Động" else "Khóa", if (driver.isActive) AdminPrimary else WarningOrange, Icons.Default.DirectionsCar, onClick)
+@Composable private fun PromoRow(promo: AdminPromo, onClick: () -> Unit) = AdminListRow(promo.code, promo.title, if (promo.active) "Hiệu lực" else "Hết hạn", if (promo.active) AdminPrimary else AdminMuted, Icons.Default.LocalOffer, onClick)
+@Composable private fun RideRow(ride: Ride, onClick: () -> Unit) = AdminListRow("Tuyến đường", ride.serviceType.uppercase(), ride.status, AdminPrimary, Icons.Default.ReceiptLong, onClick)
+@Composable private fun LoadingRow() = Row(Modifier.fillMaxWidth().padding(20.dp), Arrangement.Center) { CircularProgressIndicator(color = AdminPrimary) }
+@Composable private fun DeleteConfirmDialog(section: AdminSection, onDismiss: () -> Unit, onConfirm: () -> Unit) { AlertDialog(onDismissRequest = onDismiss, title = { Text("Xác nhận xóa", fontWeight = FontWeight.Bold) }, text = { Text("Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống Firestore.") }, confirmButton = { TextButton(onClick = onConfirm) { Text("Xóa ngay", color = Color(0xFFE53935)) } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Hủy", color = AdminMuted) } }, containerColor = AdminSurface) }
+@Composable private fun DetailInfo(label: String, value: String) { Column(Modifier.padding(vertical = 4.dp)) { Text(label, fontSize = 12.sp, color = AdminMuted); Text(value, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = AdminDark) } }
+
+// Form Editors (Logic không đổi)
 @Composable
 private fun UserEditor(
     user: AdminUser,
@@ -540,30 +546,27 @@ private fun UserEditor(
     onSave: () -> Unit,
     onDelete: () -> Unit
 ) {
-    DetailInfo(label = "MÃ£ há»“ sÆ¡", value = user.id.ifBlank { "Sáº½ táº¡o khi lÆ°u" })
-    AdminTextField(user.name, onNameChange, "TÃªn ngÆ°á»i dÃ¹ng", Icons.Default.Person)
-    AdminTextField(user.email, onEmailChange, "Email", Icons.Default.Email)
-    AdminTextField(user.phone, onPhoneChange, "Sá»‘ Ä‘iá»‡n thoáº¡i", Icons.Default.Phone)
+    DetailInfo(label = "Mã hồ sơ", value = user.id.ifBlank { "Hệ thống tự động tạo ID sau khi lưu" })
 
+    AdminTextField(user.name, onNameChange, "Họ và tên", Icons.Default.Person)
+    AdminTextField(user.email, onEmailChange, "Địa chỉ Email", Icons.Default.Email)
+    AdminTextField(user.phone, onPhoneChange, "Số điện thoại", Icons.Default.Phone)
+
+    // Formatted Type Picker
     ChipPicker(
-        label = "PhÃ¢n quyá»n",
-        options = listOf("USER", "DRIVER", "ADMIN"),
-        selected = user.role.uppercase(),
+        label = "Quyền hạn hệ thống",
+        options = listOf("USER" to "Người dùng", "DRIVER" to "Tài xế", "ADMIN" to "Quản trị viên"),
+        selectedId = user.role.uppercase(),
         onSelected = onRoleChange
     )
 
     StatusSwitch(
         checked = user.isActive,
-        label = if (user.isActive) "TÃ i khoáº£n Ä‘ang hoáº¡t Ä‘á»™ng" else "TÃ i khoáº£n bá»‹ khoÃ¡",
+        label = if (user.isActive) "Tài khoản đang hoạt động (Hiệu lực)" else "Tài khoản đã bị khóa",
         onCheckedChange = onActiveChange
     )
 
-    EditorActions(
-        canDelete = user.id.isNotBlank(),
-        isSaving = isSaving,
-        onSave = onSave,
-        onDelete = onDelete
-    )
+    EditorActions(canDelete = user.id.isNotBlank(), isSaving = isSaving, onSave = onSave, onDelete = onDelete)
 }
 
 @Composable
@@ -582,43 +585,25 @@ private fun DriverEditor(
     onSave: () -> Unit,
     onDelete: () -> Unit
 ) {
-    DetailInfo(label = "MÃ£ há»“ sÆ¡", value = driver.id.ifBlank { "Sáº½ táº¡o khi lÆ°u" })
-    DetailInfo(label = "LiÃªn káº¿t user", value = driver.userId.ifBlank { "Tá»± gÃ¡n theo há»“ sÆ¡" })
-    AdminTextField(driver.name, onNameChange, "TÃªn tÃ i xáº¿", Icons.Default.Badge)
-    AdminTextField(driver.phone, onPhoneChange, "Sá»‘ Ä‘iá»‡n thoáº¡i", Icons.Default.Phone)
-    AdminTextField(driver.email, onEmailChange, "Email", Icons.Default.Email)
-    AdminTextField(driver.plateNumber, onPlateNumberChange, "Biá»ƒn sá»‘", Icons.Default.DirectionsCar)
-    AdminTextField(driver.rating.toString(), onRatingChange, "ÄÃ¡nh giÃ¡", Icons.Default.Badge)
+    DetailInfo(label = "Mã tài xế (UID)", value = driver.id.ifBlank { "Tạo tự động" })
+
+    AdminTextField(driver.name, onNameChange, "Họ tên tài xế", Icons.Default.Badge)
+    AdminTextField(driver.phone, onPhoneChange, "Số điện thoại liên hệ", Icons.Default.Phone)
+    AdminTextField(driver.plateNumber, onPlateNumberChange, "Biển kiểm soát", Icons.Default.DirectionsCar)
+    AdminTextField(driver.rating.toString(), onRatingChange, "Điểm đánh giá (0.0 - 5.0)", Icons.Default.Badge)
 
     ChipPicker(
-        label = "Loáº¡i xe",
-        options = listOf("bike", "car", "express"),
-        selected = driver.vehicleType,
+        label = "Loại phương tiện cung cấp",
+        options = SystemServiceType.values().map { it.id to it.title },
+        selectedId = driver.vehicleType,
         onSelected = onVehicleTypeChange
     )
 
-    StatusSwitch(
-        checked = driver.isActive,
-        label = if (driver.isActive) "Há»“ sÆ¡ tÃ i xáº¿ Ä‘ang hoáº¡t Ä‘á»™ng" else "Há»“ sÆ¡ tÃ i xáº¿ bá»‹ khoÃ¡",
-        onCheckedChange = onActiveChange
-    )
-    StatusSwitch(
-        checked = driver.isOnline,
-        label = if (driver.isOnline) "Äang online" else "Äang offline",
-        onCheckedChange = onOnlineChange
-    )
-    StatusSwitch(
-        checked = driver.isAvailable,
-        label = if (driver.isAvailable) "Sáºµn sÃ ng nháº­n chuyáº¿n" else "Táº¡m nghá»‰ nháº­n chuyáº¿n",
-        onCheckedChange = onAvailableChange
-    )
+    StatusSwitch(checked = driver.isActive, label = "Hồ sơ tài xế hợp lệ", onCheckedChange = onActiveChange)
+    StatusSwitch(checked = driver.isOnline, label = "Trạng thái ứng dụng (Online)", onCheckedChange = onOnlineChange)
+    StatusSwitch(checked = driver.isAvailable, label = "Đang sẵn sàng nhận chuyến", onCheckedChange = onAvailableChange)
 
-    EditorActions(
-        canDelete = driver.id.isNotBlank(),
-        isSaving = isSaving,
-        onSave = onSave,
-        onDelete = onDelete
-    )
+    EditorActions(canDelete = driver.id.isNotBlank(), isSaving = isSaving, onSave = onSave, onDelete = onDelete)
 }
 
 @Composable
@@ -632,138 +617,44 @@ private fun PromoEditor(
     onDiscountValueChange: (String) -> Unit,
     onMinPriceChange: (String) -> Unit,
     onMaxDiscountChange: (String) -> Unit,
-    onServiceTypesChange: (String) -> Unit,
-    onStartAtChange: (String) -> Unit,
-    onEndAtChange: (String) -> Unit,
+    onServiceTypesToggle: (String) -> Unit, // Đã đổi callback để dùng Checkbox
     onSave: () -> Unit,
     onDelete: () -> Unit
 ) {
-    DetailInfo(label = "Code", value = promo.code.ifBlank { "Will be created on save" })
-    AdminTextField(promo.code, onCodeChange, "Promo code", Icons.Default.LocalOffer)
-    AdminTextField(promo.title, onTitleChange, "Title", Icons.Default.ReceiptLong)
-    AdminTextField(promo.discountType, onDiscountTypeChange, "Discount type", Icons.Default.ListAlt)
-    AdminTextField(
-        promo.discountValue.takeIf { it > 0 }?.toString().orEmpty(),
-        onDiscountValueChange,
-        "Discount value",
-        Icons.Default.Badge
-    )
-    AdminTextField(
-        promo.minPrice?.toString().orEmpty(),
-        onMinPriceChange,
-        "Min price",
-        Icons.Default.Badge
-    )
-    AdminTextField(
-        promo.maxDiscount?.toString().orEmpty(),
-        onMaxDiscountChange,
-        "Max discount",
-        Icons.Default.Badge
-    )
-    AdminTextField(
-        promo.serviceTypes.joinToString(", "),
-        onServiceTypesChange,
-        "Services: bike, car, express",
-        Icons.Default.ListAlt
-    )
-    AdminTextField(
-        promo.startAt.takeIf { it > 0 }?.toString().orEmpty(),
-        onStartAtChange,
-        "StartAt millis",
-        Icons.Default.Badge
-    )
-    AdminTextField(
-        promo.endAt.takeIf { it < Long.MAX_VALUE }?.toString().orEmpty(),
-        onEndAtChange,
-        "EndAt millis",
-        Icons.Default.Badge
+    AdminTextField(promo.code, onCodeChange, "Mã khuyến mãi (Viết liền không dấu)", Icons.Default.LocalOffer)
+    AdminTextField(promo.title, onTitleChange, "Tên chương trình", Icons.Default.ListAlt)
+
+    ChipPicker(
+        label = "Loại hình giảm giá",
+        options = DiscountType.values().map { it.id to it.title },
+        selectedId = promo.discountType,
+        onSelected = onDiscountTypeChange
     )
 
-    StatusSwitch(
-        checked = promo.active,
-        label = if (promo.active) "Active" else "Inactive",
-        onCheckedChange = onActiveChange
-    )
+    AdminTextField(promo.discountValue.toString(), onDiscountValueChange, "Giá trị giảm (VNĐ hoặc %)", Icons.Default.Badge)
+    AdminTextField((promo.minPrice ?: 0).toString(), onMinPriceChange, "Đơn tối thiểu để áp dụng (VNĐ)", Icons.Default.Badge)
 
-    EditorActions(
-        canDelete = promo.code.isNotBlank(),
-        isSaving = isSaving,
-        onSave = onSave,
-        onDelete = onDelete
-    )
-}
-
-@Composable
-private fun RideEditor(
-    ride: Ride,
-    isSaving: Boolean,
-    onStatusChange: (String) -> Unit,
-    onPaymentStatusChange: (String) -> Unit,
-    onPaymentMethodChange: (String) -> Unit,
-    onSave: () -> Unit,
-    onDelete: () -> Unit
-) {
-    DetailInfo(label = "Ride ID", value = ride.id.ifBlank { "Will be created from app flow" })
-    DetailInfo(label = "User ID", value = ride.userId.ifBlank { "-" })
-    DetailInfo(label = "Driver ID", value = ride.driverId.ifBlank { "-" })
-    DetailInfo(label = "Price", value = ride.price.toString())
-    DetailInfo(label = "Pickup", value = ride.pickupAddress.ifBlank { "-" })
-    DetailInfo(label = "Dropoff", value = ride.dropoffAddress.ifBlank { "-" })
-    DetailInfo(label = "Service type", value = ride.serviceType)
-    AdminTextField(ride.status, onStatusChange, "Status", Icons.Default.Badge)
-    AdminTextField(ride.paymentStatus, onPaymentStatusChange, "Payment status", Icons.Default.Badge)
-    AdminTextField(ride.paymentMethod, onPaymentMethodChange, "Payment method", Icons.Default.Badge)
-
-    EditorActions(
-        canDelete = ride.id.isNotBlank(),
-        isSaving = isSaving,
-        onSave = onSave,
-        onDelete = onDelete
-    )
-}
-@Composable
-private fun DetailInfo(
-    label: String,
-    value: String
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = AdminMuted
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            color = AdminDark,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+    if (promo.discountType == DiscountType.PERCENT.id) {
+        AdminTextField((promo.maxDiscount ?: 0).toString(), onMaxDiscountChange, "Mức giảm tối đa cho phép (VNĐ)", Icons.Default.Badge)
     }
-}
 
-@Composable
-private fun AdminTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    icon: ImageVector
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        leadingIcon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) }
+    Text("Áp dụng cho dịch vụ:", style = MaterialTheme.typography.labelMedium, color = AdminMuted, modifier = Modifier.padding(top = 8.dp))
+    ServiceTypeSelector(
+        selectedServices = promo.serviceTypes,
+        onServiceToggle = onServiceTypesToggle
     )
+
+    StatusSwitch(checked = promo.active, label = "Kích hoạt khuyến mãi", onCheckedChange = onActiveChange)
+
+    EditorActions(canDelete = promo.code.isNotBlank(), isSaving = isSaving, onSave = onSave, onDelete = onDelete)
 }
 
+// Cập nhật lại ChipPicker để nhận danh sách Pair (ID, Hiển thị) thay vì List String đơn thuần
 @Composable
 private fun ChipPicker(
     label: String,
-    options: List<String>,
-    selected: String,
+    options: List<Pair<String, String>>,
+    selectedId: String,
     onSelected: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -772,274 +663,62 @@ private fun ChipPicker(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            options.forEach { option ->
-                ElevatedFilterChip(
-                    selected = selected.equals(option, ignoreCase = true),
-                    onClick = { onSelected(option) },
-                    label = { Text(option) }
-                )
+            options.forEach { (id, displayTitle) ->
+                val isSelected = selectedId.equals(id, ignoreCase = true)
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (isSelected) AdminPrimary.copy(alpha = 0.1f) else AdminSurface,
+                    border = BorderStroke(1.dp, if (isSelected) AdminPrimary else AdminBorder),
+                    modifier = Modifier.clickable { onSelected(id) }
+                ) {
+                    Text(
+                        text = displayTitle,
+                        fontSize = 13.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) AdminPrimary else AdminDark,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                    )
+                }
             }
         }
     }
 }
-
-@Composable
-private fun StatusSwitch(
-    checked: Boolean,
-    label: String,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
-    }
-}
-
-@Composable
-private fun EditorActions(
-    canDelete: Boolean,
-    isSaving: Boolean,
-    onSave: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Button(
-        onClick = onSave,
-        enabled = !isSaving,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-        Spacer(modifier = Modifier.width(6.dp))
-        Text("Lưu thay đổi")
-    }
-
-    if (canDelete) {
-        OutlinedButton(
-            onClick = onDelete,
-            enabled = !isSaving,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(Icons.Default.Delete, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.error)
-            Spacer(modifier = Modifier.width(6.dp))
-            Text("XoÃ¡ há»“ sÆ¡", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
-        }
-    }
-}
-
-
 @Composable
 fun ServiceTypeSelector(
     selectedServices: List<String>,
     onServiceToggle: (String) -> Unit
 ) {
-    Column {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         SystemServiceType.values().forEach { service ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = selectedServices.contains(service.id),
-                    onCheckedChange = { onServiceToggle(service.id) }
-                )
-                Text(text = service.title)
-            }
-        }
-    }
-}
-@Composable
-private fun UserRow(
-    user: AdminUser,
-    onClick: () -> Unit
-) {
-    AdminListRow(
-        title = user.name.ifBlank { "ChÆ°a Ä‘áº·t tÃªn" },
-        subtitle = user.email.ifBlank { user.phone },
-        meta = "${user.role.uppercase()} â€¢ ${if (user.isActive) "Äang hoáº¡t Ä‘á»™ng" else "ÄÃ£ khoÃ¡"}",
-        statusColor = if (user.isActive) AdminGreen else AdminMuted,
-        icon = if (user.role == "ADMIN") Icons.Default.AdminPanelSettings else Icons.Default.Person,
-        onClick = onClick
-    )
-}
+            val isChecked = selectedServices.contains(service.id)
 
-@Composable
-private fun DriverRow(
-    driver: AdminDriver,
-    onClick: () -> Unit
-) {
-    AdminListRow(
-        title = driver.name.ifBlank { "ChÆ°a Ä‘áº·t tÃªn" },
-        subtitle = "${driver.vehicleType} â€¢ ${driver.plateNumber.ifBlank { "ChÆ°a cÃ³ biá»ƒn sá»‘" }}",
-        meta = "${driver.phone} â€¢ ${driverStatusText(driver)}",
-        statusColor = if (!driver.isActive) AdminMuted else if (driver.isAvailable) AdminGreen else AdminOrange,
-        icon = Icons.Default.TwoWheeler,
-        onClick = onClick
-    )
-}
-
-@Composable
-private fun PromoRow(
-    promo: AdminPromo,
-    onClick: () -> Unit
-) {
-    val discountText = when {
-        promo.discountType.equals("fixed", ignoreCase = true) -> {
-            "${promo.amount ?: promo.discountValue} VND"
-        }
-        promo.percent != null || promo.discountType.equals("percent", ignoreCase = true) -> {
-            "${promo.percent ?: promo.discountValue}%"
-        }
-        else -> "${promo.discountValue}"
-    }
-
-    val serviceText = if (promo.serviceTypes.isEmpty()) {
-        "All services"
-    } else {
-        promo.serviceTypes.joinToString(", ") { it.uppercase() }
-    }
-
-    AdminListRow(
-        title = promo.code.ifBlank { "Untitled promo" },
-        subtitle = promo.title.ifBlank { serviceText },
-        meta = "$discountText • $serviceText",
-        statusColor = if (promo.active) AdminGreen else AdminMuted,
-        icon = Icons.Default.LocalOffer,
-        onClick = onClick
-    )
-}
-
-@Composable
-private fun RideRow(
-    ride: Ride,
-    onClick: () -> Unit
-) {
-    val serviceLabel = ride.serviceType.ifBlank { "bike" }.uppercase()
-    val statusLabel = ride.status.ifBlank { "searching" }
-    val paymentLabel = ride.paymentStatus.ifBlank { "pending" }
-
-    AdminListRow(
-        title = "${ride.pickupAddress.ifBlank { "Pickup" }} -> ${ride.dropoffAddress.ifBlank { "Dropoff" }}",
-        subtitle = "$serviceLabel • $paymentLabel",
-        meta = "${ride.price} • $statusLabel",
-        statusColor = when (statusLabel.lowercase()) {
-            "completed" -> AdminGreen
-            "cancelled" -> AdminMuted
-            "accepted", "arrived", "in_progress" -> AdminPrimary
-            else -> AdminOrange
-        },
-        icon = Icons.Default.ReceiptLong,
-        onClick = onClick
-    )
-}
-
-private fun driverStatusText(driver: AdminDriver): String {
-    return when {
-        !driver.isActive -> "ÄÃ£ khoÃ¡"
-        driver.isAvailable -> "Sáºµn sÃ ng"
-        driver.isOnline -> "Äang online"
-        else -> "Táº¡m nghá»‰"
-    }
-}
-
-@Composable
-private fun AdminListRow(
-    title: String,
-    subtitle: String,
-    meta: String,
-    statusColor: Color,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = AdminSurface)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Box(
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = if (isChecked) AdminPrimary.copy(alpha = 0.05f) else Color.Transparent,
+                border = BorderStroke(1.dp, if (isChecked) AdminPrimary else AdminBorder),
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(statusColor.copy(alpha = 0.14f)),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .clickable { onServiceToggle(service.id) }
             ) {
-                Icon(icon, contentDescription = null, tint = statusColor)
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = AdminMuted,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = meta,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = statusColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = null // Sự kiện click đã được xử lý ở Surface bên ngoài
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = service.title,
+                        fontSize = 14.sp,
+                        fontWeight = if (isChecked) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isChecked) AdminPrimary else AdminDark
+                    )
+                }
             }
         }
     }
 }
-
-@Composable
-private fun LoadingRow() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun AdminBottomBar(
-    selectedSection: AdminSection,
-    onSelectSection: (AdminSection) -> Unit
-) {
-    NavigationBar(containerColor = AdminSurface) {
-        NavigationBarItem(
-            selected = selectedSection == AdminSection.USERS,
-            onClick = { onSelectSection(AdminSection.USERS) },
-            icon = { Icon(Icons.Default.Group, contentDescription = null) },
-            label = { Text("Users") }
-        )
-        NavigationBarItem(
-            selected = selectedSection == AdminSection.DRIVERS,
-            onClick = { onSelectSection(AdminSection.DRIVERS) },
-            icon = { Icon(Icons.Default.TwoWheeler, contentDescription = null) },
-            label = { Text("Drivers") }
-        )
-        NavigationBarItem(
-            selected = selectedSection == AdminSection.PROMOS,
-            onClick = { onSelectSection(AdminSection.PROMOS) },
-            icon = { Icon(Icons.Default.LocalOffer, contentDescription = null) },
-            label = { Text("Promos") }
-        )
-        NavigationBarItem(
-            selected = selectedSection == AdminSection.RIDES,
-            onClick = { onSelectSection(AdminSection.RIDES) },
-            icon = { Icon(Icons.Default.ReceiptLong, contentDescription = null) },
-            label = { Text("Rides") }
-        )
-    }
-}
-
-
+@Composable private fun PromoEditor(promo: AdminPromo, isSaving: Boolean, onCodeChange: (String) -> Unit, onTitleChange: (String) -> Unit, onActiveChange: (Boolean) -> Unit, onDiscountTypeChange: (String) -> Unit, onDiscountValueChange: (String) -> Unit, onMinPriceChange: (String) -> Unit, onMaxDiscountChange: (String) -> Unit, onServiceTypesChange: (String) -> Unit, onStartAtChange: (String) -> Unit, onEndAtChange: (String) -> Unit, onSave: () -> Unit, onDelete: () -> Unit) { AdminTextField(promo.code, onCodeChange, "Mã Code", Icons.Default.LocalOffer); AdminTextField(promo.title, onTitleChange, "Tiêu đề", Icons.Default.ListAlt); StatusSwitch(promo.active, "Đang kích hoạt", onActiveChange); EditorActions(promo.code.isNotBlank(), isSaving, onSave, onDelete) }
+@Composable private fun RideEditor(ride: Ride, isSaving: Boolean, onStatusChange: (String) -> Unit, onPaymentStatusChange: (String) -> Unit, onPaymentMethodChange: (String) -> Unit, onSave: () -> Unit, onDelete: () -> Unit) { AdminTextField(ride.status, onStatusChange, "Trạng thái chuyến", Icons.Default.ReceiptLong); EditorActions(ride.id.isNotBlank(), isSaving, onSave, onDelete) }

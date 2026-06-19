@@ -10,6 +10,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,6 +34,12 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -66,22 +74,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.waywayapp.presentation.components.WayWayBottomBar
 import com.example.waywayapp.presentation.navigation.Routes
-import com.example.waywayapp.presentation.theme.BgLight
-import com.example.waywayapp.presentation.theme.CardWhite
-import com.example.waywayapp.presentation.theme.TextDark
-import com.example.waywayapp.presentation.theme.TextGray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
 
-import androidx.compose.foundation.clickable
-import androidx.compose.material.icons.outlined.*
-
-// ── Palette khớp với app theme ──────────────────────────
-private val GreenPrimary  = Color(0xFF1DB954)
-private val GreenDark     = Color(0xFF0F6E56)
-private val GreenSurface  = Color(0xFFF0FBF4)
-private val AppDark       = Color(0xFF111111)
+// --- BẢNG MÀU ĐẶC TRƯNG WAYWAY ---
+private val WayWayDarkGreen = Color(0xFF006C4C)
+private val WayWayLightGreen = Color(0xFF1DB954)
+private val AppBgColor = Color(0xFFF5F7FA)
+private val CardBgColor = Color(0xFFFFFFFF)
+private val TextPrimary = Color(0xFF1D1B20)
+private val TextSecondary = Color(0xFF757575)
 
 private data class ProfileActionCallbacks(
     val onPaymentClick: () -> Unit = {},
@@ -92,10 +95,9 @@ private data class ProfileActionCallbacks(
 private val LocalProfileActionCallbacks = staticCompositionLocalOf {
     ProfileActionCallbacks()
 }
-// Xoá ProfileBlue, ProfileBlueDeep — không dùng nữa
 
 // ────────────────────────────────────────────────────────
-// ProfileScreen — không đổi logic
+// ProfileScreen
 // ────────────────────────────────────────────────────────
 @Composable
 fun ProfileScreen(
@@ -120,10 +122,10 @@ fun ProfileScreen(
         }
     }
 
-    Scaffold(containerColor = BgLight, bottomBar = {}) { padding ->
+    Scaffold(containerColor = AppBgColor, bottomBar = {}) { padding ->
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize().padding(padding), Alignment.Center) {
-                CircularProgressIndicator(color = GreenPrimary)
+                CircularProgressIndicator(color = WayWayDarkGreen)
             }
             return@Scaffold
         }
@@ -133,7 +135,7 @@ fun ProfileScreen(
         val email  = user.email.ifBlank { "user@wayway.app" }
         val phone  = user.phone.ifBlank { "Chưa cập nhật" }
 
-        Box(Modifier.fillMaxSize().padding(padding).background(BgLight)) {
+        Box(Modifier.fillMaxSize().padding(padding).background(AppBgColor)) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 112.dp)
@@ -174,7 +176,7 @@ fun ProfileScreen(
 }
 
 // ────────────────────────────────────────────────────────
-// ProfileHero — theme tối, stats liên quan đến ride-hailing
+// ProfileHero — Đồng bộ hệ thống màu WayWayDarkGreen
 // ────────────────────────────────────────────────────────
 @Composable
 private fun ProfileHero(
@@ -199,15 +201,14 @@ private fun ProfileHero(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            // ✦ Theme tối (#111) thay vì xanh dương — khớp với bottom nav và banner
-            .background(AppDark)
+            .background(WayWayDarkGreen) // Thay AppDark bằng WayWayDarkGreen
     ) {
         // Decorative circles
         Canvas(modifier = Modifier.fillMaxWidth().height(280.dp)) {
-            drawCircle(GreenPrimary.copy(alpha = 0.10f), radius = size.width * 0.55f,
-                center = Offset(size.width * 0.95f, size.height * 0.15f))
-            drawCircle(GreenPrimary.copy(alpha = 0.07f), radius = size.width * 0.4f,
-                center = Offset(size.width * 0.1f, -size.height * 0.05f))
+            drawCircle(Color.White.copy(alpha = 0.06f), radius = size.width * 0.5f,
+                center = Offset(size.width * 0.9f, size.height * 0.1f))
+            drawCircle(Color.White.copy(alpha = 0.04f), radius = size.width * 0.4f,
+                center = Offset(size.width * 0.1f, size.height * 0.8f))
         }
 
         Column {
@@ -215,34 +216,21 @@ private fun ProfileHero(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, start = 12.dp, end = 12.dp),
+                    .statusBarsPadding()
+                    .padding(top = 8.dp, start = 12.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
-                    Box(
-                        Modifier.size(34.dp).clip(RoundedCornerShape(10.dp))
-                            .background(Color.White.copy(alpha = 0.1f)),
-                        Alignment.Center
-                    ) {
-                        Icon(Icons.Default.ArrowBack, null, tint = Color.White,
-                            modifier = Modifier.size(18.dp))
-                    }
+                    Icon(Icons.Default.ArrowBack, null, tint = Color.White)
                 }
                 Text(
                     "Hồ sơ của tôi",
                     modifier = Modifier.weight(1f),
-                    color = Color.White, fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold, textAlign = TextAlign.Center
+                    color = Color.White, fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center
                 )
                 IconButton(onClick = onSettingsClick) {
-                    Box(
-                        Modifier.size(34.dp).clip(RoundedCornerShape(10.dp))
-                            .background(Color.White.copy(alpha = 0.1f)),
-                        Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Settings, null, tint = Color.White,
-                            modifier = Modifier.size(18.dp))
-                    }
+                    Icon(Icons.Default.Settings, null, tint = Color.White)
                 }
             }
 
@@ -251,18 +239,17 @@ private fun ProfileHero(
                 Modifier.fillMaxWidth().padding(top = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // ✦ Avatar với verified badge
+                // Avatar với verified badge
                 Box(contentAlignment = Alignment.BottomEnd) {
                     Surface(
-                        modifier = Modifier.size(86.dp),
+                        modifier = Modifier.size(96.dp),
                         shape = CircleShape,
-                        color = Color.White.copy(alpha = 0.12f),
-                        border = BorderStroke(2.dp, GreenPrimary.copy(alpha = 0.5f))
+                        color = Color.White.copy(alpha = 0.2f),
+                        border = BorderStroke(3.dp, Color.White)
                     ) {
-                        Box(Modifier.padding(5.dp).clip(CircleShape)
-                            .background(GreenPrimary), Alignment.Center) {
-                            // Nếu có avatar: dùng ProfileAvatar cũ
-                            // Nếu không:
+                        Box(Modifier.padding(4.dp).clip(CircleShape)
+                            .background(WayWayLightGreen), Alignment.Center) {
+
                             val bitmap = avatarBitmap
                             if (bitmap != null) {
                                 Image(
@@ -273,42 +260,40 @@ private fun ProfileHero(
                                 )
                             } else {
                                 Text(name.initials(), color = Color.White,
-                                    fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                                    fontSize = 32.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
                     // Verified badge
                     Box(
-                        Modifier.size(22.dp).clip(CircleShape)
-                            .background(GreenPrimary)
-                            .then(Modifier.offset(x = 2.dp, y = 2.dp)),
+                        Modifier.size(26.dp).clip(CircleShape)
+                            .background(WayWayLightGreen)
+                            .border(2.dp, WayWayDarkGreen, CircleShape),
                         Alignment.Center
                     ) {
                         Icon(Icons.Default.Check, null, tint = Color.White,
-                            modifier = Modifier.size(12.dp))
+                            modifier = Modifier.size(14.dp))
                     }
                 }
 
-                Spacer(Modifier.height(10.dp))
-                Text(name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(12.dp))
+                Text(name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
 
-                // ✦ Role pill với màu xanh lá
+                // Role pill
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = GreenPrimary.copy(alpha = 0.15f),
-                    border = BorderStroke(0.5.dp, GreenPrimary.copy(alpha = 0.4f)),
-                    modifier = Modifier.padding(top = 5.dp)
+                    color = Color.White.copy(alpha = 0.2f),
+                    modifier = Modifier.padding(top = 6.dp)
                 ) {
                     Text(role, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = GreenPrimary)
+                        fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
 
-            // ✦ Stats liên quan ride-hailing thay vì Followers/Following
+            // Stats
             Row(
                 Modifier.fillMaxWidth()
-                    .padding(top = 16.dp)
-                    .border(BorderStroke(0.dp, Color.Transparent))
+                    .padding(top = 24.dp, bottom = 16.dp)
             ) {
                 listOf(
                     "$tripCount" to "Chuyến đi",
@@ -316,17 +301,16 @@ private fun ProfileHero(
                     "$memberMonths th"     to "Thành viên"
                 ).forEachIndexed { i, (num, label) ->
                     Column(
-                        Modifier.weight(1f).padding(vertical = 14.dp),
+                        Modifier.weight(1f).padding(vertical = 12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(num, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Text(label, color = Color.White.copy(alpha = 0.5f),
-                            fontSize = 9.sp, fontWeight = FontWeight.Medium,
-                            letterSpacing = 0.4.sp)
+                        Text(num, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                        Text(label, color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 11.sp, fontWeight = FontWeight.Medium)
                     }
                     if (i < 2) VerticalDivider(
-                        modifier = Modifier.height(36.dp).align(Alignment.CenterVertically),
-                        thickness = 0.5.dp, color = Color.White.copy(alpha = 0.1f)
+                        modifier = Modifier.height(30.dp).align(Alignment.CenterVertically),
+                        thickness = 0.5.dp, color = Color.White.copy(alpha = 0.2f)
                     )
                 }
             }
@@ -335,7 +319,7 @@ private fun ProfileHero(
 }
 
 // ────────────────────────────────────────────────────────
-// ProfileBody — nhóm thành cards, bỏ Twitter/Behance
+// ProfileBody
 // ────────────────────────────────────────────────────────
 @Composable
 private fun ProfileBody(
@@ -353,58 +337,55 @@ private fun ProfileBody(
             onSecurityClick = onSecurityClick
         )
     ) {
-    Column(
-        Modifier.fillMaxWidth()
-            .background(BgLight)
-            .padding(horizontal = 18.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // Membership card
-        MembershipCard(onUpgradeClick = onPaymentClick)
-
-        // Contact info group
-        InfoCard {
-            InfoRow(Icons.Outlined.Email,       "Email",            email,          iconStyle = IconStyle.Green)
-            InfoRow(Icons.Outlined.Phone,        "Số điện thoại",   phone,          iconStyle = IconStyle.Blue, isLast = false)
-            InfoRow(Icons.Outlined.LocationOn,   "Địa chỉ mặc định","Chưa cập nhật",iconStyle = IconStyle.Amber, isLast = true, valueMuted = true)
-        }
-
-        // Settings group
-        InfoCard {
-            InfoRow(Icons.Outlined.AccountBalanceWallet, "Thanh toán",  "MoMo · Thẻ tín dụng", iconStyle = IconStyle.Gray)
-            InfoRow(Icons.Outlined.Notifications,        "Thông báo",   "Đã bật",               iconStyle = IconStyle.Gray)
-            InfoRow(Icons.Outlined.Shield,               "Bảo mật",     "Đổi mật khẩu",         iconStyle = IconStyle.Gray, isLast = true)
-        }
-
-        // Logout
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(18.dp),
-            color = CardWhite,
-            border = BorderStroke(0.5.dp, Color(0xFFFFE0E0)),
-            onClick = onLogout
+        Column(
+            Modifier.fillMaxWidth()
+                .background(AppBgColor)
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                Modifier.fillMaxWidth().padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            // Membership card
+            MembershipCard(onUpgradeClick = onPaymentClick)
+
+            // Contact info group
+            InfoCard {
+                InfoRow(Icons.Outlined.Email,       "Email",            email,          iconStyle = IconStyle.Green)
+                InfoRow(Icons.Outlined.Phone,        "Số điện thoại",   phone,          iconStyle = IconStyle.Blue, isLast = false)
+                InfoRow(Icons.Outlined.LocationOn,   "Địa chỉ mặc định","Chưa cập nhật",iconStyle = IconStyle.Amber, isLast = true, valueMuted = true)
+            }
+
+            // Settings group
+            InfoCard {
+                InfoRow(Icons.Outlined.AccountBalanceWallet, "Thanh toán",  "MoMo · Thẻ tín dụng", iconStyle = IconStyle.Gray)
+                InfoRow(Icons.Outlined.Notifications,        "Thông báo",   "Đã bật",               iconStyle = IconStyle.Gray)
+                InfoRow(Icons.Outlined.Shield,               "Bảo mật",     "Đổi mật khẩu",         iconStyle = IconStyle.Gray, isLast = true)
+            }
+
+            // Logout
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = Color(0xFFFFEBEE),
+                shadowElevation = 1.dp,
+                onClick = onLogout
             ) {
-                Box(
-                    Modifier.size(34.dp).clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFFFF0F0)),
-                    Alignment.Center
+                Row(
+                    Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    Icon(Icons.Default.Logout, null,
-                        tint = Color(0xFFE24B4A), modifier = Modifier.size(17.dp))
+                    Box(
+                        Modifier.size(40.dp).clip(CircleShape).background(Color.White),
+                        Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Logout, null, tint = Color(0xFFE53935), modifier = Modifier.size(20.dp))
+                    }
+                    Text("Đăng xuất", fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold, color = Color(0xFFE53935),
+                        modifier = Modifier.weight(1f))
+                    Icon(Icons.Default.ChevronRight, null, tint = Color(0xFFE53935))
                 }
-                Text("Đăng xuất", fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold, color = Color(0xFFE24B4A),
-                    modifier = Modifier.weight(1f))
-                Icon(Icons.Default.ChevronRight, null,
-                    tint = Color(0xFFCCCCCC), modifier = Modifier.size(16.dp))
             }
         }
-    }
     }
 }
 
@@ -414,35 +395,34 @@ private fun MembershipCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = CardWhite,
-        border = BorderStroke(0.5.dp, Color(0xFFEBEBEB))
+        shape = RoundedCornerShape(20.dp),
+        color = CardBgColor,
+        shadowElevation = 2.dp
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(14.dp),
+            Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Box(
-                Modifier.size(42.dp).clip(RoundedCornerShape(12.dp))
-                    .background(Brush.linearGradient(listOf(GreenPrimary, GreenDark))),
+                Modifier.size(48.dp).clip(CircleShape)
+                    .background(Brush.linearGradient(listOf(WayWayLightGreen, WayWayDarkGreen))),
                 Alignment.Center
             ) {
-                Icon(Icons.Default.Star, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                Icon(Icons.Default.Star, null, tint = Color.White, modifier = Modifier.size(24.dp))
             }
             Column(Modifier.weight(1f)) {
-                Text("WayWay Standard", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextDark)
-                Text("Nâng cấp để nhận ưu đãi tốt hơn", fontSize = 10.sp, color = TextGray)
+                Text("WayWay Standard", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+                Text("Nâng cấp để nhận ưu đãi tốt hơn", fontSize = 12.sp, color = TextSecondary)
             }
             Surface(
                 shape = RoundedCornerShape(20.dp),
-                color = GreenSurface,
-                border = BorderStroke(0.5.dp, Color(0xFF9FE1CB)),
+                color = Color(0xFFE8F5EE),
                 onClick = onUpgradeClick
             ) {
                 Text("Nâng cấp",
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    fontSize = 10.sp, fontWeight = FontWeight.Bold, color = GreenDark)
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    fontSize = 12.sp, fontWeight = FontWeight.Bold, color = WayWayDarkGreen)
             }
         }
     }
@@ -455,9 +435,9 @@ enum class IconStyle { Green, Blue, Amber, Gray, Red }
 private fun InfoCard(content: @Composable () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = CardWhite,
-        border = BorderStroke(0.5.dp, Color(0xFFEBEBEB))
+        shape = RoundedCornerShape(20.dp),
+        color = CardBgColor,
+        shadowElevation = 2.dp
     ) {
         Column(Modifier.fillMaxWidth()) { content() }
     }
@@ -473,7 +453,6 @@ private fun InfoRow(
     valueMuted: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
-    // ✦ Bỏ 2 nhánh if/else giống hệt nhau, dùng clickable conditional
     val profileActions = LocalProfileActionCallbacks.current
     val resolvedOnClick = onClick ?: when (icon.name) {
         Icons.Outlined.AccountBalanceWallet.name -> profileActions.onPaymentClick
@@ -484,45 +463,41 @@ private fun InfoRow(
     val modifier = Modifier
         .fillMaxWidth()
         .then(if (resolvedOnClick != null) Modifier.clickable { resolvedOnClick() } else Modifier)
-        .padding(horizontal = 16.dp, vertical = 13.dp)
+        .padding(horizontal = 16.dp, vertical = 14.dp)
 
     val (iconBg, iconTint) = when (iconStyle) {
-        IconStyle.Green -> Color(0xFFF0FBF4) to GreenPrimary
-        IconStyle.Blue  -> Color(0xFFE8F4FF) to Color(0xFF378ADD)
-        IconStyle.Amber -> Color(0xFFFFF7E6) to Color(0xFFEF9F27)
-        IconStyle.Red   -> Color(0xFFFFF0F0) to Color(0xFFE24B4A)
-        IconStyle.Gray  -> Color(0xFFF5F5F5) to Color(0xFF888888)
+        IconStyle.Green -> Color(0xFFE8F5EE) to WayWayDarkGreen
+        IconStyle.Blue  -> Color(0xFFE8F4FF) to Color(0xFF2563EB)
+        IconStyle.Amber -> Color(0xFFFFF7E6) to Color(0xFFF59E0B)
+        IconStyle.Red   -> Color(0xFFFFEBEE) to Color(0xFFE53935)
+        IconStyle.Gray  -> AppBgColor to TextSecondary
     }
 
     Column {
         Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
             Box(
-                Modifier.size(34.dp).clip(RoundedCornerShape(10.dp)).background(iconBg),
+                Modifier.size(40.dp).clip(CircleShape).background(iconBg),
                 Alignment.Center
             ) {
-                Icon(icon, null, tint = iconTint, modifier = Modifier.size(17.dp))
+                Icon(icon, null, tint = iconTint, modifier = Modifier.size(20.dp))
             }
             Column(Modifier.weight(1f).padding(start = 14.dp)) {
-                Text(label, fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
-                    color = TextGray, letterSpacing = 0.3.sp)
-                Text(value, fontSize = 13.sp,
-                    fontWeight = if (valueMuted) FontWeight.Normal else FontWeight.SemiBold,
-                    color = if (valueMuted) TextGray else TextDark,
-                    modifier = Modifier.padding(top = 1.dp))
+                Text(label, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = TextSecondary)
+                Text(value, fontSize = 15.sp,
+                    fontWeight = if (valueMuted) FontWeight.Medium else FontWeight.Bold,
+                    color = if (valueMuted) TextSecondary else TextPrimary)
             }
             if (resolvedOnClick != null) {
-                Icon(Icons.Default.ChevronRight, null,
-                    tint = Color(0xFFCCCCCC), modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.ChevronRight, null, tint = Color.LightGray)
             }
         }
         if (!isLast) HorizontalDivider(
-            modifier = Modifier.padding(start = 64.dp, end = 16.dp),
-            thickness = 0.5.dp, color = Color(0xFFF5F5F5)
+            modifier = Modifier.padding(start = 70.dp, end = 16.dp),
+            thickness = 0.5.dp, color = AppBgColor
         )
     }
 }
 
-// roleTitle, String.initials(), loadAvatarBitmap — giữ nguyên
 private fun roleTitle(role: String): String {
     return when (role.uppercase()) {
         "DRIVER" -> "WayWay Driver"
