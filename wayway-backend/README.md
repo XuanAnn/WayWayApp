@@ -1,32 +1,38 @@
-# WayWay Backend (MoMo Test)
+# WayWay Backend
 
-Backend Spring Boot nho de tao giao dich MoMo test va verify callback (IPN).
+Java 17, Spring Boot 3.3 WebFlux: API ZaloPay sandbox và trợ lý AI. Dữ liệu chuyến, chat và hồ sơ được Android thao tác qua Firebase. Xem [README dự án](../README.md) để cấu hình và đọc kết quả kiểm tra.
 
-## Chay local
+Tài liệu mô tả bản local ngày 29/10/2026; một số triển khai sandbox/test còn chưa commit.
 
-PowerShell:
+## Chạy từ thư mục gốc repository
 
 ```powershell
-$env:MOMO_ENDPOINT="https://test-payment.momo.vn/v2/gateway/api/create"
-$env:MOMO_PARTNER_CODE="MOMOBKUN20180529"
-$env:MOMO_ACCESS_KEY="klm05TvNBzhg7h7j"
-$env:MOMO_SECRET_KEY="at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa"
-$env:MOMO_REDIRECT_URL="http://10.0.2.2:8081/api/momo/return"
-$env:MOMO_IPN_URL="http://10.0.2.2:8081/api/momo/ipn"
-
-cd wayway-backend
-./mvnw.cmd spring-boot:run
+mvn -f wayway-backend/pom.xml spring-boot:run
+mvn -f wayway-backend/pom.xml test
 ```
 
-## API
+Mặc định cổng 8081, profile sandbox. Cần Maven và JDK phù hợp Java release 17.
 
-- `POST /api/momo/create`: tao order, tra ve `payUrl`/`deeplink` de app mo MoMo.
-- `POST /api/momo/ipn`: MoMo goi ve (server-to-server) de thong bao ket qua thanh toan.
-- `GET /api/momo/return`: redirect sau khi user xac nhan tren app/website MoMo (debug).
-- `GET /api/momo/orders/{orderId}`: kiem tra trang thai order (in-memory).
+| Biến môi trường                                  | Mục đích                                                              |
+| ------------------------------------------------ | --------------------------------------------------------------------- |
+| `SERVER_PORT`                                    | Cổng HTTP.                                                            |
+| `ZALOPAY_APP_ID`, `ZALOPAY_KEY1`, `ZALOPAY_KEY2` | Merchant sandbox; khóa chỉ giữ phía server.                           |
+| `ZALOPAY_CALLBACK_URL`, `ZALOPAY_RETURN_URL`     | URL HTTPS nếu nhận callback/return.                                   |
+| `ZALOPAY_STORAGE_FILE`                           | File JSON lưu đơn; cần giữ qua các lần khởi động.                     |
+| `AI_PROVIDER`                                    | Mặc định OLLAMA.                                                      |
+| `OLLAMA_ENDPOINT`, `OLLAMA_MODEL`                | Mặc định localhost:11434 và qwen2.5:1.5b.                             |
+| `OPENAI_API_KEY`, `OPENAI_MODEL`                 | Adapter OpenAI khi chọn provider tương ứng; không đặt khóa trong APK. |
 
-## Luu y ve verify that
+## API chính
 
-- `redirectUrl` chi de debug UI/return; trang thai thanh toan nen duoc tin tuong qua `ipnUrl` (chu ky hop le).
-- Khi test tren emulator Android: dung `10.0.2.2` de goi ve may host. IPN tu MoMo test server goi ve URL public, nen neu muon nhan IPN that ban can expose backend ra internet (VD: ngrok/cloud).
+| Method | Đường dẫn                  | Vai trò                                |
+| ------ | -------------------------- | -------------------------------------- |
+| POST   | `/api/zalopay/create`      | Tạo đơn checkout sandbox.              |
+| POST   | `/api/zalopay/callback`    | Xác minh MAC và thông tin callback.    |
+| GET    | `/api/zalopay/orders/{id}` | Kiểm tra đơn/query trạng thái cổng.    |
+| GET    | `/api/zalopay/return`      | Quay về; không tự xác nhận thanh toán. |
+| POST   | `/api/ai/chat`             | Trợ lý theo nội dung/ngữ cảnh.         |
 
+MoMo cũ vẫn có source/test nhưng mặc định tắt. Luồng thanh toán hiện mô tả là ZaloPay ATM sandbox.
+
+Ngày 29/10/2026: 62 test backend đạt. Test mock kiểm tra API, chữ ký, callback lặp, lỗi và trạng thái; chưa xác nhận PAID xuyên suốt trên cổng thật. File JSON phù hợp demo một instance. Cần hoàn thiện xác thực, ràng buộc giá/người dùng/chuyến và lưu trữ trước khi thu tiền thật.
