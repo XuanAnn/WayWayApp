@@ -1,5 +1,7 @@
 # WayWayApp
 
+[Tiếng Việt](README.md) | [日本語](README.ja.md)
+
 Ứng dụng Android đặt xe và giao hàng bằng **Kotlin, Jetpack Compose và Firebase**, có giao diện cho khách hàng, tài xế và quản trị viên. Người dùng chọn điểm đón/đến, xem tuyến và giá dự kiến, đặt xe, theo dõi trạng thái và chat với tài xế. Backend Spring Boot phụ trách thanh toán ZaloPay sandbox và trợ lý AI.
 
 > Tài liệu mô tả bản local được kiểm tra ngày **29/10/2026**. Một số phần triển khai/test còn chưa commit, nên GitHub có thể chưa có đầy đủ mã tương ứng. Đây là dự án học tập; thanh toán thử nghiệm chưa xác nhận `PAID` xuyên suốt với cổng sandbox.
@@ -17,19 +19,19 @@
 
 Trạng thái chính: `searching → accepted → arrived → in_progress → completed`, có nhánh `cancelled`. Nhận chuyến dùng transaction Firestore để kiểm tra chuyến còn trống và tài xế trong phạm vi 3 km, hạn chế nhận trùng; chưa phải thuật toán tự động chọn tài xế tối ưu.
 
-## Ảnh màn hình
+## Demo ứng dụng
 
-Ảnh lấy từ artifact chạy thử, không phải thiết kế minh họa. Hai ảnh Android là màn hình thật mở qua bộ kiểm thử giao diện; ảnh cổng thanh toán lấy từ lần thử sandbox trước đó.
+Tất cả ảnh bên dưới là **ảnh chụp trực tiếp ứng dụng đang chạy trên Android Emulator**, không ghép ảnh, không vẽ lại giao diện. Demo ngày 29/10/2026 dùng vị trí mô phỏng tại Đà Nẵng; bản đồ, gợi ý địa chỉ và tuyến đường được tải qua các dịch vụ ứng dụng tích hợp.
 
-|                                  Đăng nhập                                   |                                  Chọn thanh toán                                   |
-| :--------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/login.png" width="240" alt="Đăng nhập WayWayApp"> | <img src="docs/screenshots/payment.png" width="240" alt="Tiền mặt và ATM sandbox"> |
+|                                 Trang chủ và bản đồ                                 |                                     Tìm địa chỉ đến                                      |                                               Tuyến đường và giá Bike                                               |
+| :---------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/home.png" width="240" alt="Trang chủ và bản đồ Đà Nẵng"> | <img src="docs/screenshots/address-search.png" width="240" alt="Gợi ý địa chỉ Cầu Rồng"> | <img src="docs/screenshots/booking-route.png" width="240" alt="Tuyến đến Cầu Rồng, Bike 4,3 km và giá 32.000 đồng"> |
 
-|                                       Form ATM sandbox                                        |                                                    Kết quả thử cổng                                                     |
-| :-------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/atm-browser-form.jpg" width="340" alt="Trang nhập thẻ thử nghiệm"> | <img src="docs/screenshots/atm-gateway-result.jpg" width="340" alt="Cổng báo thanh toán không thành công do gián đoạn"> |
+|                                        Chọn Bike hoặc Car                                         |                                Tuyến đường và giá Car                                 |                                    Chọn thanh toán khi đặt xe                                     |
+| :-----------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/service-selection.png" width="240" alt="So sánh lựa chọn Bike và Car"> | <img src="docs/screenshots/car-route.png" width="240" alt="Tuyến và giá dự kiến Car"> | <img src="docs/screenshots/booking-payment.png" width="240" alt="Chọn tiền mặt hoặc ATM sandbox"> |
 
-Lần thử đã mở form và tới OTP giả lập nhưng cổng báo gián đoạn hệ thống. Ảnh cuối **không phải** bằng chứng thanh toán thành công.
+Luồng demo: mở Bike → chọn điểm đón → tìm **Cầu Rồng, Đà Nẵng** → chọn kết quả → xem tuyến OSRM trên Google Maps → chọn Bike/Car và phương thức thanh toán. Ở lần chụp này, app hiển thị khoảng **4,3 km**, **5 phút**, **32.000đ cho Bike** và **60.000đ cho Car**. Đây là số liệu dự kiến từ công thức demo tại thời điểm chụp, không phải báo giá dịch vụ vận tải thực tế. Ảnh thể hiện bước chuẩn bị xác nhận đặt xe, chưa thể hiện tài xế nhận hoặc hoàn thành chuyến.
 
 ## Công nghệ và dịch vụ
 
@@ -183,23 +185,27 @@ Mở thư mục gốc trong Android Studio, chờ sync và chạy module `app`, 
 
 APK tại `app/build/outputs/apk/debug/app-debug.apk`. Đây là APK debug để thử; bản phân phối chính thức cần ký release.
 
-## Kiểm thử và kết quả
+## Kết quả đạt được
+
+- Xây dựng ứng dụng Android có ba vai trò, kết hợp đặt xe/giao hàng, bản đồ và dữ liệu Firebase trong cùng dự án.
+- Hoàn thiện luồng chọn điểm đón/đến, gợi ý địa chỉ và hiển thị tuyến thực tế từ OSRM lên Google Maps. Demo Đà Nẵng thể hiện được khoảng cách, thời gian và giá thay đổi theo Bike/Car.
+- Tách UI, trạng thái và truy cập dữ liệu bằng ViewModel/StateFlow/repository; giảm request tìm địa chỉ bằng debounce, cache và hủy kết quả cũ.
+- Có xử lý nhận chuyến bằng transaction Firestore, trạng thái chuyến, chat, lịch sử và đánh giá trong mã nguồn.
+- Tích hợp tạo đơn ATM ZaloPay sandbox, mở checkout trên trình duyệt và xác minh trạng thái qua backend. Luồng `PAID` xuyên suốt trên cổng vẫn cần hoàn tất xác minh.
+- Có backend thanh toán/AI và khả năng build APK debug. Dữ liệu ứng dụng dùng Firebase trên cloud; backend chưa được xác minh triển khai AWS trong đợt này.
+
+### Kết quả mong muốn khi hoàn thiện
+
+Người dùng có thể đặt chuyến từ lúc chọn địa chỉ đến khi tài xế nhận, theo dõi hành trình, chat và kết thúc chuyến trong cùng ứng dụng; thanh toán sandbox được xác nhận xuyên suốt, dữ liệu và quyền truy cập được kiểm soát phía server trước khi phát hành thực tế.
+
+Chi tiết kiểm thử và phạm vi đã xác minh được lưu riêng tại [ghi chú kỹ thuật](docs/README_VERIFICATION.md).
+
+### Lệnh kiểm tra dành cho người phát triển
 
 ```powershell
 mvn -f wayway-backend/pom.xml test
 .\gradlew.bat :app:testDebugUnitTest :app:assembleDebug
 ```
-
-| Hạng mục                               | Kết quả                                                                                              |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Backend, chạy lại 29/10/2026           | **62 test đạt**, không lỗi/thất bại; gồm API, AI, ZaloPay và MoMo cũ.                                |
-| Android unit test, chạy lại 29/10/2026 | **19 test đạt**, không lỗi/thất bại.                                                                 |
-| Android debug build, 29/10/2026        | **Thành công**.                                                                                      |
-| Instrumentation                        | Báo cáo trước ghi nhận 8 test đạt; đợt README chưa chạy lại vì không có thiết bị ADB kết nối.        |
-| Cổng ATM sandbox                       | Tạo đơn, query `WAITING`, mở form và tới OTP giả lập; chưa đạt `PAID` do lần thử cổng báo gián đoạn. |
-| Cloud                                  | Tích hợp Firebase; chưa xác minh triển khai backend WayWayApp lên AWS/cloud riêng trong đợt này.     |
-
-Test mock xác minh logic chữ ký, callback lặp, lỗi và trạng thái, không thay thế thanh toán thực tế. Xem [phạm vi xác minh](docs/README_VERIFICATION.md).
 
 Nếu Java trên Windows báo `Unable to establish loopback connection`, thử thư mục tạm ngắn trước khi chạy lại:
 

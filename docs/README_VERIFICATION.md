@@ -34,3 +34,20 @@ Google Maps hiển thị, OSRM lấy tuyến `driving`; Geocoder là autocomplet
 Báo cáo local trước ghi nhận 8 instrumentation test đạt. Lần thử ATM tạo đơn, query WAITING, mở form và tới OTP giả lập, sau đó cổng báo gián đoạn; chưa có PAID xuyên suốt. Test mock PAID không thay thế kết quả này.
 
 Chưa có benchmark, kiểm thử tải hoặc bằng chứng triển khai backend WayWayApp lên AWS trong đợt xác minh.
+
+## Demo màn hình bổ sung ngày 29/10/2026
+
+Đã kết nối emulator-5554 và thao tác trực tiếp ứng dụng bằng ADB, không thay source để dựng ảnh. Vị trí GPS emulator được mô phỏng tại Đà Nẵng. Đã chọn điểm đón trên bản đồ, tìm Cầu Rồng bằng luồng tìm địa chỉ và mở màn hình xác nhận. Bản đồ hiển thị tuyến với 4,3 km / 5 phút; Bike 32.000đ, Car 60.000đ. Không bấm tạo chuyến và không thanh toán trong lần chụp này.
+
+Ảnh nguyên bản, không chỉnh sửa:
+
+| Artifact local trong `build/` | File tài liệu                       |
+| ----------------------------- | ----------------------------------- |
+| `readme-pickup.png`           | `screenshots/home.png`              |
+| `readme-address-demo.png`     | `screenshots/address-search.png`    |
+| `readme-route-demo.png`       | `screenshots/booking-route.png`     |
+| `readme-service-demo.png`     | `screenshots/service-selection.png` |
+| `readme-car-demo.png`         | `screenshots/car-route.png`         |
+| `readme-payment-demo.png`     | `screenshots/booking-payment.png`   |
+
+Bộ ảnh mới thay gallery README trước đây; ảnh cũ vẫn giữ làm bằng chứng lịch sử. Có thiết bị ADB trong lần chụp bổ sung, nhưng không chạy lại instrumentation suite. Dữ liệu vị trí mô phỏng không phải hành trình đã hoàn thành ngoài thực tế.
