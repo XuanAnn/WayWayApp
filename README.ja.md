@@ -41,6 +41,14 @@ searching → accepted → arrived → in_progress → completed
 
 デモでは、乗る場所を選んでから **Cầu Rồng（ロン橋）、Đà Nẵng（ダナン）** を探しました。OSRM の道を Google Maps に表示しました。この時は約 **4.3 km、5分、Bike は32,000 VND、Car は60,000 VND** でした。これはデモの計算による予定の料金です。本当のタクシー料金ではありません。写真は予約を確認する前の画面です。運転手が来たことや、乗車が終わったことを表す写真ではありません。
 
+### ZaloPay Sandbox の ATM 支払い
+
+下は、前のデモで撮った本当の支払いページです。ブラウザーで **12,000 VND** の注文と、ATM カード / Internet Banking のフォームを表示しています。**ORANGE** は、この練習用の環境に出るお店の名前です。上の Bike/Car の写真とは別のデモ注文です。
+
+<img src="docs/screenshots/atm-browser-form.jpg" width="480" alt="ZaloPay SandboxのATMフォームと12,000 VNDのデモ注文">
+
+アプリはブラウザーで支払いページを開きます。戻った時に、バックエンドで状態を調べます。この写真はカード情報を入れる画面です。支払いが成功した画面ではありません。
+
 ## 技術とサービス
 
 | 技術・サービス                                   | 使い方                                                                                         |

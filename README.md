@@ -33,6 +33,14 @@ Tất cả ảnh bên dưới là **ảnh chụp trực tiếp ứng dụng đan
 
 Luồng demo: mở Bike → chọn điểm đón → tìm **Cầu Rồng, Đà Nẵng** → chọn kết quả → xem tuyến OSRM trên Google Maps → chọn Bike/Car và phương thức thanh toán. Ở lần chụp này, app hiển thị khoảng **4,3 km**, **5 phút**, **32.000đ cho Bike** và **60.000đ cho Car**. Đây là số liệu dự kiến từ công thức demo tại thời điểm chụp, không phải báo giá dịch vụ vận tải thực tế. Ảnh thể hiện bước chuẩn bị xác nhận đặt xe, chưa thể hiện tài xế nhận hoặc hoàn thành chuyến.
 
+### Thanh toán ATM qua ZaloPay Sandbox
+
+Ảnh chụp thật trang thanh toán trên trình duyệt trong một lần demo trước: cổng ZaloPay hiển thị đơn thử **12.000đ** và form nhập thẻ ATM/Internet Banking. Tên **ORANGE** là tên merchant hiển thị trong môi trường thử nghiệm. Đây là đơn demo riêng, không phải đơn Bike/Car trong bộ ảnh tuyến đường phía trên.
+
+<img src="docs/screenshots/atm-browser-form.jpg" width="480" alt="Trang thanh toán ZaloPay Sandbox với form thẻ ATM và số tiền thử 12.000 đồng">
+
+Ứng dụng mở checkout bằng trình duyệt và kiểm tra trạng thái qua backend khi người dùng quay lại. Ảnh minh họa bước nhập thông tin thanh toán; chưa thể hiện giao dịch thành công.
+
 ## Công nghệ và dịch vụ
 
 | Công nghệ/dịch vụ                                           | Vai trò trong dự án                                                                                         |
