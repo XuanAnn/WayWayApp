@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+/wayway-backend/data/
+/wayway-backend/application-local.yml
+
+# Private Google service account credentials
+/service-account.json
+/app/service-account.json
+**/service-account*.json
