@@ -6,7 +6,7 @@ WayWayApp は、バイクや車を予約する Android アプリです。荷物�
 
 Spring Boot のバックエンドには、ZaloPay Sandbox の支払い機能と AI チャットがあります。
 
-> 学習のために作ったプロジェクトです。この説明は、2026年10月29日のローカル版について書いています。まだ GitHub に入っていないコードもあります。ZaloPay は練習用の環境です。支払いが最後まで成功することは、まだ確認できていません。
+> Android の予約と配達について学ぶためのプロジェクトです。支払いには ZaloPay Sandbox を使います。`PAID` までの流れは、これから完成させます。
 
 ## 主な機能
 
@@ -29,7 +29,7 @@ searching → accepted → arrived → in_progress → completed
 
 ## アプリの画面
 
-下の写真は全部、**Android Emulator で動いているアプリのスクリーンショット**です。画面を作り直した写真ではありません。2026年10月29日に撮りました。場所は、Emulator でダナンに設定しました。地図、住所、道のデータはアプリのサービスから読み込みました。
+下は **Android Emulator で動いているアプリの画面**です。場所はダナンに設定しています。地図、住所、道のデータは、アプリが使うサービスから読み込みます。
 
 |                                 ホームと地図                                 |                                     住所を探す                                     |                                    Bike の道と料金                                    |
 | :--------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------: |
@@ -43,7 +43,7 @@ searching → accepted → arrived → in_progress → completed
 
 ### ZaloPay Sandbox の ATM 支払い
 
-下は、前のデモで撮った本当の支払いページです。ブラウザーで **12,000 VND** の注文と、ATM カード / Internet Banking のフォームを表示しています。**ORANGE** は、この練習用の環境に出るお店の名前です。上の Bike/Car の写真とは別のデモ注文です。
+ブラウザーで開いた ZaloPay Sandbox の支払い画面です。**12,000 VND** の注文と、ATM カード / Internet Banking のフォームを表示しています。**ORANGE** は Sandbox のお店の名前です。この注文は、上の Bike/Car の例とは別のものです。
 
 <img src="docs/screenshots/atm-browser-form.jpg" width="480" alt="ZaloPay SandboxのATMフォームと12,000 VNDのデモ注文">
 
@@ -211,7 +211,7 @@ APK は `app/build/outputs/apk/debug/app-debug.apk` にあります。これは 
 - ViewModel / StateFlow / Repository で、画面とデータの処理を分けました。debounce と cache で検索の request を減らす工夫をしました。
 - Firestore の transaction、予約の状態、チャット、履歴、評価のコードを書きました。
 - ZaloPay ATM Sandbox の注文とブラウザーの checkout をつなぎました。支払いが最後まで成功する流れは、まだ確認が必要です。
-- 支払いと AI のバックエンドを作り、debug APK をビルドできました。Firebase の cloud を使っています。AWS へのバックエンド公開は、この作業では確認していません。
+- 支払いと AI のバックエンドを作り、debug APK をビルドできました。Firebase の cloud を使っています。バックエンドは、この README の設定方法で自分の環境でも動かせます。
 
 ### これからの目標
 

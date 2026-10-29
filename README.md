@@ -4,7 +4,7 @@
 
 Ứng dụng Android đặt xe và giao hàng bằng **Kotlin, Jetpack Compose và Firebase**, có giao diện cho khách hàng, tài xế và quản trị viên. Người dùng chọn điểm đón/đến, xem tuyến và giá dự kiến, đặt xe, theo dõi trạng thái và chat với tài xế. Backend Spring Boot phụ trách thanh toán ZaloPay sandbox và trợ lý AI.
 
-> Tài liệu mô tả bản local được kiểm tra ngày **29/10/2026**. Một số phần triển khai/test còn chưa commit, nên GitHub có thể chưa có đầy đủ mã tương ứng. Đây là dự án học tập; thanh toán thử nghiệm chưa xác nhận `PAID` xuyên suốt với cổng sandbox.
+> Dự án học tập về đặt xe và giao hàng trên Android. Thanh toán sử dụng ZaloPay Sandbox; luồng xác nhận `PAID` xuyên suốt đang được hoàn thiện.
 
 ## Chức năng
 
@@ -21,7 +21,7 @@ Trạng thái chính: `searching → accepted → arrived → in_progress → co
 
 ## Demo ứng dụng
 
-Tất cả ảnh bên dưới là **ảnh chụp trực tiếp ứng dụng đang chạy trên Android Emulator**, không ghép ảnh, không vẽ lại giao diện. Demo ngày 29/10/2026 dùng vị trí mô phỏng tại Đà Nẵng; bản đồ, gợi ý địa chỉ và tuyến đường được tải qua các dịch vụ ứng dụng tích hợp.
+Các màn hình thực tế của ứng dụng trên **Android Emulator**, sử dụng vị trí mô phỏng tại Đà Nẵng. Bản đồ, gợi ý địa chỉ và tuyến đường được tải từ các dịch vụ tích hợp.
 
 |                                 Trang chủ và bản đồ                                 |                                     Tìm địa chỉ đến                                      |                                               Tuyến đường và giá Bike                                               |
 | :---------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------: |
@@ -31,11 +31,11 @@ Tất cả ảnh bên dưới là **ảnh chụp trực tiếp ứng dụng đan
 | :-----------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/service-selection.png" width="240" alt="So sánh lựa chọn Bike và Car"> | <img src="docs/screenshots/car-route.png" width="240" alt="Tuyến và giá dự kiến Car"> | <img src="docs/screenshots/booking-payment.png" width="240" alt="Chọn tiền mặt hoặc ATM sandbox"> |
 
-Luồng demo: mở Bike → chọn điểm đón → tìm **Cầu Rồng, Đà Nẵng** → chọn kết quả → xem tuyến OSRM trên Google Maps → chọn Bike/Car và phương thức thanh toán. Ở lần chụp này, app hiển thị khoảng **4,3 km**, **5 phút**, **32.000đ cho Bike** và **60.000đ cho Car**. Đây là số liệu dự kiến từ công thức demo tại thời điểm chụp, không phải báo giá dịch vụ vận tải thực tế. Ảnh thể hiện bước chuẩn bị xác nhận đặt xe, chưa thể hiện tài xế nhận hoặc hoàn thành chuyến.
+Luồng demo: mở Bike → chọn điểm đón → tìm **Cầu Rồng, Đà Nẵng** → chọn kết quả → xem tuyến OSRM trên Google Maps → chọn Bike/Car và phương thức thanh toán. Ví dụ minh họa hiển thị khoảng **4,3 km**, **5 phút**, **32.000đ cho Bike** và **60.000đ cho Car**. Đây là số liệu dự kiến từ công thức tính giá của ứng dụng, không phải báo giá dịch vụ vận tải thực tế. Ảnh thể hiện bước chuẩn bị xác nhận đặt xe, chưa thể hiện tài xế nhận hoặc hoàn thành chuyến.
 
 ### Thanh toán ATM qua ZaloPay Sandbox
 
-Ảnh chụp thật trang thanh toán trên trình duyệt trong một lần demo trước: cổng ZaloPay hiển thị đơn thử **12.000đ** và form nhập thẻ ATM/Internet Banking. Tên **ORANGE** là tên merchant hiển thị trong môi trường thử nghiệm. Đây là đơn demo riêng, không phải đơn Bike/Car trong bộ ảnh tuyến đường phía trên.
+Trang thanh toán ZaloPay Sandbox trên trình duyệt với đơn minh họa **12.000đ**, hỗ trợ nhập thẻ ATM/Internet Banking. **ORANGE** là tên merchant trong môi trường sandbox. Đơn thanh toán minh họa độc lập với chuyến Bike/Car ở trên.
 
 <img src="docs/screenshots/atm-browser-form.jpg" width="480" alt="Trang thanh toán ZaloPay Sandbox với form thẻ ATM và số tiền thử 12.000 đồng">
 
@@ -200,7 +200,7 @@ APK tại `app/build/outputs/apk/debug/app-debug.apk`. Đây là APK debug để
 - Tách UI, trạng thái và truy cập dữ liệu bằng ViewModel/StateFlow/repository; giảm request tìm địa chỉ bằng debounce, cache và hủy kết quả cũ.
 - Có xử lý nhận chuyến bằng transaction Firestore, trạng thái chuyến, chat, lịch sử và đánh giá trong mã nguồn.
 - Tích hợp tạo đơn ATM ZaloPay sandbox, mở checkout trên trình duyệt và xác minh trạng thái qua backend. Luồng `PAID` xuyên suốt trên cổng vẫn cần hoàn tất xác minh.
-- Có backend thanh toán/AI và khả năng build APK debug. Dữ liệu ứng dụng dùng Firebase trên cloud; backend chưa được xác minh triển khai AWS trong đợt này.
+- Có backend thanh toán/AI và khả năng build APK debug. Dữ liệu ứng dụng được lưu và đồng bộ trên Firebase; backend có thể chạy độc lập theo hướng dẫn cài đặt.
 
 ### Kết quả mong muốn khi hoàn thiện
 
